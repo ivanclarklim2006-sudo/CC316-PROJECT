@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roll & Register — Student/Teacher Directory</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1F3B2E">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roll & Register">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4EEDD;
+    --paper-dark:#E9E0C6;
+    --ink:#1F2A22;
+    --ink-soft:#5C6B5E;
+    --green:#1F3B2E;
+    --green-light:#2C4F3D;
+    --brass:#B8863C;
+    --stamp:#A23E30;
+    --line:rgba(31,42,34,0.14);
+    --shadow:rgba(31,42,34,0.18);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px);
+    background-size: 100% 2.1em;
+    background-position: 0 7.2em;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  header{
+    background:var(--green);
+    color:var(--paper);
+    padding:2.6rem 1.5rem 2.2rem;
+    position:relative;
+    overflow:hidden;
+    border-bottom:6px double var(--brass);
+  }
+  header::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 14px);
+    pointer-events:none;
+  }
+  .header-inner{
+    max-width:900px; margin:0 auto; position:relative; z-index:1;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin:0 0 0.5rem;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(1.9rem, 5vw, 2.9rem);
+    margin:0 0 0.4rem;
+    letter-spacing:-0.01em;
+  }
+  header p.sub{
+    margin:0;
+    color:#CFE0D3;
+    font-size:0.98rem;
+    max-width:46ch;
+  }
+
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:2rem 1.5rem 5rem;
+  }
+
+  .tabs{
+    display:inline-flex;
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:4px;
+    margin-bottom:1.6rem;
+    position:relative;
+  }
+  .tab-btn{
+    border:none;
+    background:transparent;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    letter-spacing:0.04em;
+    padding:0.55rem 1.3rem;
+    border-radius:999px;
+    cursor:pointer;
+    color:var(--ink-soft);
+    position:relative;
+    z-index:1;
+    transition:color 0.25s ease;
+  }
+  .tab-btn.active{ color:var(--paper); }
+  .tab-highlight{
+    position:absolute;
+    top:4px; bottom:4px; left:4px;
+    width:calc(50% - 4px);
+    background:var(--green);
+    border-radius:999px;
+    transition:transform 0.32s cubic-bezier(.65,.05,.36,1);
+    z-index:0;
+  }
+  .tabs[data-active="teachers"] .tab-highlight{ transform:translateX(100%); }
+
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:0.8rem;
+    margin-bottom:1.6rem;
+  }
+
+  .section-jump{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    gap:0.5rem;
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:0.45rem 0.7rem 0.45rem 0.85rem;
+  }
+  .section-jump label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .section-jump select{
+    border:none;
+    background:transparent;
+    font-family:'Inter', sans-serif;
+    font-size:0.86rem;
+    font-weight:500;
+    color:var(--ink);
+    cursor:pointer;
+    outline:none;
+    padding:0.15rem 1.3rem 0.15rem 0.2rem;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%235C6B5E'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right center;
+  }
+
+  .filter-chip{
+    display:none;
+    align-items:center;
+    gap:0.5rem;
+    background:var(--green);
+    color:var(--paper);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem;
+    letter-spacing:0.03em;
+    border-radius:999px;
+    padding:0.4rem 0.5rem 0.4rem 0.9rem;
+    margin-bottom:1rem;
+    animation: rise 0.3s ease both;
+  }
+  .filter-chip.show{ display:inline-flex; }
+  .filter-chip button{
+    background:rgba(244,238,221,0.15);
+    border:none;
+    color:var(--paper);
+    width:20px; height:20px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:0.72rem;
+    line-height:1;
+  }
+  .filter-chip button:hover{ background:rgba(244,238,221,0.28); }
+
+  .toolbar-right{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    flex-wrap:wrap;
+  }
+
+  .add-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    background:var(--green);
+    color:var(--paper);
+    border:none;
+    border-radius:8px;
+    padding:0.5rem 0.9rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.03em;
+    cursor:pointer;
+    transition:background 0.2s ease, transform 0.15s ease;
+  }
+  .add-btn:hover{ background:var(--green-light); transform:translateY(-1px); }
+
+  .modal-overlay{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(31,42,34,0.45);
+    backdrop-filter:blur(2px);
+    z-index:100;
+    align-items:flex-start;
+    justify-content:center;
+    padding:4vh 1rem;
+    overflow-y:auto;
+  }
+  .modal-overlay.show{ display:flex; }
+
+  .modal{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    max-width:480px;
+    width:100%;
+    padding:1.6rem 1.6rem 1.4rem;
+    box-shadow:5px 5px 0 var(--shadow);
+    animation: rise 0.28s ease both;
+  }
+  .modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:1.1rem;
+  }
+  .modal-head h3{
+    font-family:'Fraunces', serif;
+    font-size:1.3rem;
+    margin:0;
+    color:var(--ink);
+  }
+  .modal-close{
+    background:var(--paper-dark);
+    border:none;
+    width:28px; height:28px;
+    border-radius:50%;
+    cursor:pointer;
+    color:var(--ink-soft);
+    font-size:0.85rem;
+  }
+  .modal-close:hover{ color:var(--ink); }
+
+  .field{
+    margin-bottom:0.9rem;
+  }
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:0.3rem;
+  }
+  .field input, .field select{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:0.55rem 0.7rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.92rem;
+    color:var(--ink);
+    background:#fff;
+    outline:none;
+    transition:border-color 0.15s ease;
+  }
+  .field input:focus, .field select:focus{ border-color:var(--brass); }
+  .field-row{ display:flex; gap:0.7rem; }
+  .field-row .field{ flex:1; }
+  .field .optional-tag{ color:var(--ink-soft); text-transform:none; letter-spacing:0; font-family:'Inter',sans-serif; font-size:0.72rem; }
+
+  .subject-rows{ margin-bottom:0.6rem; }
+  .subject-row{
+    display:flex;
+    gap:0.6rem;
+    margin-bottom:0.6rem;
+    align-items:center;
+  }
+  .subject-row input{ flex:1; }
+  .subject-row .remove-row{
+    background:none;
+    border:none;
+    color:var(--stamp);
+    cursor:pointer;
+    font-size:0.95rem;
+    padding:0.3rem;
+    flex-shrink:0;
+  }
+  .add-row-btn{
+    background:none;
+    border:1px dashed var(--ink-soft);
+    color:var(--ink-soft);
+    border-radius:8px;
+    padding:0.45rem 0.7rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem;
+    cursor:pointer;
+    width:100%;
+  }
+  .add-row-btn:hover{ border-color:var(--brass); color:var(--ink); }
+
+  .modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:0.6rem;
+    margin-top:1.3rem;
+    padding-top:1rem;
+    border-top:1px dashed var(--line);
+  }
+  .btn-secondary{
+    background:none;
+    border:1.5px solid var(--line);
+    color:var(--ink-soft);
+    border-radius:8px;
+    padding:0.55rem 1.1rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.86rem;
+    font-weight:500;
+    cursor:pointer;
+  }
+  .btn-primary{
+    background:var(--green);
+    border:none;
+    color:var(--paper);
+    border-radius:8px;
+    padding:0.55rem 1.2rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.86rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .btn-primary:hover{ background:var(--green-light); }
+
+  .form-note{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    margin:-0.3rem 0 1rem;
+    line-height:1.4;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:1.5rem; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    padding:0.7rem 1.2rem;
+    border-radius:999px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease, transform 0.25s ease;
+    z-index:200;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  .search-wrap{
+    display:flex;
+    align-items:center;
+    gap:0.7rem;
+    background:#fff;
+    border:1.5px solid var(--ink);
+    border-radius:10px;
+    padding:0.35rem 0.35rem 0.35rem 0.9rem;
+    box-shadow:3px 3px 0 var(--shadow);
+    margin-bottom:0.4rem;
+  }
+  .search-wrap svg{ flex-shrink:0; color:var(--ink-soft); }
+  .search-wrap input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    font-family:'Inter', sans-serif;
+    font-size:1rem;
+    padding:0.7rem 0;
+    color:var(--ink);
+  }
+  .search-wrap input::placeholder{ color:#9CA79C; }
+  .clear-btn{
+    border:none;
+    background:var(--paper-dark);
+    color:var(--ink-soft);
+    width:28px; height:28px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:0.9rem;
+    display:none;
+  }
+  .clear-btn.show{ display:block; }
+
+  .hint{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.74rem;
+    color:var(--ink-soft);
+    margin:0.5rem 0 1.8rem;
+  }
+
+  .results{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(270px, 1fr));
+    gap:1.1rem;
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:1.2rem 1.2rem 1.1rem;
+    position:relative;
+    box-shadow:2px 2px 0 var(--shadow);
+    animation: rise 0.38s ease both;
+  }
+  @keyframes rise{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .card .id{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    color:var(--brass);
+    margin:0 0 0.35rem;
+  }
+  .card h3{
+    font-family:'Fraunces', serif;
+    font-size:1.22rem;
+    margin:0 0 0.7rem;
+    color:var(--ink);
+  }
+  .card .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    padding:0.3rem 0;
+    border-top:1px dashed var(--line);
+  }
+  .card .row:first-of-type{ border-top:1px dashed var(--line); }
+  .card .row span.label{ color:var(--ink-soft); }
+  .card .row span.value{ color:var(--ink); font-weight:500; text-align:right; }
+
+  .stamp{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.66rem;
+    font-weight:600;
+    letter-spacing:0.03em;
+    color:var(--stamp);
+    border:1.5px solid var(--stamp);
+    border-radius:999px;
+    padding:0.25rem 0.6rem;
+    transform:rotate(-6deg);
+    background:rgba(162,62,48,0.05);
+    animation: stampin 0.4s cubic-bezier(.34,1.56,.64,1) both;
+    animation-delay:0.1s;
+    white-space:nowrap;
+  }
+  @keyframes stampin{
+    from{ opacity:0; transform:rotate(-6deg) scale(1.6); }
+    to{ opacity:1; transform:rotate(-6deg) scale(1); }
+  }
+
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--green);
+    font-weight:600;
+    cursor:pointer;
+    padding:0;
+    text-decoration:underline;
+    text-decoration-color:var(--brass);
+    text-underline-offset:3px;
+    font-size:0.88rem;
+  }
+
+  .subj-list{ list-style:none; margin:0; padding:0; }
+  .subj-list li{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.86rem;
+    padding:0.32rem 0;
+    border-top:1px dashed var(--line);
+    color:var(--ink);
+  }
+  .subj-list li .sec-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    color:var(--ink-soft);
+  }
+
+  .empty{
+    text-align:center;
+    padding:3.5rem 1rem;
+    color:var(--ink-soft);
+  }
+  .empty .mark{
+    font-family:'Fraunces', serif;
+    font-size:2.2rem;
+    color:var(--brass);
+    display:block;
+    margin-bottom:0.4rem;
+  }
+
+  .count-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    float:right;
+  }
+
+  .card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:0.7rem;
+    gap:0.5rem;
+  }
+  .card-head-right{
+    display:flex;
+    align-items:center;
+    gap:0.4rem;
+  }
+  .card.selected{
+    border-color:var(--green);
+    background:#FBFAF4;
+    box-shadow:2px 2px 0 var(--shadow), 0 0 0 2px rgba(31,59,46,0.16) inset;
+  }
+
+  .chk{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .chk input{
+    position:absolute;
+    opacity:0;
+    width:20px; height:20px;
+    margin:0;
+    cursor:pointer;
+  }
+  .chk-box{
+    width:19px; height:19px;
+    border:1.5px solid var(--ink-soft);
+    border-radius:5px;
+    background:#fff;
+    display:inline-block;
+    position:relative;
+    transition:background 0.15s ease, border-color 0.15s ease;
+  }
+  .chk input:checked + .chk-box{
+    background:var(--green);
+    border-color:var(--green);
+  }
+  .chk input:checked + .chk-box::after{
+    content:"";
+    position:absolute;
+    left:6px; top:2px;
+    width:5px; height:10px;
+    border:solid var(--paper);
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  .chk input:focus-visible + .chk-box{
+    outline:2px solid var(--brass);
+    outline-offset:2px;
+  }
+
+  .icon-del{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-size:1rem;
+    line-height:1;
+    padding:0.3rem;
+    border-radius:6px;
+    transition:color 0.15s ease, background 0.15s ease;
+  }
+  .icon-del:hover{ color:var(--stamp); background:rgba(162,62,48,0.08); }
+
+  .selection-bar{
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:10px;
+    padding:0.7rem 1rem;
+    margin-bottom:1.1rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    animation: rise 0.25s ease both;
+  }
+  .selection-bar.show{ display:flex; }
+  .selection-bar .sel-actions{ display:flex; gap:0.6rem; }
+
+  .btn-danger{
+    background:var(--stamp);
+    border:none;
+    color:#fff;
+    border-radius:8px;
+    padding:0.45rem 0.95rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.82rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .btn-danger:hover{ background:#8a3227; }
+
+  .btn-ghost{
+    background:none;
+    border:1px solid rgba(244,238,221,0.4);
+    color:var(--paper);
+    border-radius:8px;
+    padding:0.45rem 0.95rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.82rem;
+    cursor:pointer;
+  }
+  .btn-ghost:hover{ border-color:var(--paper); }
+
+  .confirm-modal{ max-width:400px; }
+  .confirm-modal p.confirm-text{
+    font-size:0.94rem;
+    color:var(--ink);
+    line-height:1.5;
+    margin:0 0 0.4rem;
+  }
+  .confirm-modal p.confirm-sub{
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    margin:0 0 1.2rem;
+  }
+
+  .onboarding{
+    text-align:center;
+    padding:3rem 1.2rem;
+    max-width:520px;
+    margin:0 auto;
+    animation: rise 0.4s ease both;
+    grid-column:1/-1;
+  }
+  .onboarding .stamp-icon{
+    font-family:'Fraunces', serif;
+    font-size:2rem;
+    color:var(--brass);
+    display:inline-block;
+    border:2px solid var(--brass);
+    border-radius:50%;
+    width:64px; height:64px;
+    line-height:60px;
+    margin-bottom:1rem;
+    transform:rotate(-4deg);
+  }
+  .onboarding h2{
+    font-family:'Fraunces', serif;
+    font-size:1.5rem;
+    margin:0 0 0.5rem;
+    color:var(--ink);
+  }
+  .onboarding p.lead{
+    color:var(--ink-soft);
+    margin:0 0 1.6rem;
+    font-size:0.92rem;
+  }
+  .onboarding ol{
+    text-align:left;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:1.2rem 1.2rem 1.2rem 2.3rem;
+    margin:0 0 1.6rem;
+    box-shadow:2px 2px 0 var(--shadow);
+  }
+  .onboarding ol li{
+    margin-bottom:0.65rem;
+    font-size:0.88rem;
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .onboarding ol li:last-child{ margin-bottom:0; }
+  .onboarding ol li b{ color:var(--green); }
+
+  .name-btn{
+    background:none;
+    border:none;
+    padding:0;
+    cursor:pointer;
+    font-family:'Fraunces', serif;
+    font-size:1.22rem;
+    color:var(--ink);
+    text-align:left;
+    margin:0 0 0.7rem;
+    display:block;
+    border-bottom:1.5px solid transparent;
+    transition:border-color 0.2s ease;
+  }
+  .name-btn:hover, .name-btn:focus-visible{
+    border-bottom-color:var(--brass);
+  }
+
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+    padding:0;
+    margin-bottom:1.4rem;
+  }
+  .back-btn:hover{ color:var(--ink); }
+
+  .profile-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:1.8rem 1.8rem 1.6rem;
+    box-shadow:3px 3px 0 var(--shadow);
+    animation: rise 0.38s ease both;
+    max-width:520px;
+  }
+  .profile-card .id{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.74rem;
+    letter-spacing:0.06em;
+    color:var(--brass);
+    margin:0 0 0.4rem;
+  }
+  .profile-card h2{
+    font-family:'Fraunces', serif;
+    font-size:1.7rem;
+    margin:0 0 0.3rem;
+    color:var(--ink);
+  }
+  .profile-card .current-line{
+    font-size:0.92rem;
+    color:var(--ink-soft);
+    margin:0 0 1.3rem;
+    padding-bottom:1.1rem;
+    border-bottom:1px dashed var(--line);
+  }
+  .profile-card .current-line b{ color:var(--ink); font-weight:600; }
+
+  .origin-note{
+    display:flex;
+    gap:0.6rem;
+    align-items:flex-start;
+    background:rgba(184,134,60,0.08);
+    border:1px solid rgba(184,134,60,0.35);
+    border-radius:8px;
+    padding:0.7rem 0.85rem;
+    margin-bottom:1.4rem;
+    font-size:0.85rem;
+    color:var(--ink);
+  }
+  .origin-note .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.66rem;
+    letter-spacing:0.05em;
+    color:var(--brass);
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:0.15rem;
+  }
+
+  .section-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 0.8rem;
+  }
+
+  .timeline{ list-style:none; margin:0; padding:0; }
+  .timeline li{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:0.6rem 0;
+    border-top:1px dashed var(--line);
+    position:relative;
+    padding-left:1rem;
+  }
+  .timeline li::before{
+    content:"";
+    position:absolute;
+    left:0; top:1.05rem;
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--brass);
+  }
+  .timeline li.current::before{ background:var(--stamp); }
+  .timeline .year{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+  .timeline .sec{
+    font-size:0.92rem;
+    font-weight:500;
+    color:var(--ink);
+  }
+  .timeline .now-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.62rem;
+    color:var(--stamp);
+    border:1px solid var(--stamp);
+    border-radius:999px;
+    padding:0.1rem 0.4rem;
+    margin-left:0.5rem;
+  }
+
+  footer{
+    text-align:center;
+    padding:1.5rem;
+    color:var(--ink-soft);
+    font-size:0.76rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  :focus-visible{
+    outline:2px solid var(--brass);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <p class="eyebrow">School Records // Directory Search</p>
+    <h1>Roll &amp; Register</h1>
+    <p class="sub">Look up a student by name or ID to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <div class="tabs" id="tabs" data-active="students">
+      <div class="tab-highlight"></div>
+      <button class="tab-btn active" data-tab="students">STUDENTS</button>
+      <button class="tab-btn" data-tab="teachers">TEACHERS</button>
+    </div>
+
+    <div class="toolbar-right">
+      <div class="section-jump" id="sectionJumpWrap">
+        <label for="sectionSelect">Section</label>
+        <select id="sectionSelect">
+          <option value="">All</option>
+        </select>
+      </div>
+      <div class="section-jump" id="yearJumpWrap">
+        <label for="yearSelect">School year</label>
+        <select id="yearSelect">
+          <option value="">All</option>
+        </select>
+      </div>
+      <button class="add-btn" id="addBtn">+ Add student</button>
+    </div>
+  </div>
+
+  <div class="filter-chip" id="filterChip">
+    <span id="filterChipText"></span>
+    <button id="filterChipClear" aria-label="Clear filters">✕</button>
+  </div>
+
+  <div class="search-wrap">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="text" placeholder="Search by name or ID…" autocomplete="off">
+    <button class="clear-btn" id="clearBtn" aria-label="Clear search">✕</button>
+  </div>
+  <p class="hint" id="hintText">0 students on file</p>
+
+  <div class="selection-bar" id="selectionBar">
+    <span id="selectionCount">0 selected</span>
+    <div class="sel-actions">
+      <button class="btn-ghost" id="selectionClearBtn">Clear</button>
+      <button class="btn-danger" id="selectionDeleteBtn">Delete selected</button>
+    </div>
+  </div>
+
+  <div class="results" id="results"></div>
+</main>
+
+<!-- Add Student modal -->
+<div class="modal-overlay" id="studentModalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Add student</h3>
+      <button class="modal-close" id="studentModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="form-note">New records are added to this session's list right away. See "Export data" at the bottom of either tab to save them permanently into the file.</p>
+    <form id="studentForm">
+      <div class="field-row">
+        <div class="field">
+          <label for="stuId">Student ID</label>
+          <input type="text" id="stuId" placeholder="STU-1013" required>
+        </div>
+        <div class="field">
+          <label for="stuName">Full name</label>
+          <input type="text" id="stuName" placeholder="Jane Doe" required>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="stuSection">Section</label>
+          <input type="text" id="stuSection" placeholder="7-Rizal" required>
+        </div>
+        <div class="field">
+          <label for="stuYear">School year</label>
+          <input type="text" id="stuYear" placeholder="2024-2025" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="stuTeacher">Adviser (teacher ID)</label>
+        <select id="stuTeacher"></select>
+      </div>
+      <div class="field">
+        <label for="stuOrigin">Transferred from <span class="optional-tag">— optional</span></label>
+        <input type="text" id="stuOrigin" placeholder="Leave blank if not a transferee">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="studentCancelBtn">Cancel</button>
+        <button type="submit" class="btn-primary">Save student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Teacher modal -->
+<div class="modal-overlay" id="teacherModalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Add teacher</h3>
+      <button class="modal-close" id="teacherModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="form-note">New records are added to this session's list right away. See "Export data" at the bottom of either tab to save them permanently into the file.</p>
+    <form id="teacherForm">
+      <div class="field-row">
+        <div class="field">
+          <label for="teachId">Teacher ID</label>
+          <input type="text" id="teachId" placeholder="T-206" required>
+        </div>
+        <div class="field">
+          <label for="teachName">Full name</label>
+          <input type="text" id="teachName" placeholder="Ms. Dela Peña" required>
+        </div>
+      </div>
+      <label style="display:block; font-family:'IBM Plex Mono', monospace; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:0.4rem;">Subjects &amp; sections held</label>
+      <div class="subject-rows" id="subjectRows"></div>
+      <button type="button" class="add-row-btn" id="addSubjectRowBtn">+ Add another subject/section</button>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="teacherCancelBtn">Cancel</button>
+        <button type="submit" class="btn-primary">Save teacher</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Confirm delete modal -->
+<div class="modal-overlay" id="confirmModalOverlay">
+  <div class="modal confirm-modal">
+    <div class="modal-head">
+      <h3 id="confirmTitle">Delete record?</h3>
+      <button class="modal-close" id="confirmModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="confirm-text" id="confirmText"></p>
+    <p class="confirm-sub" id="confirmSubText"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="confirmCancelBtn">Cancel</button>
+      <button type="button" class="btn-danger" id="confirmDeleteBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export data modal -->
+<div class="modal-overlay" id="exportModalOverlay">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-head">
+      <h3>Export data</h3>
+      <button class="modal-close" id="exportModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="form-note">Copy this and paste it over the <code>students</code> / <code>teachers</code> arrays near the top of the file's &lt;script&gt; tag to make your additions permanent.</p>
+    <textarea id="exportText" readonly style="width:100%; height:260px; font-family:'IBM Plex Mono', monospace; font-size:0.76rem; border:1.5px solid var(--line); border-radius:8px; padding:0.7rem; background:#fff; color:var(--ink); resize:vertical;"></textarea>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="exportCloseBtn">Close</button>
+      <button type="button" class="btn-primary" id="exportCopyBtn">Copy to clipboard</button>
+    </div>
+  </div>
+</div>
+
+<footer>Sample records for demonstration — <button class="link-btn" id="exportOpenBtn" style="font-size:0.76rem;">export current data</button> to save your additions into the file.</footer>
+
+<script>
+  // ---- Data: starts empty. Use "+ Add student/teacher" in the app, or paste
+  // your own records here in the same shape as the commented example below. ----
+  // { id:"STU-1001", name:"Maria Santos", section:"7-Rizal", year:"2024-2025", teacherId:"T-201",
+  //   history:[ {year:"2024-2025", section:"7-Rizal"} ], transferredFrom:"Optional Prior School" }
+  const students = [];
+
+  // { id:"T-201", name:"Mr. Ramon Ibañez", subjects:[{subject:"Mathematics", section:"7-Rizal"}] }
+  const teachers = [];
+
+  const teacherById = Object.fromEntries(teachers.map(t => [t.id, t]));
+
+  const tabsEl = document.getElementById('tabs');
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const resultsEl = document.getElementById('results');
+  const hintText = document.getElementById('hintText');
+  const sectionSelect = document.getElementById('sectionSelect');
+  const yearSelect = document.getElementById('yearSelect');
+  const sectionJumpWrap = document.getElementById('sectionJumpWrap');
+  const yearJumpWrap = document.getElementById('yearJumpWrap');
+  const filterChip = document.getElementById('filterChip');
+  const filterChipText = document.getElementById('filterChipText');
+  const filterChipClear = document.getElementById('filterChipClear');
+  const addBtn = document.getElementById('addBtn');
+  const toast = document.getElementById('toast');
+
+  function refreshDropdowns(){
+    const currentSection = sectionSelect.value;
+    const currentYear = yearSelect.value;
+    const allSections = [...new Set(students.map(s => s.section))].sort();
+    const allYears = [...new Set(students.map(s => s.year).filter(Boolean))].sort().reverse();
+
+    sectionSelect.innerHTML = '<option value="">All</option>' +
+      allSections.map(sec => `<option value="${escapeHtml(sec)}">${escapeHtml(sec)}</option>`).join('');
+    yearSelect.innerHTML = '<option value="">All</option>' +
+      allYears.map(yr => `<option value="${escapeHtml(yr)}">${escapeHtml(yr)}</option>`).join('');
+
+    sectionSelect.value = allSections.includes(currentSection) ? currentSection : '';
+    yearSelect.value = allYears.includes(currentYear) ? currentYear : '';
+  }
+  refreshDropdowns();
+
+  let activeTab = 'students';
+  let query = '';
+  let view = 'list'; // 'list' or 'profile'
+  let profileStudentId = null;
+  let sectionFilter = '';
+  let yearFilter = '';
+  let selectedStudentIds = new Set();
+  let selectedTeacherIds = new Set();
+
+  const selectionBar = document.getElementById('selectionBar');
+  const selectionCount = document.getElementById('selectionCount');
+  const selectionClearBtn = document.getElementById('selectionClearBtn');
+  const selectionDeleteBtn = document.getElementById('selectionDeleteBtn');
+
+  function currentSelection(){
+    return activeTab === 'students' ? selectedStudentIds : selectedTeacherIds;
+  }
+  function clearSelection(){
+    selectedStudentIds.clear();
+    selectedTeacherIds.clear();
+    updateSelectionBar();
+  }
+  function updateSelectionBar(){
+    const sel = currentSelection();
+    if(sel.size > 0){
+      selectionBar.classList.add('show');
+      selectionCount.textContent = `${sel.size} selected`;
+    } else {
+      selectionBar.classList.remove('show');
+    }
+  }
+  selectionClearBtn.addEventListener('click', () => { currentSelection().clear(); render(); });
+  selectionDeleteBtn.addEventListener('click', () => {
+    const ids = [...currentSelection()];
+    if(ids.length === 0) return;
+    if(activeTab === 'students') confirmDeleteStudents(ids);
+    else confirmDeleteTeachers(ids);
+  });
+
+  sectionSelect.addEventListener('change', () => {
+    sectionFilter = sectionSelect.value;
+    if(sectionFilter){
+      activeTab = 'students';
+      view = 'list';
+      tabsEl.dataset.active = 'students';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
+      searchInput.value = '';
+      query = '';
+      clearBtn.classList.remove('show');
+    }
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  yearSelect.addEventListener('change', () => {
+    yearFilter = yearSelect.value;
+    if(yearFilter){
+      activeTab = 'students';
+      view = 'list';
+      tabsEl.dataset.active = 'students';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
+      searchInput.value = '';
+      query = '';
+      clearBtn.classList.remove('show');
+    }
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  filterChipClear.addEventListener('click', () => {
+    sectionFilter = '';
+    yearFilter = '';
+    sectionSelect.value = '';
+    yearSelect.value = '';
+    render();
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTab = btn.dataset.tab;
+      tabsEl.dataset.active = activeTab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+      searchInput.placeholder = activeTab === 'students'
+        ? "Search by student name or ID…"
+        : "Search by teacher name or ID…";
+      addBtn.textContent = activeTab === 'students' ? '+ Add student' : '+ Add teacher';
+      sectionJumpWrap.style.display = activeTab === 'students' ? '' : 'none';
+      yearJumpWrap.style.display = activeTab === 'students' ? '' : 'none';
+      sectionFilter = '';
+      yearFilter = '';
+      sectionSelect.value = '';
+      yearSelect.value = '';
+      clearSelection();
+      render();
+    });
+  });
+
+  searchInput.addEventListener('input', e => {
+    query = e.target.value.trim().toLowerCase();
+    clearBtn.classList.toggle('show', query.length > 0);
+    render();
+  });
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    query = '';
+    clearBtn.classList.remove('show');
+    searchInput.focus();
+    render();
+  });
+
+  function showProfile(studentId){
+    profileStudentId = studentId;
+    view = 'profile';
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function backToList(){
+    view = 'list';
+    profileStudentId = null;
+    render();
+  }
+
+  function renderProfile(){
+    document.querySelector('.search-wrap').style.display = 'none';
+    hintText.style.display = 'none';
+
+    const s = students.find(st => st.id === profileStudentId);
+    if(!s){
+      resultsEl.innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="mark">—</span>Record not found.</div>`;
+      return;
+    }
+    const teacher = teacherById[s.teacherId];
+    const sortedHistory = [...(s.history || [])].sort((a, b) => b.year.localeCompare(a.year));
+
+    resultsEl.style.display = 'block';
+    resultsEl.innerHTML = `
+      <button class="back-btn" id="backBtn">← Back to students</button>
+      <div class="profile-card">
+        <p class="id">${escapeHtml(s.id)}</p>
+        <h2>${escapeHtml(s.name)}</h2>
+        <p class="current-line">Currently in <b>${escapeHtml(s.section)}</b> · SY <b>${escapeHtml(s.year || '—')}</b> · Adviser: <b>${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId)}</b></p>
+        ${s.transferredFrom ? `
+          <div class="origin-note">
+            <span>🏫</span>
+            <div><span class="tag">Transferred in</span>Came from ${escapeHtml(s.transferredFrom)}</div>
+          </div>
+        ` : ''}
+        <p class="section-label">Section history</p>
+        <ul class="timeline">
+          ${sortedHistory.map((h, i) => `
+            <li class="${i === 0 ? 'current' : ''}">
+              <span class="year">${escapeHtml(h.year)}</span>
+              <span class="sec">${escapeHtml(h.section)}${i === 0 ? '<span class="now-tag">CURRENT</span>' : ''}</span>
+            </li>
+          `).join('') || '<li>No prior section records on file.</li>'}
+        </ul>
+        <div class="modal-actions" style="justify-content:flex-start; margin-top:1.4rem;">
+          <button type="button" class="btn-danger" id="deleteFromProfileBtn">Delete this student</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('backBtn').addEventListener('click', backToList);
+    document.getElementById('deleteFromProfileBtn').addEventListener('click', () => confirmDeleteStudents([s.id]));
+  }
+
+  function jumpToTeacher(teacherId){
+    activeTab = 'teachers';
+    tabsEl.dataset.active = 'teachers';
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'teachers'));
+    searchInput.value = teacherId;
+    query = teacherId.toLowerCase();
+    clearBtn.classList.add('show');
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function matchStudent(s){
+    const textOk = s.name.toLowerCase().includes(query) || s.id.toLowerCase().includes(query);
+    const sectionOk = !sectionFilter || s.section === sectionFilter;
+    const yearOk = !yearFilter || s.year === yearFilter;
+    return textOk && sectionOk && yearOk;
+  }
+  function matchTeacher(t){
+    return t.name.toLowerCase().includes(query) || t.id.toLowerCase().includes(query);
+  }
+
+  function render(){
+    resultsEl.innerHTML = '';
+
+    if(view === 'profile'){
+      document.querySelector('.toolbar').style.display = 'none';
+      filterChip.classList.remove('show');
+      selectionBar.classList.remove('show');
+      renderProfile();
+      return;
+    }
+    document.querySelector('.toolbar').style.display = '';
+    document.querySelector('.search-wrap').style.display = '';
+    hintText.style.display = '';
+    resultsEl.style.display = 'grid';
+
+    if(activeTab === 'students'){
+      const hasFilter = query || sectionFilter || yearFilter;
+
+      if(students.length === 0 && !hasFilter){
+        selectionBar.classList.remove('show');
+        document.querySelector('.search-wrap').style.display = 'none';
+        hintText.style.display = 'none';
+        hintText.textContent = '0 students on file';
+        resultsEl.innerHTML = `
+          <div class="onboarding">
+            <span class="stamp-icon">R&amp;R</span>
+            <h2>No students yet</h2>
+            <p class="lead">This directory is empty — here's how to get it going.</p>
+            <ol>
+              <li><b>Add a teacher first</b> (optional) so you can assign advisers as you go — use the Teachers tab.</li>
+              <li><b>Tap "+ Add student"</b> below to enter a student's ID, name, section, and school year.</li>
+              <li><b>Search</b> by name or ID any time, or use the Section / School year dropdowns to browse.</li>
+              <li><b>Tap a student's name</b> to see their full section history, and check the boxes on any card to delete several at once.</li>
+              <li>When you're ready to keep your data permanently, use <b>"export current data"</b> in the footer.</li>
+            </ol>
+            <button class="add-btn" id="onboardingAddStudent">+ Add your first student</button>
+          </div>
+        `;
+        document.getElementById('onboardingAddStudent').addEventListener('click', openStudentModal);
+        return;
+      }
+
+      const list = hasFilter ? students.filter(matchStudent) : students;
+
+      if(sectionFilter || yearFilter){
+        filterChip.classList.add('show');
+        const parts = [];
+        if(sectionFilter) parts.push(`Section: ${sectionFilter}`);
+        if(yearFilter) parts.push(`SY: ${yearFilter}`);
+        filterChipText.textContent = parts.join(' · ');
+      } else {
+        filterChip.classList.remove('show');
+      }
+
+      hintText.textContent = hasFilter
+        ? `${list.length} match${list.length === 1 ? '' : 'es'}${query ? ` for "${searchInput.value.trim()}"` : ''}`
+        : `${students.length} students on file`;
+
+      updateSelectionBar();
+
+      if(list.length === 0){
+        resultsEl.innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="mark">—</span>No student matches that name or ID.</div>`;
+        return;
+      }
+
+      list.forEach((s, i) => {
+        const teacher = teacherById[s.teacherId];
+        const card = document.createElement('div');
+        card.className = 'card' + (selectedStudentIds.has(s.id) ? ' selected' : '');
+        card.style.animationDelay = (i * 0.03) + 's';
+        card.innerHTML = `
+          <div class="card-head">
+            <label class="chk">
+              <input type="checkbox" class="select-chk" data-select-student="${escapeHtml(s.id)}" ${selectedStudentIds.has(s.id) ? 'checked' : ''}>
+              <span class="chk-box"></span>
+            </label>
+            <div class="card-head-right">
+              <div class="stamp">${escapeHtml(s.section)}</div>
+              <button class="icon-del" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
+            </div>
+          </div>
+          <p class="id">${escapeHtml(s.id)}</p>
+          <button class="name-btn" data-profile="${escapeHtml(s.id)}">${escapeHtml(s.name)}</button>
+          <div class="row"><span class="label">Section</span><span class="value">${escapeHtml(s.section)}</span></div>
+          <div class="row"><span class="label">School Year</span><span class="value">${escapeHtml(s.year || '—')}</span></div>
+          <div class="row"><span class="label">Adviser</span><span class="value"><button class="link-btn" data-teacher="${escapeHtml(s.teacherId)}">${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || '—')}</button></span></div>
+          <div class="row"><span class="label">Teacher ID</span><span class="value">${escapeHtml(s.teacherId || '—')}</span></div>
+        `;
+        resultsEl.appendChild(card);
+      });
+
+      resultsEl.querySelectorAll('[data-teacher]').forEach(btn => {
+        btn.addEventListener('click', () => jumpToTeacher(btn.dataset.teacher));
+      });
+      resultsEl.querySelectorAll('[data-profile]').forEach(btn => {
+        btn.addEventListener('click', () => showProfile(btn.dataset.profile));
+      });
+      resultsEl.querySelectorAll('[data-delete-student]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          confirmDeleteStudents([btn.dataset.deleteStudent]);
+        });
+      });
+      resultsEl.querySelectorAll('[data-select-student]').forEach(chk => {
+        chk.addEventListener('change', () => {
+          const id = chk.dataset.selectStudent;
+          if(chk.checked) selectedStudentIds.add(id); else selectedStudentIds.delete(id);
+          chk.closest('.card').classList.toggle('selected', chk.checked);
+          updateSelectionBar();
+        });
+      });
+
+    } else {
+      const hasFilter = !!query;
+
+      if(teachers.length === 0 && !hasFilter){
+        selectionBar.classList.remove('show');
+        document.querySelector('.search-wrap').style.display = 'none';
+        hintText.style.display = 'none';
+        hintText.textContent = '0 teachers on file';
+        resultsEl.innerHTML = `
+          <div class="onboarding">
+            <span class="stamp-icon">R&amp;R</span>
+            <h2>No teachers yet</h2>
+            <p class="lead">Add your first teacher to start assigning advisers and subjects.</p>
+            <ol>
+              <li><b>Tap "+ Add teacher"</b> below and enter their ID and name.</li>
+              <li><b>List each subject and section</b> they teach — add as many rows as you need.</li>
+              <li>Once saved, they'll show up as an <b>adviser option</b> when you add students.</li>
+              <li>Check the boxes on teacher cards to <b>select and delete several at once</b>.</li>
+            </ol>
+            <button class="add-btn" id="onboardingAddTeacher">+ Add your first teacher</button>
+          </div>
+        `;
+        document.getElementById('onboardingAddTeacher').addEventListener('click', openTeacherModal);
+        return;
+      }
+
+      const list = hasFilter ? teachers.filter(matchTeacher) : teachers;
+      hintText.textContent = hasFilter
+        ? `${list.length} match${list.length === 1 ? '' : 'es'} for "${searchInput.value.trim()}"`
+        : `${teachers.length} teachers on file`;
+
+      updateSelectionBar();
+
+      if(list.length === 0){
+        resultsEl.innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="mark">—</span>No teacher matches that name or ID.</div>`;
+        return;
+      }
+
+      list.forEach((t, i) => {
+        const card = document.createElement('div');
+        card.className = 'card' + (selectedTeacherIds.has(t.id) ? ' selected' : '');
+        card.style.animationDelay = (i * 0.03) + 's';
+        card.innerHTML = `
+          <div class="card-head">
+            <label class="chk">
+              <input type="checkbox" class="select-chk" data-select-teacher="${escapeHtml(t.id)}" ${selectedTeacherIds.has(t.id) ? 'checked' : ''}>
+              <span class="chk-box"></span>
+            </label>
+            <div class="card-head-right">
+              <div class="stamp">${t.subjects.length} held</div>
+              <button class="icon-del" data-delete-teacher="${escapeHtml(t.id)}" aria-label="Delete teacher" title="Delete teacher">🗑</button>
+            </div>
+          </div>
+          <p class="id">${escapeHtml(t.id)}</p>
+          <h3>${escapeHtml(t.name)}</h3>
+          <ul class="subj-list">
+            ${t.subjects.map(sub => `<li><span>${escapeHtml(sub.subject)}</span><span class="sec-tag">${escapeHtml(sub.section)}</span></li>`).join('')}
+          </ul>
+        `;
+        resultsEl.appendChild(card);
+      });
+
+      resultsEl.querySelectorAll('[data-delete-teacher]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          confirmDeleteTeachers([btn.dataset.deleteTeacher]);
+        });
+      });
+      resultsEl.querySelectorAll('[data-select-teacher]').forEach(chk => {
+        chk.addEventListener('change', () => {
+          const id = chk.dataset.selectTeacher;
+          if(chk.checked) selectedTeacherIds.add(id); else selectedTeacherIds.delete(id);
+          chk.closest('.card').classList.toggle('selected', chk.checked);
+          updateSelectionBar();
+        });
+      });
+    }
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ---------- Toast ----------
+  let toastTimer = null;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  // ---------- Confirm delete modal ----------
+  const confirmModalOverlay = document.getElementById('confirmModalOverlay');
+  const confirmTitle = document.getElementById('confirmTitle');
+  const confirmText = document.getElementById('confirmText');
+  const confirmSubText = document.getElementById('confirmSubText');
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  let pendingDelete = null; // { type: 'student' | 'teacher', ids: [...] }
+
+  function openConfirmModal({ title, text, sub }){
+    confirmTitle.textContent = title;
+    confirmText.textContent = text;
+    confirmSubText.textContent = sub || '';
+    confirmSubText.style.display = sub ? '' : 'none';
+    confirmModalOverlay.classList.add('show');
+  }
+  function closeConfirmModal(){
+    confirmModalOverlay.classList.remove('show');
+    pendingDelete = null;
+  }
+  document.getElementById('confirmModalClose').addEventListener('click', closeConfirmModal);
+  document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
+  confirmModalOverlay.addEventListener('click', e => { if(e.target === confirmModalOverlay) closeConfirmModal(); });
+
+  function confirmDeleteStudents(ids){
+    pendingDelete = { type: 'student', ids };
+    const single = ids.length === 1 ? students.find(s => s.id === ids[0]) : null;
+    openConfirmModal({
+      title: ids.length === 1 ? 'Delete student?' : `Delete ${ids.length} students?`,
+      text: single
+        ? `This will permanently remove ${single.name} (${single.id}) from the directory.`
+        : `This will permanently remove ${ids.length} selected students from the directory.`,
+      sub: 'This cannot be undone.'
+    });
+  }
+
+  function confirmDeleteTeachers(ids){
+    pendingDelete = { type: 'teacher', ids };
+    const single = ids.length === 1 ? teachers.find(t => t.id === ids[0]) : null;
+    const affected = students.filter(s => ids.includes(s.teacherId)).length;
+    openConfirmModal({
+      title: ids.length === 1 ? 'Delete teacher?' : `Delete ${ids.length} teachers?`,
+      text: single
+        ? `This will permanently remove ${single.name} (${single.id}) from the directory.`
+        : `This will permanently remove ${ids.length} selected teachers from the directory.`,
+      sub: affected > 0
+        ? `${affected} student${affected === 1 ? '' : 's'} currently list${affected === 1 ? 's' : ''} them as adviser — that field will show as unassigned afterward. This cannot be undone.`
+        : 'This cannot be undone.'
+    });
+  }
+
+  confirmDeleteBtn.addEventListener('click', () => {
+    if(!pendingDelete) return;
+    const { type, ids } = pendingDelete;
+
+    if(type === 'student'){
+      for(let i = students.length - 1; i >= 0; i--){
+        if(ids.includes(students[i].id)) students.splice(i, 1);
+      }
+      ids.forEach(id => selectedStudentIds.delete(id));
+      refreshDropdowns();
+      if(sectionFilter && !students.some(s => s.section === sectionFilter)){ sectionFilter = ''; sectionSelect.value = ''; }
+      if(yearFilter && !students.some(s => s.year === yearFilter)){ yearFilter = ''; yearSelect.value = ''; }
+      showToast(ids.length === 1 ? 'Student deleted' : `${ids.length} students deleted`);
+      if(view === 'profile' && ids.includes(profileStudentId)){
+        view = 'list';
+        profileStudentId = null;
+      }
+    } else {
+      for(let i = teachers.length - 1; i >= 0; i--){
+        if(ids.includes(teachers[i].id)) teachers.splice(i, 1);
+      }
+      ids.forEach(id => { delete teacherById[id]; selectedTeacherIds.delete(id); });
+      showToast(ids.length === 1 ? 'Teacher deleted' : `${ids.length} teachers deleted`);
+    }
+
+    closeConfirmModal();
+    render();
+  });
+
+  // ---------- Add Student modal ----------
+  const studentModalOverlay = document.getElementById('studentModalOverlay');
+  const studentForm = document.getElementById('studentForm');
+  const stuTeacherSelect = document.getElementById('stuTeacher');
+
+  function openStudentModal(){
+    stuTeacherSelect.innerHTML = '<option value="">— none yet —</option>' +
+      teachers.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.id)} — ${escapeHtml(t.name)}</option>`).join('');
+    studentForm.reset();
+    studentModalOverlay.classList.add('show');
+    document.getElementById('stuId').focus();
+  }
+  function closeStudentModal(){ studentModalOverlay.classList.remove('show'); }
+
+  document.getElementById('studentModalClose').addEventListener('click', closeStudentModal);
+  document.getElementById('studentCancelBtn').addEventListener('click', closeStudentModal);
+  studentModalOverlay.addEventListener('click', e => { if(e.target === studentModalOverlay) closeStudentModal(); });
+
+  studentForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = document.getElementById('stuId').value.trim();
+    const name = document.getElementById('stuName').value.trim();
+    const section = document.getElementById('stuSection').value.trim();
+    const year = document.getElementById('stuYear').value.trim();
+    const teacherId = stuTeacherSelect.value;
+    const origin = document.getElementById('stuOrigin').value.trim();
+
+    if(students.some(s => s.id.toLowerCase() === id.toLowerCase())){
+      showToast(`Student ID "${id}" already exists`);
+      return;
+    }
+
+    const newStudent = {
+      id, name, section, year, teacherId,
+      history:[ { year, section } ]
+    };
+    if(origin) newStudent.transferredFrom = origin;
+    students.push(newStudent);
+
+    refreshDropdowns();
+    closeStudentModal();
+    activeTab = 'students';
+    tabsEl.dataset.active = 'students';
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
+    addBtn.textContent = '+ Add student';
+    sectionFilter = ''; yearFilter = '';
+    sectionSelect.value = ''; yearSelect.value = '';
+    query = id.toLowerCase();
+    searchInput.value = id;
+    clearBtn.classList.add('show');
+    view = 'list';
+    render();
+    showToast(`Added ${name}`);
+  });
+
+  // ---------- Add Teacher modal ----------
+  const teacherModalOverlay = document.getElementById('teacherModalOverlay');
+  const teacherForm = document.getElementById('teacherForm');
+  const subjectRows = document.getElementById('subjectRows');
+  let subjectRowCount = 0;
+
+  function addSubjectRow(subject = '', section = ''){
+    subjectRowCount++;
+    const row = document.createElement('div');
+    row.className = 'subject-row';
+    row.dataset.rowId = subjectRowCount;
+    row.innerHTML = `
+      <input type="text" placeholder="Subject (e.g. Mathematics)" class="subj-input" value="${escapeHtml(subject)}" required>
+      <input type="text" placeholder="Section (e.g. 7-Rizal)" class="sec-input" value="${escapeHtml(section)}" required>
+      <button type="button" class="remove-row" aria-label="Remove row">✕</button>
+    `;
+    row.querySelector('.remove-row').addEventListener('click', () => {
+      if(subjectRows.children.length > 1) row.remove();
+    });
+    subjectRows.appendChild(row);
+  }
+
+  function openTeacherModal(){
+    teacherForm.reset();
+    subjectRows.innerHTML = '';
+    addSubjectRow();
+    teacherModalOverlay.classList.add('show');
+    document.getElementById('teachId').focus();
+  }
+  function closeTeacherModal(){ teacherModalOverlay.classList.remove('show'); }
+
+  document.getElementById('teacherModalClose').addEventListener('click', closeTeacherModal);
+  document.getElementById('teacherCancelBtn').addEventListener('click', closeTeacherModal);
+  teacherModalOverlay.addEventListener('click', e => { if(e.target === teacherModalOverlay) closeTeacherModal(); });
+  document.getElementById('addSubjectRowBtn').addEventListener('click', () => addSubjectRow());
+
+  teacherForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = document.getElementById('teachId').value.trim();
+    const name = document.getElementById('teachName').value.trim();
+
+    if(teachers.some(t => t.id.toLowerCase() === id.toLowerCase())){
+      showToast(`Teacher ID "${id}" already exists`);
+      return;
+    }
+
+    const subjects = [...subjectRows.children].map(row => ({
+      subject: row.querySelector('.subj-input').value.trim(),
+      section: row.querySelector('.sec-input').value.trim()
+    })).filter(s => s.subject && s.section);
+
+    if(subjects.length === 0){
+      showToast('Add at least one subject and section');
+      return;
+    }
+
+    const newTeacher = { id, name, subjects };
+    teachers.push(newTeacher);
+    teacherById[id] = newTeacher;
+
+    closeTeacherModal();
+    activeTab = 'teachers';
+    tabsEl.dataset.active = 'teachers';
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'teachers'));
+    addBtn.textContent = '+ Add teacher';
+    sectionJumpWrap.style.display = 'none';
+    yearJumpWrap.style.display = 'none';
+    query = id.toLowerCase();
+    searchInput.value = id;
+    clearBtn.classList.add('show');
+    view = 'list';
+    render();
+    showToast(`Added ${name}`);
+  });
+
+  addBtn.addEventListener('click', () => {
+    if(activeTab === 'students') openStudentModal();
+    else openTeacherModal();
+  });
+
+  // ---------- Export data ----------
+  const exportModalOverlay = document.getElementById('exportModalOverlay');
+  const exportText = document.getElementById('exportText');
+
+  function buildExportCode(){
+    const stuLines = students.map(s => {
+      const fields = [`id:${JSON.stringify(s.id)}`, `name:${JSON.stringify(s.name)}`, `section:${JSON.stringify(s.section)}`, `year:${JSON.stringify(s.year || '')}`, `teacherId:${JSON.stringify(s.teacherId)}`];
+      fields.push(`history:${JSON.stringify(s.history || [])}`);
+      if(s.transferredFrom) fields.push(`transferredFrom:${JSON.stringify(s.transferredFrom)}`);
+      return `    { ${fields.join(', ')} },`;
+    }).join('\n');
+
+    const teachLines = teachers.map(t => {
+      return `    { id:${JSON.stringify(t.id)}, name:${JSON.stringify(t.name)}, subjects:${JSON.stringify(t.subjects)} },`;
+    }).join('\n');
+
+    return `const students = [\n${stuLines}\n  ];\n\n  const teachers = [\n${teachLines}\n  ];`;
+  }
+
+  document.getElementById('exportOpenBtn').addEventListener('click', () => {
+    exportText.value = buildExportCode();
+    exportModalOverlay.classList.add('show');
+  });
+  document.getElementById('exportModalClose').addEventListener('click', () => exportModalOverlay.classList.remove('show'));
+  document.getElementById('exportCloseBtn').addEventListener('click', () => exportModalOverlay.classList.remove('show'));
+  exportModalOverlay.addEventListener('click', e => { if(e.target === exportModalOverlay) exportModalOverlay.classList.remove('show'); });
+  document.getElementById('exportCopyBtn').addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(exportText.value);
+      showToast('Copied to clipboard');
+    }catch(err){
+      exportText.select();
+      showToast('Select and copy manually (⌘/Ctrl+C)');
+    }
+  });
+
+  render();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>
