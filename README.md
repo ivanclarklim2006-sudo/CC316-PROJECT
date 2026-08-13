@@ -14,8 +14,8 @@ Select your operating system below to download the latest executable binary:
 
 | Platform | Format | Direct Download |
 | :--- | :--- | :--- |
-| **Windows 10/11** | Standalone Executable (`.exe`) | [**Download for Windows**](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PROJECT/RollAndRegister.exe) |
-| **Android** | Package Installer (`.apk`) | [**Download for Android**](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PROJECT/RollandRegister.apk) |
+| **Windows 10/11** | Standalone Executable (`.exe`) | [**Download for Windows**](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PRE-RELEASE_TESTING/Roll.Register.exe) |
+| **Android** | Package Installer (`.apk`) | [**Download for Android**](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PRE-RELEASE_TESTING/RollAndRegister.apk) |
 
 <br/>
 
