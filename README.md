@@ -86,7 +86,7 @@ Select your operating system below to download the latest executable binary:
 | Platform | Format | Direct Download |
 | :--- | :--- | :--- |
 | **Web Browser** | Live Demo | [**Try Web Version**](https://ivanclarklim2006-sudo.github.io/CC316-PROJECT/) |
-| **Windows 10/11** | Standalone Executable (`.exe`) | [**Download for Windows**](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PRE-RELEASE_TESTING/Roll.Register.exe) |
+| **Windows 10/11** | Standalone Executable (`.exe`) | [**Download for Windows**](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PRE-Production/CC316-Project-win32-x64.zip) |
 | **Android** | Package Installer (`.apk`) | [**Download for Android**](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PRE-RELEASE_TESTING/RollAndRegister.apk) |
 
 <br/>
@@ -97,7 +97,7 @@ Select your operating system below to download the latest executable binary:
   <img src="https://img.shields.io/badge/Try_Web_Version-Live_Demo-orange?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Try Web Version">
 </a>
 &nbsp;
-<a href="https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PROJECT/RollAndRegister.exe">
+<a href="https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/download/PRE-Production/CC316-Project-win32-x64.zip">
   <img src="https://img.shields.io/badge/Download_for_Windows-EXE-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows App">
 </a>
 &nbsp;
@@ -112,9 +112,9 @@ Select your operating system below to download the latest executable binary:
 <details>
 <summary><b>💻 Windows Installation</b></summary>
 
-1. Download **`RollAndRegister.exe`** from the links above.
-2. Move the `.exe` file to your preferred folder or Desktop.
-3. Double-click **`RollAndRegister.exe`** to open and run the app.
+1. Download **`CC316-Project-win32-x64.zip`** from the links above.
+2. save the `.zip` file to your preferred folder or Desktop.
+3. Extract **`CC316-Project-win32-x64.zip`** then click **`CC316-Project.exe`**  to open and run the app.
 </details>
 
 <details>
