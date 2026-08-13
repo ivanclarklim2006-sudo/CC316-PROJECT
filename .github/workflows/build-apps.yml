@@ -2,10 +2,10 @@ name: Build Desktop and Mobile Apps
 on:
   push:
     branches:
-      - main
+      - main  # Fires automatically whenever you push code changes to the main branch
 
 permissions:
-  contents: write
+  contents: write  # Grants the workflow worker explicit rights to save binaries back to your repo
 
 jobs:
   # --- JOB 1: BUILD WINDOWS EXE ON A WINDOWS RUNNER ---
@@ -55,9 +55,14 @@ jobs:
       - name: Build Android Mobile App File (.apk)
         run: |
           npm install -g @bubblewrap/cli
-          echo -e "\n\n\n\n\n\n" | bubblewrap init --manifest="https://github.io" --meta --yes
-          bubblewrap build --yes
-          mkdir downloads
+          
+          # Automatically satisfies both the JDK and Android SDK setup prompts headlessly
+          yes "Y" | bubblewrap init --manifest="https://github.io" --meta --yes --accept-notice
+          
+          # Automatically hits enter through the final build confirmation prompts
+          yes "" | bubblewrap build --yes
+          
+          mkdir -p downloads
           mv *.apk downloads/app-release-signed.apk || true
 
       - name: Upload Android Artifact temporarily
