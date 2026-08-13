@@ -4,7 +4,7 @@ A cross-platform desktop and mobile application converted from the CC316 project
 
 [![Windows](https://img.shields.io/badge/Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white)](#-downloads)
 [![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#-downloads)
-[![Release](https://img.shields.io/badge/Release-v1.0.0-238636?style=for-the-badge)](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/tag/PRE-RELEASE_TESTING)
+[![PRE-Release](https://img.shields.io/badge/Release-v1.0.0-238636?style=for-the-badge)](https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/tag/PRE-RELEASE_TESTING)
 
 ---
 
