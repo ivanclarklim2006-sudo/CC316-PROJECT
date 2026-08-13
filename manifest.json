@@ -2,21 +2,21 @@
   "name": "Roll and Register — Student/Teacher Directory",
   "short_name": "RollAndRegister",
   "description": "Searchable student and teacher directory with section, school year, and history lookup.",
-  "start_url": "/CC316-PROJECT/",
-  "scope": "/CC316-PROJECT/",
+  "start_url": "https://ivanclarklim2006-sudo.github.io/CC316-PROJECT/",
+  "scope": "https://ivanclarklim2006-sudo.github.io/CC316-PROJECT/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F4EEDD",
   "theme_color": "#1F3B2E",
   "icons": [
     { 
-      "src": "/CC316-PROJECT/icon-192.png", 
+      "src": "https://ivanclarklim2006-sudo.github.io/CC316-PROJECT/icon-192.png", 
       "sizes": "192x192", 
       "type": "image/png", 
       "purpose": "any maskable" 
     },
     { 
-      "src": "/CC316-PROJECT/icon-512.png", 
+      "src": "https://ivanclarklim2006-sudo.github.io/CC316-PROJECT/icon-512.png", 
       "sizes": "512x512", 
       "type": "image/png", 
       "purpose": "any maskable" 
