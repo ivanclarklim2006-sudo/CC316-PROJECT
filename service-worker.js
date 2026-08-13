@@ -1,4 +1,4 @@
-const CACHE_NAME = "roll-register-v2";
+const CACHE_NAME = "roll-register-v1";
 const ASSETS = [
   "./",
   "./index.html",

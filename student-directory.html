@@ -60,6 +60,89 @@
   .header-inner{
     max-width:900px; margin:0 auto; position:relative; z-index:1;
   }
+  .header-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+  .header-text{ flex:1; min-width:220px; }
+
+  .download-dropdown{ position:relative; flex-shrink:0; }
+  .download-btn{
+    background:rgba(244,238,221,0.1);
+    border:1.5px solid var(--brass);
+    color:var(--paper);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem;
+    letter-spacing:0.04em;
+    padding:0.55rem 0.95rem;
+    border-radius:8px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    white-space:nowrap;
+    transition:background 0.2s ease;
+  }
+  .download-btn:hover{ background:rgba(244,238,221,0.18); }
+  .download-btn .caret{ transition:transform 0.2s ease; font-size:0.7rem; }
+  .download-dropdown.open .download-btn .caret{ transform:rotate(180deg); }
+
+  .download-menu{
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:4px 4px 0 rgba(0,0,0,0.22);
+    min-width:230px;
+    padding:0.4rem;
+    display:none;
+    z-index:50;
+    animation: rise 0.18s ease both;
+  }
+  .download-dropdown.open .download-menu{ display:block; }
+  .download-menu a{
+    display:flex;
+    align-items:center;
+    gap:0.65rem;
+    padding:0.6rem 0.7rem;
+    border-radius:7px;
+    text-decoration:none;
+    color:var(--ink);
+    transition:background 0.15s ease;
+  }
+  .download-menu a:hover{ background:var(--paper-dark); }
+  .download-menu a .dl-ic{
+    font-size:1.15rem;
+    width:22px;
+    text-align:center;
+    flex-shrink:0;
+  }
+  .download-menu a .dl-txt{
+    font-family:'Inter', sans-serif;
+    font-size:0.86rem;
+    font-weight:500;
+    color:var(--ink);
+    line-height:1.3;
+  }
+  .download-menu a .dl-txt small{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--ink-soft);
+    font-size:0.68rem;
+    font-weight:400;
+    margin-top:0.1rem;
+  }
+  .download-menu hr{
+    border:none;
+    border-top:1px dashed var(--line);
+    margin:0.35rem 0.2rem;
+  }
+
   .eyebrow{
     font-family:'IBM Plex Mono', monospace;
     font-size:0.72rem;
@@ -217,6 +300,164 @@
     transition:background 0.2s ease, transform 0.15s ease;
   }
   .add-btn:hover{ background:var(--green-light); transform:translateY(-1px); }
+
+  .scan-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    background:#fff;
+    color:var(--green);
+    border:1.5px solid var(--green);
+    border-radius:8px;
+    padding:0.48rem 0.85rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.03em;
+    cursor:pointer;
+    transition:background 0.2s ease, transform 0.15s ease;
+  }
+  .scan-btn:hover{ background:var(--paper-dark); transform:translateY(-1px); }
+
+  .scan-choice{
+    display:flex;
+    flex-direction:column;
+    gap:0.7rem;
+    margin-bottom:0.4rem;
+  }
+  .scan-choice button{
+    display:flex;
+    align-items:flex-start;
+    gap:0.8rem;
+    text-align:left;
+    background:var(--paper-dark);
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:0.9rem 1rem;
+    cursor:pointer;
+    transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .scan-choice button:hover{ border-color:var(--brass); background:#fff; }
+  .scan-choice .ic{ font-size:1.5rem; line-height:1; flex-shrink:0; }
+  .scan-choice .txt b{
+    display:block;
+    font-family:'Fraunces', serif;
+    font-size:1rem;
+    color:var(--ink);
+    margin-bottom:0.15rem;
+  }
+  .scan-choice .txt span{
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    line-height:1.4;
+  }
+
+  .ocr-progress{
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:0.9rem;
+    padding:1.6rem 1rem;
+    text-align:center;
+  }
+  .ocr-progress.show{ display:flex; }
+  .ocr-spinner{
+    width:38px; height:38px;
+    border:3px solid var(--paper-dark);
+    border-top-color:var(--brass);
+    border-radius:50%;
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .ocr-progress .ocr-status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+  }
+  .ocr-progress .ocr-bar{
+    width:100%;
+    max-width:260px;
+    height:6px;
+    background:var(--paper-dark);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .ocr-progress .ocr-bar-fill{
+    height:100%;
+    width:0%;
+    background:var(--green);
+    transition:width 0.2s ease;
+  }
+
+  .review-table-wrap{
+    max-height:48vh;
+    overflow-y:auto;
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:1rem;
+  }
+  .review-row{
+    display:grid;
+    grid-template-columns:24px 1fr 1fr 1fr 0.9fr 28px;
+    gap:0.5rem;
+    align-items:center;
+    padding:0.6rem 0.7rem;
+    border-bottom:1px dashed var(--line);
+  }
+  .review-row:last-child{ border-bottom:none; }
+  .review-row.header{
+    background:var(--paper-dark);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.66rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    position:sticky; top:0;
+  }
+  .review-row input[type="text"]{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:0.35rem 0.45rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.82rem;
+    color:var(--ink);
+    background:#fff;
+    outline:none;
+  }
+  .review-row input[type="text"]:focus{ border-color:var(--brass); }
+  .review-row .row-remove{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-size:0.85rem;
+  }
+  .review-row .row-remove:hover{ color:var(--stamp); }
+
+  .add-row-blank-btn{
+    background:none;
+    border:1px dashed var(--ink-soft);
+    color:var(--ink-soft);
+    border-radius:8px;
+    padding:0.45rem 0.7rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem;
+    cursor:pointer;
+    width:100%;
+    margin-bottom:1rem;
+  }
+  .add-row-blank-btn:hover{ border-color:var(--brass); color:var(--ink); }
+
+  .ocr-disclaimer{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    background:rgba(184,134,60,0.08);
+    border:1px solid rgba(184,134,60,0.3);
+    border-radius:8px;
+    padding:0.6rem 0.8rem;
+    margin-bottom:1rem;
+    line-height:1.45;
+  }
 
   .modal-overlay{
     display:none;
@@ -755,6 +996,7 @@
     box-shadow:3px 3px 0 var(--shadow);
     animation: rise 0.38s ease both;
     max-width:520px;
+    width:100%;
   }
   .profile-card .id{
     font-family:'IBM Plex Mono', monospace;
@@ -860,15 +1102,93 @@
     outline:2px solid var(--brass);
     outline-offset:2px;
   }
+
+  /* ---------- Mobile layout ---------- */
+  @media (max-width: 640px){
+    header{ padding:1.9rem 1.1rem 1.7rem; }
+    main{ padding:1.5rem 1rem 4.5rem; }
+
+    .header-top{ flex-direction:column; align-items:stretch; }
+    .download-dropdown{ width:100%; }
+    .download-btn{ width:100%; justify-content:center; }
+    .download-menu{ left:0; right:0; width:100%; min-width:0; }
+
+    .toolbar{ flex-direction:column; align-items:stretch; gap:0.7rem; }
+    .tabs{ width:100%; }
+    .tab-btn{ flex:1; text-align:center; }
+    .toolbar-right{ flex-direction:column; align-items:stretch; gap:0.6rem; }
+    .section-jump{ width:100%; justify-content:space-between; }
+    .section-jump select{ flex:1; text-align:right; }
+    .scan-btn, .add-btn{ width:100%; justify-content:center; text-align:center; }
+
+    .results{ grid-template-columns:1fr; }
+
+    .selection-bar{ flex-wrap:wrap; gap:0.6rem; }
+    .selection-bar .sel-actions{ width:100%; justify-content:flex-end; }
+
+    .modal{ padding:1.4rem 1.1rem 1.2rem; max-width:100%; }
+    .field-row{ flex-direction:column; gap:0; }
+    .modal-actions{ flex-direction:column-reverse; }
+    .modal-actions button{ width:100%; }
+
+    .onboarding{ padding:2.2rem 0.9rem; }
+    .onboarding ol{ padding:1.1rem 1rem 1.1rem 1.9rem; }
+
+    /* Review table becomes a horizontally-scrollable strip so every
+       field stays readable instead of being squeezed into slivers */
+    .review-table-wrap{ overflow-x:auto; }
+    .review-row{
+      grid-template-columns:24px 110px 140px 110px 100px 28px;
+      width:max-content;
+      min-width:100%;
+    }
+    .review-row.header{ position:sticky; top:0; left:0; }
+  }
+
+  @media (max-width: 400px){
+    h1{ font-size:1.7rem; }
+    .card{ padding:1rem 1rem 0.9rem; }
+    .profile-card{ padding:1.4rem 1.3rem 1.2rem; }
+  }
 </style>
 </head>
 <body>
 
 <header>
   <div class="header-inner">
-    <p class="eyebrow">School Records // Directory Search</p>
-    <h1>Roll &amp; Register</h1>
-    <p class="sub">Look up a student by name or ID to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
+    <div class="header-top">
+      <div class="header-text">
+        <p class="eyebrow">School Records // Directory Search</p>
+        <h1>Roll &amp; Register</h1>
+        <p class="sub">Look up a student by name or ID to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
+      </div>
+
+      <!-- ============================================================
+           DOWNLOAD DROPDOWN — the menu itself. Link targets live in
+           DOWNLOAD_LINKS near the top of the script block below — edit
+           the links there, not here, and they'll flow through automatically.
+           ============================================================ -->
+      <div class="download-dropdown" id="downloadDropdown">
+        <button class="download-btn" id="downloadBtn" aria-haspopup="true" aria-expanded="false">
+          ⬇ Download <span class="caret">▾</span>
+        </button>
+        <div class="download-menu" id="downloadMenu">
+          <a id="dlWindows" href="#" target="_blank" rel="noopener">
+            <span class="dl-ic">🪟</span>
+            <span class="dl-txt">Windows<small>.exe installer</small></span>
+          </a>
+          <a id="dlAndroid" href="#" target="_blank" rel="noopener">
+            <span class="dl-ic">🤖</span>
+            <span class="dl-txt">Android<small>.apk file</small></span>
+          </a>
+          <hr>
+          <a id="dlGithub" href="#" target="_blank" rel="noopener">
+            <span class="dl-ic">🐙</span>
+            <span class="dl-txt">Source code<small>View on GitHub</small></span>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -893,6 +1213,7 @@
           <option value="">All</option>
         </select>
       </div>
+      <button class="scan-btn" id="scanBtn">📷 Scan</button>
       <button class="add-btn" id="addBtn">+ Add student</button>
     </div>
   </div>
@@ -997,6 +1318,53 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Scan chooser modal -->
+<div class="modal-overlay" id="scanChooserOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="scanChooserTitle">Scan</h3>
+      <button class="modal-close" id="scanChooserClose" aria-label="Close">✕</button>
+    </div>
+    <p class="ocr-disclaimer">Scanning reads text from a photo right in your browser using an on-device OCR engine — no photos are uploaded anywhere. The first scan needs internet to download the scanner (a few MB, one-time); after that it's cached. Works best on clear, well-lit, printed (not handwritten) text. Always double-check the results before saving.</p>
+    <div class="scan-choice" id="scanChoiceButtons"></div>
+  </div>
+</div>
+
+<!-- OCR progress modal -->
+<div class="modal-overlay" id="ocrProgressOverlay">
+  <div class="modal" style="max-width:360px;">
+    <div class="ocr-progress show">
+      <div class="ocr-spinner"></div>
+      <div class="ocr-status" id="ocrStatusText">Reading image…</div>
+      <div class="ocr-bar"><div class="ocr-bar-fill" id="ocrBarFill"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Single-scan result note (feeds into the Add Student/Teacher modal) -->
+
+<!-- Bulk review modal (class list) -->
+<div class="modal-overlay" id="bulkReviewOverlay">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-head">
+      <h3>Review scanned students</h3>
+      <button class="modal-close" id="bulkReviewClose" aria-label="Close">✕</button>
+    </div>
+    <p class="ocr-disclaimer">Here's everything the scan picked up. Fix anything that looks wrong, uncheck rows you don't want, or add a blank row — then add them all at once.</p>
+    <div class="review-table-wrap">
+      <div class="review-row header">
+        <span></span><span>ID</span><span>Name</span><span>Section</span><span>Year</span><span></span>
+      </div>
+      <div id="bulkReviewRows"></div>
+    </div>
+    <button type="button" class="add-row-blank-btn" id="bulkAddRowBtn">+ Add a blank row</button>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="bulkReviewCancelBtn">Cancel</button>
+      <button type="button" class="btn-primary" id="bulkReviewSaveBtn">Add selected students</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm delete modal -->
 <div class="modal-overlay" id="confirmModalOverlay">
   <div class="modal confirm-modal">
@@ -1012,6 +1380,9 @@
     </div>
   </div>
 </div>
+
+<!-- Hidden file inputs used by the scan feature -->
+<input type="file" id="scanFileInput" accept="image/*" capture="environment" style="display:none">
 
 <!-- Export data modal -->
 <div class="modal-overlay" id="exportModalOverlay">
@@ -1032,6 +1403,45 @@
 <footer>Changes save automatically in this browser — no account or server needed. <button class="link-btn" id="exportOpenBtn" style="font-size:0.76rem;">Export data</button> to back it up or move it to another device.</footer>
 
 <script>
+  // ================================================================
+  // DOWNLOAD LINKS — update these 3 lines whenever you publish a new
+  // build, then re-upload this file. Nothing else needs to change.
+  //
+  //   windows -> direct link to your latest .exe (e.g. a GitHub
+  //              Releases asset URL — see the repo's "Releases" tab)
+  //   android -> direct link to your latest .apk (same idea)
+  //   github  -> your repo's URL, for the "Source code" menu item
+  // ================================================================
+  const DOWNLOAD_LINKS = {
+    windows: "https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/latest/download/RollAndRegister-Setup.exe",
+    android: "https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/latest/download/RollAndRegister.apk",
+    github:  "https://github.com/ivanclarklim2006-sudo/CC316-PROJECT"
+  };
+
+  document.getElementById('dlWindows').href = DOWNLOAD_LINKS.windows;
+  document.getElementById('dlAndroid').href = DOWNLOAD_LINKS.android;
+  document.getElementById('dlGithub').href = DOWNLOAD_LINKS.github;
+
+  const downloadDropdown = document.getElementById('downloadDropdown');
+  const downloadBtn = document.getElementById('downloadBtn');
+  downloadBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = downloadDropdown.classList.toggle('open');
+    downloadBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  document.addEventListener('click', (e) => {
+    if(!downloadDropdown.contains(e.target)){
+      downloadDropdown.classList.remove('open');
+      downloadBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      downloadDropdown.classList.remove('open');
+      downloadBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
   // ---- Data: starts empty. Use "+ Add student/teacher" in the app, or paste
   // your own records here in the same shape as the commented example below. ----
   // { id:"STU-1001", name:"Maria Santos", section:"7-Rizal", year:"2024-2025", teacherId:"T-201",
@@ -1087,6 +1497,7 @@
   const filterChipText = document.getElementById('filterChipText');
   const filterChipClear = document.getElementById('filterChipClear');
   const addBtn = document.getElementById('addBtn');
+  const scanBtn = document.getElementById('scanBtn');
   const toast = document.getElementById('toast');
 
   function refreshDropdowns(){
@@ -1715,6 +2126,253 @@
   addBtn.addEventListener('click', () => {
     if(activeTab === 'students') openStudentModal();
     else openTeacherModal();
+  });
+
+  // ---------- OCR Scan feature ----------
+  const scanChooserOverlay = document.getElementById('scanChooserOverlay');
+  const scanChoiceButtons = document.getElementById('scanChoiceButtons');
+  const scanChooserTitle = document.getElementById('scanChooserTitle');
+  const ocrProgressOverlay = document.getElementById('ocrProgressOverlay');
+  const ocrStatusText = document.getElementById('ocrStatusText');
+  const ocrBarFill = document.getElementById('ocrBarFill');
+  const scanFileInput = document.getElementById('scanFileInput');
+  const bulkReviewOverlay = document.getElementById('bulkReviewOverlay');
+  const bulkReviewRows = document.getElementById('bulkReviewRows');
+
+  let tesseractLoadPromise = null;
+  function loadTesseract(){
+    if(window.Tesseract) return Promise.resolve();
+    if(tesseractLoadPromise) return tesseractLoadPromise;
+    tesseractLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Could not load the scanner — check your internet connection and try again.'));
+      document.head.appendChild(script);
+    });
+    return tesseractLoadPromise;
+  }
+
+  let pendingScanMode = null; // 'student-single' | 'student-bulk' | 'teacher-single'
+
+  function openScanChooser(){
+    scanChooserTitle.textContent = activeTab === 'students' ? 'Scan students' : 'Scan a teacher';
+    scanChoiceButtons.innerHTML = activeTab === 'students' ? `
+      <button type="button" data-mode="student-single">
+        <span class="ic">🪪</span>
+        <span class="txt"><b>Single student ID</b><span>Scan one ID or record — I'll open the Add Student form pre-filled.</span></span>
+      </button>
+      <button type="button" data-mode="student-bulk">
+        <span class="ic">📋</span>
+        <span class="txt"><b>Class list</b><span>Scan a printed list with several students — review every row before adding.</span></span>
+      </button>
+    ` : `
+      <button type="button" data-mode="teacher-single">
+        <span class="ic">🪪</span>
+        <span class="txt"><b>Single teacher ID</b><span>Scan an ID or record — I'll open the Add Teacher form pre-filled with ID and name.</span></span>
+      </button>
+    `;
+    scanChoiceButtons.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        pendingScanMode = btn.dataset.mode;
+        scanChooserOverlay.classList.remove('show');
+        scanFileInput.value = '';
+        scanFileInput.click();
+      });
+    });
+    scanChooserOverlay.classList.add('show');
+  }
+
+  scanBtn.addEventListener('click', openScanChooser);
+  document.getElementById('scanChooserClose').addEventListener('click', () => scanChooserOverlay.classList.remove('show'));
+  scanChooserOverlay.addEventListener('click', e => { if(e.target === scanChooserOverlay) scanChooserOverlay.classList.remove('show'); });
+
+  // ---- parsing heuristics (best-effort guesses — user reviews everything after) ----
+  function guessIdFromText(text){
+    const m = text.match(/\b([A-Z]{1,6}-\d{3,7})\b/) || text.match(/\b(\d{4,10})\b/);
+    return m ? m[1] : '';
+  }
+  function guessSectionFromText(text){
+    const m = text.match(/\b(\d{1,2}\s*-\s*[A-Za-z][A-Za-z\s]{2,20})\b/);
+    return m ? m[1].replace(/\s+/g, ' ').trim() : '';
+  }
+  function guessYearFromText(text){
+    const m = text.match(/\b(20\d{2})\s*[-–]\s*(20\d{2})\b/);
+    return m ? `${m[1]}-${m[2]}` : '';
+  }
+  function guessNameFromText(text, exclude){
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    for(const line of lines){
+      if(exclude.some(ex => ex && line.includes(ex))) continue;
+      const letters = line.replace(/[^A-Za-z]/g, '');
+      if(letters.length < 4) continue;
+      if(/^[A-Za-z.,'\-\s]+$/.test(line) && line.split(/\s+/).length <= 5){
+        return line.replace(/\s+/g, ' ').trim();
+      }
+    }
+    return '';
+  }
+  function parseSingleStudent(text){
+    const id = guessIdFromText(text);
+    const section = guessSectionFromText(text);
+    const year = guessYearFromText(text);
+    const name = guessNameFromText(text, [id, section, year]);
+    return { id, name, section, year };
+  }
+  function parseSingleTeacher(text){
+    const id = guessIdFromText(text);
+    const name = guessNameFromText(text, [id]);
+    return { id, name };
+  }
+  function parseClassList(text){
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const rows = [];
+    for(const line of lines){
+      if(/^(id|name|student|section|year|no\.?|#)\b/i.test(line) && line.split(/\s+/).length <= 5 && !/\d{3,}/.test(line)) continue;
+      const id = guessIdFromText(line);
+      const section = guessSectionFromText(line);
+      const year = guessYearFromText(line);
+      let remainder = line;
+      [id, section, year].forEach(tok => { if(tok) remainder = remainder.split(tok).join(''); });
+      const name = remainder.replace(/[^A-Za-z.,'\-\s]/g, ' ').replace(/\s+/g, ' ').trim();
+      if(!id && !name) continue;
+      rows.push({ id, name, section, year });
+    }
+    return rows;
+  }
+
+  // Phone camera photos are often huge (12MP+) — shrink to a sane max
+  // dimension first so OCR runs quickly and doesn't stall lower-end phones.
+  function downscaleImage(file, maxDim = 1600){
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        if(scale === 1){ resolve(file); return; }
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => resolve(blob || file), 'image/jpeg', 0.92);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
+  }
+
+  scanFileInput.addEventListener('change', async () => {
+    const file = scanFileInput.files[0];
+    if(!file || !pendingScanMode) return;
+    const mode = pendingScanMode;
+    pendingScanMode = null;
+
+    ocrStatusText.textContent = 'Preparing image…';
+    ocrBarFill.style.width = '0%';
+    ocrProgressOverlay.classList.add('show');
+
+    try{
+      const scannable = await downscaleImage(file);
+      ocrStatusText.textContent = 'Loading scanner…';
+      await loadTesseract();
+      const result = await window.Tesseract.recognize(scannable, 'eng', {
+        logger: info => {
+          if(info.status) ocrStatusText.textContent = info.status.replace(/_/g, ' ');
+          if(typeof info.progress === 'number') ocrBarFill.style.width = Math.round(info.progress * 100) + '%';
+        }
+      });
+      const text = result.data.text || '';
+      ocrProgressOverlay.classList.remove('show');
+
+      if(!text.trim()){
+        showToast('Could not read any text from that image');
+        return;
+      }
+
+      if(mode === 'student-single'){
+        const guess = parseSingleStudent(text);
+        openStudentModal();
+        document.getElementById('stuId').value = guess.id;
+        document.getElementById('stuName').value = guess.name;
+        document.getElementById('stuSection').value = guess.section;
+        document.getElementById('stuYear').value = guess.year;
+        showToast('Scanned — please review before saving');
+      } else if(mode === 'teacher-single'){
+        const guess = parseSingleTeacher(text);
+        openTeacherModal();
+        document.getElementById('teachId').value = guess.id;
+        document.getElementById('teachName').value = guess.name;
+        showToast('Scanned — please review before saving');
+      } else if(mode === 'student-bulk'){
+        openBulkReview(parseClassList(text));
+      }
+    }catch(err){
+      ocrProgressOverlay.classList.remove('show');
+      showToast(err.message || 'Scan failed — try a clearer photo');
+    }
+  });
+
+  // ---- bulk review table (class list) ----
+  let bulkRowCount = 0;
+  function openBulkReview(rows){
+    bulkReviewRows.innerHTML = '';
+    bulkRowCount = 0;
+    if(rows.length === 0) addBulkRow({}); else rows.forEach(r => addBulkRow(r));
+    bulkReviewOverlay.classList.add('show');
+  }
+  function addBulkRow(data){
+    bulkRowCount++;
+    const row = document.createElement('div');
+    row.className = 'review-row';
+    row.innerHTML = `
+      <input type="checkbox" class="bulk-include" checked>
+      <input type="text" class="bulk-id" value="${escapeHtml(data.id || '')}" placeholder="STU-1013">
+      <input type="text" class="bulk-name" value="${escapeHtml(data.name || '')}" placeholder="Full name">
+      <input type="text" class="bulk-section" value="${escapeHtml(data.section || '')}" placeholder="7-Rizal">
+      <input type="text" class="bulk-year" value="${escapeHtml(data.year || '')}" placeholder="2024-2025">
+      <button type="button" class="row-remove" aria-label="Remove row">✕</button>
+    `;
+    row.querySelector('.row-remove').addEventListener('click', () => row.remove());
+    bulkReviewRows.appendChild(row);
+  }
+  document.getElementById('bulkAddRowBtn').addEventListener('click', () => addBulkRow({}));
+  document.getElementById('bulkReviewClose').addEventListener('click', () => bulkReviewOverlay.classList.remove('show'));
+  document.getElementById('bulkReviewCancelBtn').addEventListener('click', () => bulkReviewOverlay.classList.remove('show'));
+  bulkReviewOverlay.addEventListener('click', e => { if(e.target === bulkReviewOverlay) bulkReviewOverlay.classList.remove('show'); });
+
+  document.getElementById('bulkReviewSaveBtn').addEventListener('click', () => {
+    const rows = [...bulkReviewRows.children];
+    let added = 0, skippedDup = 0, skippedIncomplete = 0;
+    rows.forEach(row => {
+      if(!row.querySelector('.bulk-include').checked) return;
+      const id = row.querySelector('.bulk-id').value.trim();
+      const name = row.querySelector('.bulk-name').value.trim();
+      const section = row.querySelector('.bulk-section').value.trim();
+      const year = row.querySelector('.bulk-year').value.trim();
+      if(!id || !name){ skippedIncomplete++; return; }
+      if(students.some(s => s.id.toLowerCase() === id.toLowerCase())){ skippedDup++; return; }
+      students.push({ id, name, section, year, teacherId: '', history: [{ year, section }] });
+      added++;
+    });
+
+    if(added > 0){
+      saveData();
+      refreshDropdowns();
+    }
+    bulkReviewOverlay.classList.remove('show');
+    activeTab = 'students';
+    tabsEl.dataset.active = 'students';
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
+    addBtn.textContent = '+ Add student';
+    view = 'list';
+    render();
+
+    let msg = added > 0 ? `Added ${added} student${added === 1 ? '' : 's'}` : 'No students added';
+    const skipped = skippedDup + skippedIncomplete;
+    if(skipped > 0) msg += ` — skipped ${skipped}`;
+    showToast(msg);
   });
 
   // ---------- Export data ----------
