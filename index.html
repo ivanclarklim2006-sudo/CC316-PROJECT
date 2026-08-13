@@ -48,7 +48,6 @@
     color:var(--paper);
     padding:2.6rem 1.5rem 2.2rem;
     position:relative;
-    overflow:hidden;
     border-bottom:6px double var(--brass);
   }
   header::before{
@@ -198,11 +197,18 @@
     border-radius:10px;
     box-shadow:4px 4px 0 rgba(0,0,0,0.22);
     min-width:230px;
+    max-height:min(320px, 60vh);
+    overflow-y:auto;
+    overscroll-behavior:contain;
     padding:0.4rem;
     display:none;
     z-index:50;
     animation: rise 0.18s ease both;
   }
+  .download-menu::-webkit-scrollbar{ width:8px; }
+  .download-menu::-webkit-scrollbar-track{ background:transparent; }
+  .download-menu::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px; }
+  .download-menu::-webkit-scrollbar-thumb:hover{ background:var(--ink-soft); }
   .download-dropdown.open .download-menu{ display:block; }
   .download-menu a{
     display:flex;
@@ -701,6 +707,26 @@
     margin:-0.3rem 0 1rem;
     line-height:1.4;
   }
+
+  .gdrive-box{
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--paper-dark);
+    padding:0.85rem 1rem;
+    margin:0 0 1.1rem;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:0.7rem;
+  }
+  .gdrive-row{ display:flex; align-items:center; gap:0.65rem; }
+  .gdrive-ic{ font-size:1.3rem; flex-shrink:0; }
+  .gdrive-text{ display:flex; flex-direction:column; font-family:'Inter',sans-serif; }
+  .gdrive-text b{ font-size:0.86rem; color:var(--ink); }
+  .gdrive-text span{ font-size:0.74rem; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; }
+  .gdrive-actions{ display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .gdrive-actions button{ font-size:0.78rem; padding:0.5rem 0.8rem; }
 
   .toast{
     position:fixed;
@@ -1577,6 +1603,19 @@
     </div>
     <p class="form-note">Your data already autosaves in this browser. Download a backup file to keep a copy, move it to another device, or hand it to a colleague — then import it back in any time.</p>
 
+    <div class="gdrive-box" id="gdriveBox">
+      <div class="gdrive-row">
+        <span class="gdrive-ic">☁</span>
+        <div class="gdrive-text">
+          <b>Google Drive sync</b>
+          <span id="gdriveStatus">Not connected</span>
+        </div>
+      </div>
+      <div class="gdrive-actions" id="gdriveActions">
+        <button type="button" class="btn-secondary" id="gdriveConnectBtn">Connect Google account</button>
+      </div>
+    </div>
+
     <div class="modal-actions" style="justify-content:flex-start; margin:0 0 1.3rem; padding:0; border:none;">
       <button type="button" class="btn-primary" id="downloadBackupBtn">⬇ Download backup (.json)</button>
       <button type="button" class="btn-secondary" id="importBackupBtn">⬆ Import backup</button>
@@ -1620,6 +1659,18 @@
   document.getElementById('dlWindows').href = DOWNLOAD_LINKS.windows;
   document.getElementById('dlAndroid').href = DOWNLOAD_LINKS.android;
   document.getElementById('dlGithub').href = DOWNLOAD_LINKS.github;
+
+  // ================================================================
+  // GOOGLE DRIVE SYNC CONFIG — replace with your own OAuth Client ID
+  // from Google Cloud Console (APIs & Services > Credentials > Create
+  // Credentials > OAuth client ID > Web application). Add this site's
+  // exact URL under "Authorized JavaScript origins" there.
+  // Leave the placeholder as-is to keep the "Connect Google account"
+  // button hidden until it's configured.
+  // ================================================================
+  const GOOGLE_CLIENT_ID = "YOUR_CLIENT_ID.apps.googleusercontent.com";
+  const GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
+  const GOOGLE_BACKUP_FILENAME = "roll-and-register-backup.json";
 
   const downloadDropdown = document.getElementById('downloadDropdown');
   const downloadBtn = document.getElementById('downloadBtn');
@@ -2745,26 +2796,113 @@
     return rows;
   }
 
-  // Phone camera photos are often huge (12MP+) — shrink to a sane max
-  // dimension first so OCR runs quickly and doesn't stall lower-end phones.
-  function downscaleImage(file, maxDim = 1600){
+  // Phone camera photos are often huge (12MP+) and low-contrast under
+  // ordinary indoor lighting — both hurt OCR accuracy. This pass:
+  //   1) upscales small/low-res crops so character strokes are thick
+  //      enough for Tesseract to resolve, and caps huge photos so OCR
+  //      doesn't stall lower-end phones,
+  //   2) converts to grayscale,
+  //   3) stretches contrast against the image's own darkest/lightest
+  //      pixels (so a dim or glare-y photo doesn't get lost in the
+  //      midtones), then
+  //   4) applies local adaptive thresholding (a blurred-mean comparison,
+  //      not one fixed cutoff) so text stays legible across uneven
+  //      lighting/shadows on the page — a fixed global threshold washes
+  //      out one side of an unevenly-lit photo.
+  // Net effect: crisp black text on a flat white background, which is
+  // exactly what Tesseract is tuned for, instead of a noisy color photo.
+  function preprocessForOCR(file, { maxDim = 2200, minDim = 1000 } = {}){
     return new Promise((resolve) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
       img.onload = () => {
         URL.revokeObjectURL(url);
-        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-        if(scale === 1){ resolve(file); return; }
+        const longSide = Math.max(img.width, img.height);
+        let scale = 1;
+        if(longSide > maxDim) scale = maxDim / longSide;
+        else if(longSide < minDim) scale = minDim / longSide;
+
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
         const canvas = document.createElement('canvas');
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(blob => resolve(blob || file), 'image/jpeg', 0.92);
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, w, h);
+
+        try{
+          const imgData = ctx.getImageData(0, 0, w, h);
+          const px = imgData.data;
+          const n = w * h;
+          const gray = new Uint8ClampedArray(n);
+
+          // Grayscale (luminosity-weighted) + track min/max for contrast stretch.
+          let lo = 255, hi = 0;
+          for(let i = 0, p = 0; i < n; i++, p += 4){
+            const g = 0.299 * px[p] + 0.587 * px[p+1] + 0.114 * px[p+2];
+            gray[i] = g;
+            if(g < lo) lo = g;
+            if(g > hi) hi = g;
+          }
+          const range = Math.max(1, hi - lo);
+          const stretched = new Uint8ClampedArray(n);
+          for(let i = 0; i < n; i++){
+            stretched[i] = ((gray[i] - lo) / range) * 255;
+          }
+
+          // Fast box-blur (two-pass) to approximate a local mean per
+          // pixel — this is the "adaptive" part of the threshold.
+          const radius = Math.max(8, Math.round(Math.min(w, h) * 0.02));
+          const blurred = boxBlur(stretched, w, h, radius);
+
+          // A pixel is text (black) if it's noticeably darker than its
+          // local neighborhood average; otherwise it's background (white).
+          const bias = 12; // small tolerance so flat regions stay white
+          for(let i = 0, p = 0; i < n; i++, p += 4){
+            const v = stretched[i] < (blurred[i] - bias) ? 0 : 255;
+            px[p] = px[p+1] = px[p+2] = v;
+          }
+          ctx.putImageData(imgData, 0, 0);
+        }catch(e){
+          // getImageData can fail on some browsers for cross-origin/edge
+          // cases — fall back to the plain resized (color) image rather
+          // than blocking the scan entirely.
+        }
+
+        canvas.toBlob(blob => resolve(blob || file), 'image/png');
       };
       img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
       img.src = url;
     });
+  }
+
+  // Simple separable box blur used for local-mean thresholding above.
+  function boxBlur(src, w, h, radius){
+    const tmp = new Float32Array(w * h);
+    const out = new Float32Array(w * h);
+    const size = radius * 2 + 1;
+    for(let y = 0; y < h; y++){
+      let sum = 0;
+      const row = y * w;
+      for(let x = -radius; x <= radius; x++) sum += src[row + Math.min(w - 1, Math.max(0, x))];
+      for(let x = 0; x < w; x++){
+        tmp[row + x] = sum / size;
+        const addX = Math.min(w - 1, x + radius + 1);
+        const subX = Math.max(0, x - radius);
+        sum += src[row + addX] - src[row + subX];
+      }
+    }
+    for(let x = 0; x < w; x++){
+      let sum = 0;
+      for(let y = -radius; y <= radius; y++) sum += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+      for(let y = 0; y < h; y++){
+        out[y * w + x] = sum / size;
+        const addY = Math.min(h - 1, y + radius + 1);
+        const subY = Math.max(0, y - radius);
+        sum += tmp[addY * w + x] - tmp[subY * w + x];
+      }
+    }
+    return out;
   }
 
   scanFileInput.addEventListener('change', async () => {
@@ -2778,16 +2916,39 @@
     ocrProgressOverlay.classList.add('show');
 
     try{
-      const scannable = await downscaleImage(file);
+      ocrStatusText.textContent = 'Cleaning up image…';
+      const scannable = await preprocessForOCR(file);
       ocrStatusText.textContent = 'Loading scanner…';
       await loadTesseract();
+      // PSM 4 = "single column of text of variable sizes" — fits a
+      // printed class list (one entry per line, ragged widths) better
+      // than the default "fully automatic" mode, which sometimes
+      // fragments a list into separate blocks and drops lines. PSM 6 =
+      // "uniform block of text" — fits a single ID card/record, which is
+      // usually a tight, uniform cluster of lines.
+      const psm = mode === 'student-bulk' ? '4' : '6';
       const result = await window.Tesseract.recognize(scannable, 'eng', {
+        tessedit_pageseg_mode: psm,
+        preserve_interword_spaces: '1',
         logger: info => {
           if(info.status) ocrStatusText.textContent = info.status.replace(/_/g, ' ');
           if(typeof info.progress === 'number') ocrBarFill.style.width = Math.round(info.progress * 100) + '%';
         }
       });
-      const text = result.data.text || '';
+      let text = result.data.text || '';
+
+      // If the tuned PSM came back empty (can happen on layouts it
+      // doesn't expect), fall back to Tesseract's automatic mode once
+      // before giving up, using the same cleaned-up image.
+      if(!text.trim()){
+        ocrStatusText.textContent = 'Retrying with a different mode…';
+        const retry = await window.Tesseract.recognize(scannable, 'eng', {
+          tessedit_pageseg_mode: '3',
+          preserve_interword_spaces: '1'
+        });
+        text = retry.data.text || '';
+      }
+
       ocrProgressOverlay.classList.remove('show');
 
       if(!text.trim()){
@@ -2915,18 +3076,22 @@
     }
   });
 
-  // ---------- Backup download (.json) ----------
-  document.getElementById('downloadBackupBtn').addEventListener('click', () => {
+  // ---------- Shared backup payload builder (used by manual download AND Drive sync) ----------
+  function buildBackupPayload(){
     let branding = null;
     try{ branding = JSON.parse(localStorage.getItem(BRAND_KEY) || 'null'); }catch(err){}
-
-    const payload = {
+    return {
       type: 'roll-and-register-backup',
       exportedAt: new Date().toISOString(),
       students,
       teachers,
       branding
     };
+  }
+
+  // ---------- Backup download (.json) ----------
+  document.getElementById('downloadBackupBtn').addEventListener('click', () => {
+    const payload = buildBackupPayload();
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2938,6 +3103,54 @@
     URL.revokeObjectURL(url);
     showToast('Backup downloaded');
   });
+
+  // ---------- Shared import-merge logic (used by manual file import AND Drive sync) ----------
+  // Adds students/teachers from a parsed backup object, skipping duplicates
+  // by ID. Returns a summary object; does NOT close the modal or re-render
+  // by itself so callers (file import vs Drive load) can decide when to.
+  function mergeImportedBackup(data){
+    const importedStudents = Array.isArray(data.students) ? data.students : [];
+    const importedTeachers = Array.isArray(data.teachers) ? data.teachers : [];
+
+    let addedStudents = 0, skippedStudents = 0;
+    importedStudents.forEach(s => {
+      if(!s || !s.id || !s.name) return;
+      if(students.some(existing => existing.id.toLowerCase() === String(s.id).toLowerCase())){ skippedStudents++; return; }
+      students.push(s);
+      addedStudents++;
+    });
+
+    let addedTeachers = 0, skippedTeachers = 0;
+    importedTeachers.forEach(t => {
+      if(!t || !t.id || !t.name) return;
+      if(teachers.some(existing => existing.id.toLowerCase() === String(t.id).toLowerCase())){ skippedTeachers++; return; }
+      teachers.push(t);
+      addedTeachers++;
+    });
+
+    let brandingImported = false;
+    if(data.branding && (data.branding.logo || data.branding.title || data.branding.description)){
+      saveBrandingToStorage(data.branding);
+      applyBranding(data.branding);
+      brandingImported = true;
+    }
+
+    if(addedStudents > 0 || addedTeachers > 0){
+      rebuildTeacherById();
+      saveData();
+      refreshDropdowns();
+    }
+
+    const parts = [];
+    if(addedStudents > 0) parts.push(`${addedStudents} student${addedStudents === 1 ? '' : 's'}`);
+    if(addedTeachers > 0) parts.push(`${addedTeachers} teacher${addedTeachers === 1 ? '' : 's'}`);
+    let message = parts.length ? `Imported ${parts.join(' & ')}` : 'Nothing new to import';
+    const skippedTotal = skippedStudents + skippedTeachers;
+    if(skippedTotal > 0) message += ` — skipped ${skippedTotal} duplicate${skippedTotal === 1 ? '' : 's'}`;
+    if(brandingImported) message += ' · logo/title restored';
+
+    return { addedStudents, addedTeachers, skippedStudents, skippedTeachers, brandingImported, message };
+  }
 
   // ---------- Backup import (.json) ----------
   const importFileInput = document.getElementById('importFileInput');
@@ -2955,54 +3168,180 @@
       try{ data = JSON.parse(reader.result); }
       catch(err){ showToast('That file is not a valid backup (bad JSON)'); return; }
 
-      const importedStudents = Array.isArray(data.students) ? data.students : [];
-      const importedTeachers = Array.isArray(data.teachers) ? data.teachers : [];
-
-      let addedStudents = 0, skippedStudents = 0;
-      importedStudents.forEach(s => {
-        if(!s || !s.id || !s.name) return;
-        if(students.some(existing => existing.id.toLowerCase() === String(s.id).toLowerCase())){ skippedStudents++; return; }
-        students.push(s);
-        addedStudents++;
-      });
-
-      let addedTeachers = 0, skippedTeachers = 0;
-      importedTeachers.forEach(t => {
-        if(!t || !t.id || !t.name) return;
-        if(teachers.some(existing => existing.id.toLowerCase() === String(t.id).toLowerCase())){ skippedTeachers++; return; }
-        teachers.push(t);
-        addedTeachers++;
-      });
-
-      let brandingImported = false;
-      if(data.branding && (data.branding.logo || data.branding.title || data.branding.description)){
-        saveBrandingToStorage(data.branding);
-        applyBranding(data.branding);
-        brandingImported = true;
-      }
-
-      if(addedStudents > 0 || addedTeachers > 0){
-        rebuildTeacherById();
-        saveData();
-        refreshDropdowns();
-      }
+      const result = mergeImportedBackup(data);
 
       exportModalOverlay.classList.remove('show');
       view = 'list';
       render();
-
-      const parts = [];
-      if(addedStudents > 0) parts.push(`${addedStudents} student${addedStudents === 1 ? '' : 's'}`);
-      if(addedTeachers > 0) parts.push(`${addedTeachers} teacher${addedTeachers === 1 ? '' : 's'}`);
-      let msg = parts.length ? `Imported ${parts.join(' & ')}` : 'Nothing new to import';
-      const skippedTotal = skippedStudents + skippedTeachers;
-      if(skippedTotal > 0) msg += ` — skipped ${skippedTotal} duplicate${skippedTotal === 1 ? '' : 's'}`;
-      if(brandingImported) msg += ' · logo/title restored';
-      showToast(msg);
+      showToast(result.message);
     };
     reader.onerror = () => showToast('Could not read that file');
     reader.readAsText(file);
   });
+
+  // ---------- Google Drive sync ----------
+  // Uses Google Identity Services for sign-in and the Drive API's hidden
+  // "appDataFolder" space to store one backup file per Google account —
+  // that folder isn't visible in the account's regular Drive, it's just
+  // storage for this app. Reuses buildBackupPayload() / mergeImportedBackup()
+  // above so Drive sync behaves exactly like the manual download/import.
+  const gdriveBox = document.getElementById('gdriveBox');
+  const gdriveStatus = document.getElementById('gdriveStatus');
+  const gdriveActions = document.getElementById('gdriveActions');
+
+  let gapiToken = null;       // current OAuth access token (memory only)
+  let gdriveEmail = null;
+  let gdriveFileId = null;    // cached Drive file ID for the backup file
+  let gisLoadPromise = null;
+
+  const isGoogleConfigured = GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('YOUR_CLIENT_ID');
+  if(!isGoogleConfigured){
+    // Hide the whole box until a real Client ID is set, rather than show
+    // a button that can only fail — see the GOOGLE_CLIENT_ID comment above.
+    gdriveBox.style.display = 'none';
+  }
+
+  function loadGis(){
+    if(window.google && window.google.accounts && window.google.accounts.oauth2) return Promise.resolve();
+    if(gisLoadPromise) return gisLoadPromise;
+    gisLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Could not load Google Sign-In — check your internet connection.'));
+      document.head.appendChild(script);
+    });
+    return gisLoadPromise;
+  }
+
+  function setGdriveUI(state){
+    if(state === 'connected'){
+      gdriveStatus.textContent = gdriveEmail ? `Connected as ${gdriveEmail}` : 'Connected';
+      gdriveActions.innerHTML = `
+        <button type="button" class="btn-secondary" id="gdriveSaveBtn">⬆ Save to Drive</button>
+        <button type="button" class="btn-secondary" id="gdriveLoadBtn">⬇ Load from Drive</button>
+        <button type="button" class="btn-secondary" id="gdriveDisconnectBtn">Disconnect</button>
+      `;
+      document.getElementById('gdriveSaveBtn').addEventListener('click', gdriveSave);
+      document.getElementById('gdriveLoadBtn').addEventListener('click', gdriveLoad);
+      document.getElementById('gdriveDisconnectBtn').addEventListener('click', gdriveDisconnect);
+    } else {
+      gdriveStatus.textContent = state === 'connecting' ? 'Connecting…' : 'Not connected';
+      gdriveActions.innerHTML = `<button type="button" class="btn-secondary" id="gdriveConnectBtn">Connect Google account</button>`;
+      document.getElementById('gdriveConnectBtn').addEventListener('click', gdriveConnect);
+    }
+  }
+
+  async function driveFetch(url, options = {}){
+    const res = await fetch(url, {
+      ...options,
+      headers: { ...(options.headers || {}), Authorization: `Bearer ${gapiToken}` }
+    });
+    if(res.status === 401){ gdriveDisconnect(); throw new Error('Google session expired — please reconnect.'); }
+    return res;
+  }
+
+  async function findBackupFile(){
+    const q = encodeURIComponent(`name='${GOOGLE_BACKUP_FILENAME}' and trashed=false`);
+    const res = await driveFetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,modifiedTime)`);
+    const data = await res.json();
+    return (data.files && data.files[0]) || null;
+  }
+
+  async function gdriveSave(){
+    try{
+      gdriveStatus.textContent = 'Saving…';
+      const payload = buildBackupPayload();
+      const body = JSON.stringify(payload, null, 2);
+
+      if(!gdriveFileId){
+        const existing = await findBackupFile();
+        if(existing) gdriveFileId = existing.id;
+      }
+
+      let res;
+      if(gdriveFileId){
+        res = await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${gdriveFileId}?uploadType=media`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body
+        });
+      } else {
+        const metadata = { name: GOOGLE_BACKUP_FILENAME, parents: ['appDataFolder'] };
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', new Blob([body], { type: 'application/json' }));
+        res = await driveFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+          method: 'POST',
+          body: form
+        });
+        const created = await res.json();
+        gdriveFileId = created.id;
+      }
+      if(!res.ok) throw new Error('Drive save failed');
+      setGdriveUI('connected');
+      showToast('Saved to Google Drive');
+    }catch(err){
+      setGdriveUI('connected');
+      showToast(err.message || 'Could not save to Drive');
+    }
+  }
+
+  async function gdriveLoad(){
+    try{
+      gdriveStatus.textContent = 'Loading…';
+      const existing = await findBackupFile();
+      if(!existing){ setGdriveUI('connected'); showToast('No backup found in this Google account yet'); return; }
+      gdriveFileId = existing.id;
+      const res = await driveFetch(`https://www.googleapis.com/drive/v3/files/${gdriveFileId}?alt=media`);
+      if(!res.ok) throw new Error('Drive load failed');
+      const data = await res.json();
+      const result = mergeImportedBackup(data);
+      setGdriveUI('connected');
+      exportModalOverlay.classList.remove('show');
+      view = 'list';
+      render();
+      showToast(result.message);
+    }catch(err){
+      setGdriveUI('connected');
+      showToast(err.message || 'Could not load from Drive');
+    }
+  }
+
+  function gdriveDisconnect(){
+    if(gapiToken && window.google) window.google.accounts.oauth2.revoke(gapiToken, () => {});
+    gapiToken = null;
+    gdriveEmail = null;
+    gdriveFileId = null;
+    setGdriveUI('disconnected');
+    showToast('Disconnected from Google');
+  }
+
+  async function gdriveConnect(){
+    try{
+      setGdriveUI('connecting');
+      await loadGis();
+      const tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: GOOGLE_DRIVE_SCOPE,
+        callback: async (resp) => {
+          if(resp.error){ setGdriveUI('disconnected'); showToast('Google sign-in was cancelled or failed'); return; }
+          gapiToken = resp.access_token;
+          // appdata scope doesn't return an email/profile, so just confirm
+          // "connected" without a name — good enough for a shared office login.
+          gdriveEmail = null;
+          setGdriveUI('connected');
+          showToast('Connected to Google Drive');
+        }
+      });
+      tokenClient.requestAccessToken();
+    }catch(err){
+      setGdriveUI('disconnected');
+      showToast(err.message || 'Could not start Google sign-in');
+    }
+  }
+
+  if(isGoogleConfigured) setGdriveUI('disconnected');
 
   render();
 
