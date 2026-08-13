@@ -1,0 +1,53 @@
+name: Build Desktop and Mobile Apps
+on:
+  push:
+    branches:
+      - main  # Fires automatically whenever you push code changes to the main branch
+
+permissions:
+  contents: write # Grants the workflow worker explicit rights to save binaries back to your repo
+
+jobs:
+  compile-installers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Current Workspace Files
+        uses: actions/checkout@v4 # Pulls down your repo code
+
+      - name: Configure Execution Node Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 # Updated to the latest stable runtime for optimized compilation
+
+      - name: Install Compiler Tools
+        run: |
+          npm install -g pake-cli
+          npm install -g @bubblewrap/cli
+
+      - name: Build Windows Desktop App File (.exe)
+        run: |
+          # Uses Pake to bypass rcedit/Windows Defender blocks
+          pake https://ivanclarklim2006-sudo.github.io/CC316-PROJECT/ --name "Roll_and_Register" --targets win
+          mkdir -p downloads
+          mv *.exe downloads/Roll_and_Register_Setup.exe || true
+
+      - name: Configure Java Mobile Dependencies
+        uses: actions/setup-java@v4 # Updated to setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17' # Necessary JDK structure required for Android SDK builds
+
+      - name: Build Android Mobile App File (.apk)
+        run: |
+          # Echoes inputs into bubblewrap to handle the interactive command line prompt completely headlessly
+          echo -e "\n\n\n\n\n\n" | bubblewrap init --manifest="https://github.io" --meta --yes
+          bubblewrap build --yes
+          mv *.apk downloads/app-release-signed.apk || true
+
+      - name: Commit Packages to GitHub Repository
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add downloads/
+          git commit -m "System Build: Automatically updated release installers" || exit 0
+          git push origin main
