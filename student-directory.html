@@ -69,6 +69,105 @@
   }
   .header-text{ flex:1; min-width:220px; }
 
+  .header-brand-row{
+    display:flex;
+    align-items:center;
+    gap:1.2rem;
+  }
+  .header-brand-row.logo-right{ flex-direction:row-reverse; }
+  .header-text-col{ flex:1; min-width:0; }
+
+  .school-logo{
+    width:76px; height:76px;
+    border-radius:14px;
+    object-fit:cover;
+    border:2px solid var(--brass);
+    background:rgba(244,238,221,0.08);
+    flex-shrink:0;
+    display:none;
+  }
+  .school-logo.show{ display:block; }
+
+  .header-actions{
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+    flex-shrink:0;
+    align-items:stretch;
+  }
+  .customize-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:0.4rem;
+    background:transparent;
+    border:1.5px solid rgba(244,238,221,0.4);
+    color:var(--paper);
+    border-radius:8px;
+    padding:0.5rem 0.95rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem;
+    letter-spacing:0.03em;
+    cursor:pointer;
+    transition:background 0.2s ease, border-color 0.2s ease;
+    white-space:nowrap;
+  }
+  .customize-btn:hover{ background:rgba(244,238,221,0.1); border-color:var(--paper); }
+
+  .logo-upload-row{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    margin-bottom:1.1rem;
+  }
+  .logo-preview{
+    width:64px; height:64px;
+    border-radius:10px;
+    object-fit:cover;
+    border:1.5px dashed var(--line);
+    background:var(--paper-dark);
+    flex-shrink:0;
+  }
+  .logo-upload-controls{ display:flex; flex-direction:column; gap:0.4rem; }
+  .logo-upload-controls .file-btn-row{ display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .file-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:0.35rem;
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    color:var(--ink);
+    border-radius:7px;
+    padding:0.4rem 0.75rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.8rem;
+    cursor:pointer;
+  }
+  .file-btn:hover{ border-color:var(--brass); }
+  .logo-hint{ font-size:0.74rem; color:var(--ink-soft); }
+
+  .color-field-row{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+  }
+  .color-swatch{
+    width:42px; height:38px;
+    padding:0;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    cursor:pointer;
+    background:none;
+  }
+  .color-swatch::-webkit-color-swatch-wrapper{ padding:3px; }
+  .color-swatch::-webkit-color-swatch{ border:none; border-radius:5px; }
+  .color-hex{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+
   .download-dropdown{ position:relative; flex-shrink:0; }
   .download-btn{
     background:rgba(244,238,221,0.1);
@@ -850,6 +949,7 @@
     transition:color 0.15s ease, background 0.15s ease;
   }
   .icon-del:hover{ color:var(--stamp); background:rgba(162,62,48,0.08); }
+  .icon-edit:hover{ color:var(--green); background:rgba(31,59,46,0.08); }
 
   .selection-bar{
     display:none;
@@ -1109,6 +1209,9 @@
     main{ padding:1.5rem 1rem 4.5rem; }
 
     .header-top{ flex-direction:column; align-items:stretch; }
+    .school-logo{ width:58px; height:58px; }
+    .header-actions{ width:100%; }
+    .customize-btn{ width:100%; }
     .download-dropdown{ width:100%; }
     .download-btn{ width:100%; justify-content:center; }
     .download-menu{ left:0; right:0; width:100%; min-width:0; }
@@ -1158,34 +1261,49 @@
   <div class="header-inner">
     <div class="header-top">
       <div class="header-text">
-        <p class="eyebrow">School Records // Directory Search</p>
-        <h1>Roll &amp; Register</h1>
-        <p class="sub">Look up a student by name or ID to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
+        <div class="header-brand-row" id="headerBrandRow">
+          <!-- School logo, shown only once one is uploaded via Customize -->
+          <img class="school-logo" id="schoolLogo" alt="School logo">
+          <div class="header-text-col">
+            <p class="eyebrow" id="brandTitle">School Records // Directory Search</p>
+            <h1 id="brandHeading">Roll &amp; Register</h1>
+            <p class="sub" id="brandDescription">Look up a student by name or LRN to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
+          </div>
+        </div>
       </div>
 
-      <!-- ============================================================
-           DOWNLOAD DROPDOWN — the menu itself. Link targets live in
-           DOWNLOAD_LINKS near the top of the script block below — edit
-           the links there, not here, and they'll flow through automatically.
-           ============================================================ -->
-      <div class="download-dropdown" id="downloadDropdown">
-        <button class="download-btn" id="downloadBtn" aria-haspopup="true" aria-expanded="false">
-          ⬇ Download <span class="caret">▾</span>
-        </button>
-        <div class="download-menu" id="downloadMenu">
-          <a id="dlWindows" href="#" target="_blank" rel="noopener">
-            <span class="dl-ic">🪟</span>
-            <span class="dl-txt">Windows<small>.exe installer</small></span>
-          </a>
-          <a id="dlAndroid" href="#" target="_blank" rel="noopener">
-            <span class="dl-ic">🤖</span>
-            <span class="dl-txt">Android<small>.apk file</small></span>
-          </a>
-          <hr>
-          <a id="dlGithub" href="#" target="_blank" rel="noopener">
-            <span class="dl-ic">🐙</span>
-            <span class="dl-txt">Source code<small>View on GitHub</small></span>
-          </a>
+      <div class="header-actions">
+        <!-- ============================================================
+             CUSTOMIZE — lets a school upload their own logo, edit the
+             heading/title/description text, choose colors, and pick
+             which side the logo sits on.
+             ============================================================ -->
+        <button class="customize-btn" id="customizeBtn">🎨 Customize</button>
+
+        <!-- ============================================================
+             DOWNLOAD DROPDOWN — the menu itself. Link targets live in
+             DOWNLOAD_LINKS near the top of the script block below — edit
+             the links there, not here, and they'll flow through automatically.
+             ============================================================ -->
+        <div class="download-dropdown" id="downloadDropdown">
+          <button class="download-btn" id="downloadBtn" aria-haspopup="true" aria-expanded="false">
+            ⬇ Download <span class="caret">▾</span>
+          </button>
+          <div class="download-menu" id="downloadMenu">
+            <a id="dlWindows" href="#" target="_blank" rel="noopener">
+              <span class="dl-ic">🪟</span>
+              <span class="dl-txt">Windows<small>.exe installer</small></span>
+            </a>
+            <a id="dlAndroid" href="#" target="_blank" rel="noopener">
+              <span class="dl-ic">🤖</span>
+              <span class="dl-txt">Android<small>.apk file</small></span>
+            </a>
+            <hr>
+            <a id="dlGithub" href="#" target="_blank" rel="noopener">
+              <span class="dl-ic">🐙</span>
+              <span class="dl-txt">Source code<small>View on GitHub</small></span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -1245,15 +1363,15 @@
 <div class="modal-overlay" id="studentModalOverlay">
   <div class="modal">
     <div class="modal-head">
-      <h3>Add student</h3>
+      <h3 id="studentModalTitle">Add student</h3>
       <button class="modal-close" id="studentModalClose" aria-label="Close">✕</button>
     </div>
     <p class="form-note">Saved automatically to this browser as soon as you hit save — no extra steps needed.</p>
     <form id="studentForm">
       <div class="field-row">
         <div class="field">
-          <label for="stuId">Student ID</label>
-          <input type="text" id="stuId" placeholder="STU-1013" required>
+          <label for="stuId">Student LRN</label>
+          <input type="text" id="stuId" placeholder="e.g. 136456789012" required>
         </div>
         <div class="field">
           <label for="stuName">Full name</label>
@@ -1280,7 +1398,7 @@
       </div>
       <div class="modal-actions">
         <button type="button" class="btn-secondary" id="studentCancelBtn">Cancel</button>
-        <button type="submit" class="btn-primary">Save student</button>
+        <button type="submit" class="btn-primary" id="studentSubmitBtn">Save student</button>
       </div>
     </form>
   </div>
@@ -1290,7 +1408,7 @@
 <div class="modal-overlay" id="teacherModalOverlay">
   <div class="modal">
     <div class="modal-head">
-      <h3>Add teacher</h3>
+      <h3 id="teacherModalTitle">Add teacher</h3>
       <button class="modal-close" id="teacherModalClose" aria-label="Close">✕</button>
     </div>
     <p class="form-note">Saved automatically to this browser as soon as you hit save — no extra steps needed.</p>
@@ -1310,7 +1428,7 @@
       <button type="button" class="add-row-btn" id="addSubjectRowBtn">+ Add another subject/section</button>
       <div class="modal-actions">
         <button type="button" class="btn-secondary" id="teacherCancelBtn">Cancel</button>
-        <button type="submit" class="btn-primary">Save teacher</button>
+        <button type="submit" class="btn-primary" id="teacherSubmitBtn">Save teacher</button>
       </div>
     </form>
   </div>
@@ -1353,7 +1471,7 @@
     <p class="ocr-disclaimer">Here's everything the scan picked up. Fix anything that looks wrong, uncheck rows you don't want, or add a blank row — then add them all at once.</p>
     <div class="review-table-wrap">
       <div class="review-row header">
-        <span></span><span>ID</span><span>Name</span><span>Section</span><span>Year</span><span></span>
+        <span></span><span>LRN</span><span>Name</span><span>Section</span><span>Year</span><span></span>
       </div>
       <div id="bulkReviewRows"></div>
     </div>
@@ -1384,23 +1502,104 @@
 <!-- Hidden file inputs used by the scan feature -->
 <input type="file" id="scanFileInput" accept="image/*" capture="environment" style="display:none">
 
-<!-- Export data modal -->
-<div class="modal-overlay" id="exportModalOverlay">
-  <div class="modal" style="max-width:600px;">
+<!-- Customize (school branding) modal -->
+<div class="modal-overlay" id="customizeModalOverlay">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-head">
-      <h3>Export data</h3>
-      <button class="modal-close" id="exportModalClose" aria-label="Close">✕</button>
+      <h3>Customize for your school</h3>
+      <button class="modal-close" id="customizeModalClose" aria-label="Close">✕</button>
     </div>
-    <p class="form-note">Your data already autosaves in this browser. Use this to back it up, move it to another device, or bake it in as the default by pasting over the <code>students</code> / <code>teachers</code> arrays near the top of the file's &lt;script&gt; tag.</p>
-    <textarea id="exportText" readonly style="width:100%; height:260px; font-family:'IBM Plex Mono', monospace; font-size:0.76rem; border:1.5px solid var(--line); border-radius:8px; padding:0.7rem; background:#fff; color:var(--ink); resize:vertical;"></textarea>
-    <div class="modal-actions">
-      <button type="button" class="btn-secondary" id="exportCloseBtn">Close</button>
-      <button type="button" class="btn-primary" id="exportCopyBtn">Copy to clipboard</button>
+    <p class="form-note">Your logo, text, colors, and layout are all saved in this browser, just like your roster.</p>
+
+    <div class="logo-upload-row">
+      <img class="logo-preview" id="logoPreview" alt="Logo preview">
+      <div class="logo-upload-controls">
+        <div class="file-btn-row">
+          <label class="file-btn" for="logoFileInput">Choose image</label>
+          <button type="button" class="file-btn" id="removeLogoBtn">Remove</button>
+        </div>
+        <span class="logo-hint">Square images look best. Resized automatically.</span>
+      </div>
+      <input type="file" id="logoFileInput" accept="image/*" style="display:none">
+    </div>
+
+    <div class="field">
+      <label for="brandLogoPositionInput">Logo position</label>
+      <select id="brandLogoPositionInput">
+        <option value="left">Left side</option>
+        <option value="right">Right side</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="brandTitleInput">School name <span class="optional-tag">— small text above the main title</span></label>
+      <input type="text" id="brandTitleInput" placeholder="e.g. San Jose Litex Senior Highschool">
+    </div>
+    <div class="field">
+      <label for="brandHeadingInput">Main title <span class="optional-tag">— replaces "Roll &amp; Register"</span></label>
+      <input type="text" id="brandHeadingInput" placeholder="Roll &amp; Register">
+    </div>
+    <div class="field">
+      <label for="brandDescriptionInput">Description</label>
+      <input type="text" id="brandDescriptionInput" placeholder="A short line about how to use this directory">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="brandPrimaryColorInput">Primary color <span class="optional-tag">— header &amp; buttons</span></label>
+        <div class="color-field-row">
+          <input type="color" id="brandPrimaryColorInput" class="color-swatch">
+          <span class="color-hex" id="brandPrimaryColorHex"></span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="brandAccentColorInput">Accent color <span class="optional-tag">— highlights</span></label>
+        <div class="color-field-row">
+          <input type="color" id="brandAccentColorInput" class="color-swatch">
+          <span class="color-hex" id="brandAccentColorHex"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="justify-content:space-between;">
+      <button type="button" class="btn-secondary" id="resetBrandingBtn">Reset to default</button>
+      <button type="button" class="btn-primary" id="saveBrandingBtn">Save</button>
     </div>
   </div>
 </div>
 
-<footer>Changes save automatically in this browser — no account or server needed. <button class="link-btn" id="exportOpenBtn" style="font-size:0.76rem;">Export data</button> to back it up or move it to another device.</footer>
+<!-- Backup & Import data modal -->
+<div class="modal-overlay" id="exportModalOverlay">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-head">
+      <h3>Backup &amp; import data</h3>
+      <button class="modal-close" id="exportModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="form-note">Your data already autosaves in this browser. Download a backup file to keep a copy, move it to another device, or hand it to a colleague — then import it back in any time.</p>
+
+    <div class="modal-actions" style="justify-content:flex-start; margin:0 0 1.3rem; padding:0; border:none;">
+      <button type="button" class="btn-primary" id="downloadBackupBtn">⬇ Download backup (.json)</button>
+      <button type="button" class="btn-secondary" id="importBackupBtn">⬆ Import backup</button>
+      <input type="file" id="importFileInput" accept="application/json,.json" style="display:none">
+    </div>
+    <p class="logo-hint" style="margin:-0.8rem 0 1.3rem;">Importing adds students/teachers from the file and skips any whose LRN or Teacher ID already exists here — it won't erase what you already have.</p>
+
+    <details style="margin-bottom:0.4rem;">
+      <summary style="cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:0.76rem; color:var(--ink-soft); letter-spacing:0.03em;">Advanced: bake this data in as the file's default</summary>
+      <p class="form-note" style="margin-top:0.8rem;">Copy this and paste it over the <code>students</code> / <code>teachers</code> arrays near the top of the file's script block, so this becomes the starting data for anyone opening a fresh copy.</p>
+      <textarea id="exportText" readonly style="width:100%; height:220px; font-family:'IBM Plex Mono', monospace; font-size:0.76rem; border:1.5px solid var(--line); border-radius:8px; padding:0.7rem; background:#fff; color:var(--ink); resize:vertical;"></textarea>
+      <div class="modal-actions" style="padding-top:0.8rem;">
+        <button type="button" class="btn-secondary" id="exportCopyBtn">Copy to clipboard</button>
+      </div>
+    </details>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="exportCloseBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<footer>Changes save automatically in this browser — no account or server needed. <button class="link-btn" id="exportOpenBtn" style="font-size:0.76rem;">Backup / Import data</button> to move it to another device.</footer>
 
 <script>
   // ================================================================
@@ -1442,9 +1641,196 @@
     }
   });
 
+  // ================================================================
+  // SCHOOL BRANDING — lets a school upload their own logo and set a
+  // title/description without touching any code. Saved in this
+  // browser only (same as the roster autosave), under its own key so
+  // it never mixes with student/teacher data. "Roll & Register" is
+  // intentionally NOT part of this — it's fixed in the HTML above.
+  // ================================================================
+  const BRAND_KEY = 'rollRegister_branding_v1';
+  const DEFAULT_TITLE = 'School Records // Directory Search';
+  const DEFAULT_HEADING = 'Roll & Register';
+  const DEFAULT_DESCRIPTION = 'Look up a student by name or LRN to see their section and adviser — or look up a teacher to see every subject and section they hold.';
+  const DEFAULT_PRIMARY_COLOR = '#1F3B2E'; // header background, buttons, tabs
+  const DEFAULT_ACCENT_COLOR = '#B8863C';  // brass highlights, stamps, borders
+  const DEFAULT_LOGO_POSITION = 'left';
+
+  const brandTitleEl = document.getElementById('brandTitle');
+  const brandHeadingEl = document.getElementById('brandHeading');
+  const brandDescriptionEl = document.getElementById('brandDescription');
+  const schoolLogoEl = document.getElementById('schoolLogo');
+  const headerBrandRowEl = document.getElementById('headerBrandRow');
+
+  // Lightens a #rrggbb color by a flat amount — used to derive the
+  // hover-state shade from whatever primary color the school picks.
+  function lightenColor(hex, amount){
+    const num = parseInt(hex.replace('#', ''), 16);
+    const r = Math.min(255, (num >> 16) + amount);
+    const g = Math.min(255, ((num >> 8) & 0xff) + amount);
+    const b = Math.min(255, (num & 0xff) + amount);
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  function applyBranding(brand){
+    brandTitleEl.textContent = (brand && brand.title) ? brand.title : DEFAULT_TITLE;
+    brandHeadingEl.textContent = (brand && brand.heading) ? brand.heading : DEFAULT_HEADING;
+    brandDescriptionEl.textContent = (brand && brand.description) ? brand.description : DEFAULT_DESCRIPTION;
+    if(brand && brand.logo){
+      schoolLogoEl.src = brand.logo;
+      schoolLogoEl.classList.add('show');
+    } else {
+      schoolLogoEl.src = '';
+      schoolLogoEl.classList.remove('show');
+    }
+    const logoPosition = (brand && brand.logoPosition) || DEFAULT_LOGO_POSITION;
+    headerBrandRowEl.classList.toggle('logo-right', logoPosition === 'right');
+
+    const primary = (brand && brand.primaryColor) || DEFAULT_PRIMARY_COLOR;
+    const accent = (brand && brand.accentColor) || DEFAULT_ACCENT_COLOR;
+    document.documentElement.style.setProperty('--green', primary);
+    document.documentElement.style.setProperty('--green-light', lightenColor(primary, 40));
+    document.documentElement.style.setProperty('--brass', accent);
+  }
+
+  function loadBranding(){
+    try{
+      const raw = localStorage.getItem(BRAND_KEY);
+      if(raw) applyBranding(JSON.parse(raw));
+    }catch(err){ /* fall back silently to defaults */ }
+  }
+  function saveBrandingToStorage(brand){
+    try{ localStorage.setItem(BRAND_KEY, JSON.stringify(brand)); }
+    catch(err){ showToast('Could not save — logo image may be too large'); }
+  }
+  loadBranding();
+
+  // Shrinks an uploaded logo before storing it, so it doesn't eat into
+  // this browser's storage quota (same idea as the OCR photo downscale).
+  function resizeImageToDataURL(file, maxDim = 300){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read that image')); };
+      img.src = url;
+    });
+  }
+
+  const customizeBtn = document.getElementById('customizeBtn');
+  const customizeModalOverlay = document.getElementById('customizeModalOverlay');
+  const logoFileInput = document.getElementById('logoFileInput');
+  const logoPreview = document.getElementById('logoPreview');
+  const brandLogoPositionInput = document.getElementById('brandLogoPositionInput');
+  const brandTitleInput = document.getElementById('brandTitleInput');
+  const brandHeadingInput = document.getElementById('brandHeadingInput');
+  const brandDescriptionInput = document.getElementById('brandDescriptionInput');
+  const brandPrimaryColorInput = document.getElementById('brandPrimaryColorInput');
+  const brandAccentColorInput = document.getElementById('brandAccentColorInput');
+  const brandPrimaryColorHex = document.getElementById('brandPrimaryColorHex');
+  const brandAccentColorHex = document.getElementById('brandAccentColorHex');
+  let pendingLogoDataUrl = null; // null = unchanged from current saved logo this session
+
+  function openCustomizeModal(){
+    const current = (() => {
+      try{ return JSON.parse(localStorage.getItem(BRAND_KEY) || '{}'); }
+      catch(err){ return {}; }
+    })();
+    pendingLogoDataUrl = current.logo || null;
+    logoPreview.src = current.logo || '';
+    brandLogoPositionInput.value = current.logoPosition || DEFAULT_LOGO_POSITION;
+    brandTitleInput.value = current.title || '';
+    brandHeadingInput.value = current.heading || '';
+    brandDescriptionInput.value = current.description || '';
+    brandPrimaryColorInput.value = current.primaryColor || DEFAULT_PRIMARY_COLOR;
+    brandAccentColorInput.value = current.accentColor || DEFAULT_ACCENT_COLOR;
+    brandPrimaryColorHex.textContent = brandPrimaryColorInput.value;
+    brandAccentColorHex.textContent = brandAccentColorInput.value;
+    customizeModalOverlay.classList.add('show');
+  }
+  function closeCustomizeModal(){
+    customizeModalOverlay.classList.remove('show');
+    loadBranding(); // discard any live color preview that wasn't saved
+  }
+
+  customizeBtn.addEventListener('click', openCustomizeModal);
+  document.getElementById('customizeModalClose').addEventListener('click', closeCustomizeModal);
+  customizeModalOverlay.addEventListener('click', e => { if(e.target === customizeModalOverlay) closeCustomizeModal(); });
+
+  // Live-preview colors as the school picks them, without saving yet
+  brandPrimaryColorInput.addEventListener('input', () => {
+    brandPrimaryColorHex.textContent = brandPrimaryColorInput.value;
+    document.documentElement.style.setProperty('--green', brandPrimaryColorInput.value);
+    document.documentElement.style.setProperty('--green-light', lightenColor(brandPrimaryColorInput.value, 40));
+  });
+  brandAccentColorInput.addEventListener('input', () => {
+    brandAccentColorHex.textContent = brandAccentColorInput.value;
+    document.documentElement.style.setProperty('--brass', brandAccentColorInput.value);
+  });
+
+  logoFileInput.addEventListener('change', async () => {
+    const file = logoFileInput.files[0];
+    if(!file) return;
+    try{
+      pendingLogoDataUrl = await resizeImageToDataURL(file);
+      logoPreview.src = pendingLogoDataUrl;
+    }catch(err){
+      showToast('Could not read that image — try a different file');
+    }
+  });
+
+  document.getElementById('removeLogoBtn').addEventListener('click', () => {
+    pendingLogoDataUrl = null;
+    logoPreview.src = '';
+  });
+
+  document.getElementById('saveBrandingBtn').addEventListener('click', () => {
+    const brand = {
+      logo: pendingLogoDataUrl || null,
+      logoPosition: brandLogoPositionInput.value,
+      title: brandTitleInput.value.trim(),
+      heading: brandHeadingInput.value.trim(),
+      description: brandDescriptionInput.value.trim(),
+      primaryColor: brandPrimaryColorInput.value,
+      accentColor: brandAccentColorInput.value
+    };
+    saveBrandingToStorage(brand);
+    applyBranding(brand);
+    closeCustomizeModal();
+    showToast('Customization saved');
+  });
+
+  document.getElementById('resetBrandingBtn').addEventListener('click', () => {
+    try{ localStorage.removeItem(BRAND_KEY); }catch(err){}
+    pendingLogoDataUrl = null;
+    logoPreview.src = '';
+    brandLogoPositionInput.value = DEFAULT_LOGO_POSITION;
+    brandTitleInput.value = '';
+    brandHeadingInput.value = '';
+    brandDescriptionInput.value = '';
+    brandPrimaryColorInput.value = DEFAULT_PRIMARY_COLOR;
+    brandAccentColorInput.value = DEFAULT_ACCENT_COLOR;
+    brandPrimaryColorHex.textContent = DEFAULT_PRIMARY_COLOR;
+    brandAccentColorHex.textContent = DEFAULT_ACCENT_COLOR;
+    applyBranding(null);
+    customizeModalOverlay.classList.remove('show');
+    showToast('Reset to default');
+  });
+
   // ---- Data: starts empty. Use "+ Add student/teacher" in the app, or paste
-  // your own records here in the same shape as the commented example below. ----
-  // { id:"STU-1001", name:"Maria Santos", section:"7-Rizal", year:"2024-2025", teacherId:"T-201",
+  // your own records here in the same shape as the commented example below.
+  // Note: the "id" field holds the student's LRN — the UI now labels it
+  // "Student LRN", the field name in the data just stayed "id" for simplicity. ----
+  // { id:"136456789012", name:"Maria Santos", section:"7-Rizal", year:"2024-2025", teacherId:"T-201",
   //   history:[ {year:"2024-2025", section:"7-Rizal"} ], transferredFrom:"Optional Prior School" }
   const students = [];
 
@@ -1599,7 +1985,7 @@
       tabsEl.dataset.active = activeTab;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
       searchInput.placeholder = activeTab === 'students'
-        ? "Search by student name or ID…"
+        ? "Search by student name or LRN…"
         : "Search by teacher name or ID…";
       addBtn.textContent = activeTab === 'students' ? '+ Add student' : '+ Add teacher';
       sectionJumpWrap.style.display = activeTab === 'students' ? '' : 'none';
@@ -1675,11 +2061,13 @@
           `).join('') || '<li>No prior section records on file.</li>'}
         </ul>
         <div class="modal-actions" style="justify-content:flex-start; margin-top:1.4rem;">
+          <button type="button" class="btn-secondary" id="editFromProfileBtn">Edit this student</button>
           <button type="button" class="btn-danger" id="deleteFromProfileBtn">Delete this student</button>
         </div>
       </div>
     `;
     document.getElementById('backBtn').addEventListener('click', backToList);
+    document.getElementById('editFromProfileBtn').addEventListener('click', () => openStudentModal(s));
     document.getElementById('deleteFromProfileBtn').addEventListener('click', () => confirmDeleteStudents([s.id]));
   }
 
@@ -1734,7 +2122,7 @@
             <p class="lead">This directory is empty — here's how to get it going.</p>
             <ol>
               <li><b>Add a teacher first</b> (optional) so you can assign advisers as you go — use the Teachers tab.</li>
-              <li><b>Tap "+ Add student"</b> below to enter a student's ID, name, section, and school year.</li>
+              <li><b>Tap "+ Add student"</b> below to enter a student's LRN, name, section, and school year.</li>
               <li><b>Search</b> by name or ID any time, or use the Section / School year dropdowns to browse.</li>
               <li><b>Tap a student's name</b> to see their full section history, and check the boxes on any card to delete several at once.</li>
               <li>When you're ready to keep your data permanently, use <b>"export current data"</b> in the footer.</li>
@@ -1765,7 +2153,7 @@
       updateSelectionBar();
 
       if(list.length === 0){
-        resultsEl.innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="mark">—</span>No student matches that name or ID.</div>`;
+        resultsEl.innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="mark">—</span>No student matches that name or LRN.</div>`;
         return;
       }
 
@@ -1782,6 +2170,7 @@
             </label>
             <div class="card-head-right">
               <div class="stamp">${escapeHtml(s.section)}</div>
+              <button class="icon-del icon-edit" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>
               <button class="icon-del" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
             </div>
           </div>
@@ -1805,6 +2194,13 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           confirmDeleteStudents([btn.dataset.deleteStudent]);
+        });
+      });
+      resultsEl.querySelectorAll('[data-edit-student]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const s = students.find(st => st.id === btn.dataset.editStudent);
+          if(s) openStudentModal(s);
         });
       });
       resultsEl.querySelectorAll('[data-select-student]').forEach(chk => {
@@ -1866,6 +2262,7 @@
             </label>
             <div class="card-head-right">
               <div class="stamp">${t.subjects.length} held</div>
+              <button class="icon-del icon-edit" data-edit-teacher="${escapeHtml(t.id)}" aria-label="Edit teacher" title="Edit teacher">✏️</button>
               <button class="icon-del" data-delete-teacher="${escapeHtml(t.id)}" aria-label="Delete teacher" title="Delete teacher">🗑</button>
             </div>
           </div>
@@ -1882,6 +2279,13 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           confirmDeleteTeachers([btn.dataset.deleteTeacher]);
+        });
+      });
+      resultsEl.querySelectorAll('[data-edit-teacher]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const t = teachers.find(tc => tc.id === btn.dataset.editTeacher);
+          if(t) openTeacherModal(t);
         });
       });
       resultsEl.querySelectorAll('[data-select-teacher]').forEach(chk => {
@@ -1991,19 +2395,39 @@
     render();
   });
 
-  // ---------- Add Student modal ----------
+  // ---------- Add / Edit Student modal ----------
   const studentModalOverlay = document.getElementById('studentModalOverlay');
   const studentForm = document.getElementById('studentForm');
   const stuTeacherSelect = document.getElementById('stuTeacher');
+  const studentModalTitle = document.getElementById('studentModalTitle');
+  const studentSubmitBtn = document.getElementById('studentSubmitBtn');
+  let editingStudentId = null; // null = adding new; otherwise the original LRN being edited
 
-  function openStudentModal(){
+  function openStudentModal(existing){
     stuTeacherSelect.innerHTML = '<option value="">— none yet —</option>' +
       teachers.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.id)} — ${escapeHtml(t.name)}</option>`).join('');
     studentForm.reset();
+
+    if(existing){
+      editingStudentId = existing.id;
+      studentModalTitle.textContent = 'Edit student';
+      studentSubmitBtn.textContent = 'Save changes';
+      document.getElementById('stuId').value = existing.id;
+      document.getElementById('stuName').value = existing.name;
+      document.getElementById('stuSection').value = existing.section;
+      document.getElementById('stuYear').value = existing.year || '';
+      stuTeacherSelect.value = existing.teacherId || '';
+      document.getElementById('stuOrigin').value = existing.transferredFrom || '';
+    } else {
+      editingStudentId = null;
+      studentModalTitle.textContent = 'Add student';
+      studentSubmitBtn.textContent = 'Save student';
+    }
+
     studentModalOverlay.classList.add('show');
     document.getElementById('stuId').focus();
   }
-  function closeStudentModal(){ studentModalOverlay.classList.remove('show'); }
+  function closeStudentModal(){ studentModalOverlay.classList.remove('show'); editingStudentId = null; }
 
   document.getElementById('studentModalClose').addEventListener('click', closeStudentModal);
   document.getElementById('studentCancelBtn').addEventListener('click', closeStudentModal);
@@ -2018,8 +2442,41 @@
     const teacherId = stuTeacherSelect.value;
     const origin = document.getElementById('stuOrigin').value.trim();
 
-    if(students.some(s => s.id.toLowerCase() === id.toLowerCase())){
-      showToast(`Student ID "${id}" already exists`);
+    // Duplicate LRN check — ignore the record we're currently editing
+    const dupe = students.some(s => s.id.toLowerCase() === id.toLowerCase() && s.id !== editingStudentId);
+    if(dupe){
+      showToast(`Student LRN "${id}" already exists`);
+      return;
+    }
+
+    if(editingStudentId){
+      const s = students.find(st => st.id === editingStudentId);
+      s.id = id;
+      s.name = name;
+      s.section = section;
+      s.year = year;
+      s.teacherId = teacherId;
+      if(origin) s.transferredFrom = origin; else delete s.transferredFrom;
+
+      // Keep the section-history timeline in sync with the current year/section
+      s.history = s.history || [];
+      const histEntry = s.history.find(h => h.year === year);
+      if(histEntry) histEntry.section = section;
+      else s.history.unshift({ year, section });
+
+      saveData();
+      refreshDropdowns();
+      closeStudentModal();
+      view = 'list';
+      activeTab = 'students';
+      tabsEl.dataset.active = 'students';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
+      addBtn.textContent = '+ Add student';
+      query = id.toLowerCase();
+      searchInput.value = id;
+      clearBtn.classList.add('show');
+      render();
+      showToast(`Saved changes to ${name}`);
       return;
     }
 
@@ -2047,11 +2504,14 @@
     showToast(`Added ${name}`);
   });
 
-  // ---------- Add Teacher modal ----------
+  // ---------- Add / Edit Teacher modal ----------
   const teacherModalOverlay = document.getElementById('teacherModalOverlay');
   const teacherForm = document.getElementById('teacherForm');
   const subjectRows = document.getElementById('subjectRows');
+  const teacherModalTitle = document.getElementById('teacherModalTitle');
+  const teacherSubmitBtn = document.getElementById('teacherSubmitBtn');
   let subjectRowCount = 0;
+  let editingTeacherId = null; // null = adding new; otherwise the original ID being edited
 
   function addSubjectRow(subject = '', section = ''){
     subjectRowCount++;
@@ -2069,14 +2529,32 @@
     subjectRows.appendChild(row);
   }
 
-  function openTeacherModal(){
+  function openTeacherModal(existing){
     teacherForm.reset();
     subjectRows.innerHTML = '';
-    addSubjectRow();
+
+    if(existing){
+      editingTeacherId = existing.id;
+      teacherModalTitle.textContent = 'Edit teacher';
+      teacherSubmitBtn.textContent = 'Save changes';
+      document.getElementById('teachId').value = existing.id;
+      document.getElementById('teachName').value = existing.name;
+      if(existing.subjects && existing.subjects.length){
+        existing.subjects.forEach(s => addSubjectRow(s.subject, s.section));
+      } else {
+        addSubjectRow();
+      }
+    } else {
+      editingTeacherId = null;
+      teacherModalTitle.textContent = 'Add teacher';
+      teacherSubmitBtn.textContent = 'Save teacher';
+      addSubjectRow();
+    }
+
     teacherModalOverlay.classList.add('show');
     document.getElementById('teachId').focus();
   }
-  function closeTeacherModal(){ teacherModalOverlay.classList.remove('show'); }
+  function closeTeacherModal(){ teacherModalOverlay.classList.remove('show'); editingTeacherId = null; }
 
   document.getElementById('teacherModalClose').addEventListener('click', closeTeacherModal);
   document.getElementById('teacherCancelBtn').addEventListener('click', closeTeacherModal);
@@ -2088,7 +2566,8 @@
     const id = document.getElementById('teachId').value.trim();
     const name = document.getElementById('teachName').value.trim();
 
-    if(teachers.some(t => t.id.toLowerCase() === id.toLowerCase())){
+    const dupe = teachers.some(t => t.id.toLowerCase() === id.toLowerCase() && t.id !== editingTeacherId);
+    if(dupe){
       showToast(`Teacher ID "${id}" already exists`);
       return;
     }
@@ -2100,6 +2579,31 @@
 
     if(subjects.length === 0){
       showToast('Add at least one subject and section');
+      return;
+    }
+
+    if(editingTeacherId){
+      const oldId = editingTeacherId;
+      const t = teachers.find(tc => tc.id === oldId);
+      t.id = id;
+      t.name = name;
+      t.subjects = subjects;
+
+      // If the teacher's ID changed, update any students that list them as adviser
+      if(oldId !== id){
+        students.forEach(s => { if(s.teacherId === oldId) s.teacherId = id; });
+      }
+      rebuildTeacherById();
+      saveData();
+
+      closeTeacherModal();
+      view = 'list';
+      activeTab = 'teachers';
+      tabsEl.dataset.active = 'teachers';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'teachers'));
+      addBtn.textContent = '+ Add teacher';
+      render();
+      showToast(`Saved changes to ${name}`);
       return;
     }
 
@@ -2160,7 +2664,7 @@
     scanChoiceButtons.innerHTML = activeTab === 'students' ? `
       <button type="button" data-mode="student-single">
         <span class="ic">🪪</span>
-        <span class="txt"><b>Single student ID</b><span>Scan one ID or record — I'll open the Add Student form pre-filled.</span></span>
+        <span class="txt"><b>Single student LRN</b><span>Scan one LRN or record — I'll open the Add Student form pre-filled.</span></span>
       </button>
       <button type="button" data-mode="student-bulk">
         <span class="ic">📋</span>
@@ -2328,7 +2832,7 @@
     row.className = 'review-row';
     row.innerHTML = `
       <input type="checkbox" class="bulk-include" checked>
-      <input type="text" class="bulk-id" value="${escapeHtml(data.id || '')}" placeholder="STU-1013">
+      <input type="text" class="bulk-id" value="${escapeHtml(data.id || '')}" placeholder="e.g. 136456789012">
       <input type="text" class="bulk-name" value="${escapeHtml(data.name || '')}" placeholder="Full name">
       <input type="text" class="bulk-section" value="${escapeHtml(data.section || '')}" placeholder="7-Rizal">
       <input type="text" class="bulk-year" value="${escapeHtml(data.year || '')}" placeholder="2024-2025">
@@ -2409,6 +2913,95 @@
       exportText.select();
       showToast('Select and copy manually (⌘/Ctrl+C)');
     }
+  });
+
+  // ---------- Backup download (.json) ----------
+  document.getElementById('downloadBackupBtn').addEventListener('click', () => {
+    let branding = null;
+    try{ branding = JSON.parse(localStorage.getItem(BRAND_KEY) || 'null'); }catch(err){}
+
+    const payload = {
+      type: 'roll-and-register-backup',
+      exportedAt: new Date().toISOString(),
+      students,
+      teachers,
+      branding
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `roll-and-register-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Backup downloaded');
+  });
+
+  // ---------- Backup import (.json) ----------
+  const importFileInput = document.getElementById('importFileInput');
+  document.getElementById('importBackupBtn').addEventListener('click', () => {
+    importFileInput.value = '';
+    importFileInput.click();
+  });
+
+  importFileInput.addEventListener('change', () => {
+    const file = importFileInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try{ data = JSON.parse(reader.result); }
+      catch(err){ showToast('That file is not a valid backup (bad JSON)'); return; }
+
+      const importedStudents = Array.isArray(data.students) ? data.students : [];
+      const importedTeachers = Array.isArray(data.teachers) ? data.teachers : [];
+
+      let addedStudents = 0, skippedStudents = 0;
+      importedStudents.forEach(s => {
+        if(!s || !s.id || !s.name) return;
+        if(students.some(existing => existing.id.toLowerCase() === String(s.id).toLowerCase())){ skippedStudents++; return; }
+        students.push(s);
+        addedStudents++;
+      });
+
+      let addedTeachers = 0, skippedTeachers = 0;
+      importedTeachers.forEach(t => {
+        if(!t || !t.id || !t.name) return;
+        if(teachers.some(existing => existing.id.toLowerCase() === String(t.id).toLowerCase())){ skippedTeachers++; return; }
+        teachers.push(t);
+        addedTeachers++;
+      });
+
+      let brandingImported = false;
+      if(data.branding && (data.branding.logo || data.branding.title || data.branding.description)){
+        saveBrandingToStorage(data.branding);
+        applyBranding(data.branding);
+        brandingImported = true;
+      }
+
+      if(addedStudents > 0 || addedTeachers > 0){
+        rebuildTeacherById();
+        saveData();
+        refreshDropdowns();
+      }
+
+      exportModalOverlay.classList.remove('show');
+      view = 'list';
+      render();
+
+      const parts = [];
+      if(addedStudents > 0) parts.push(`${addedStudents} student${addedStudents === 1 ? '' : 's'}`);
+      if(addedTeachers > 0) parts.push(`${addedTeachers} teacher${addedTeachers === 1 ? '' : 's'}`);
+      let msg = parts.length ? `Imported ${parts.join(' & ')}` : 'Nothing new to import';
+      const skippedTotal = skippedStudents + skippedTeachers;
+      if(skippedTotal > 0) msg += ` — skipped ${skippedTotal} duplicate${skippedTotal === 1 ? '' : 's'}`;
+      if(brandingImported) msg += ' · logo/title restored';
+      showToast(msg);
+    };
+    reader.onerror = () => showToast('Could not read that file');
+    reader.readAsText(file);
   });
 
   render();
