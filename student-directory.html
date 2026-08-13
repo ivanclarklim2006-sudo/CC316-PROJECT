@@ -1601,7 +1601,7 @@
       <h3>Backup &amp; import data</h3>
       <button class="modal-close" id="exportModalClose" aria-label="Close">✕</button>
     </div>
-    <p class="form-note">Your data already autosaves in this browser. Download a backup file to keep a copy, move it to another device, or hand it to a colleague — then import it back in any time.</p>
+    <p class="form-note">Your data already autosaves in this browser. Connect a Google account below to also auto-sync it to Drive, or download a backup file to keep a copy, move it to another device, or hand it to a colleague.</p>
 
     <div class="gdrive-box" id="gdriveBox">
       <div class="gdrive-row">
@@ -1668,7 +1668,7 @@
   // Leave the placeholder as-is to keep the "Connect Google account"
   // button hidden until it's configured.
   // ================================================================
-  const GOOGLE_CLIENT_ID = "YOUR_CLIENT_ID.apps.googleusercontent.com";
+  const GOOGLE_CLIENT_ID = "539917251167-crisqpt23rcb9q069ht82gesh92dmf0v.apps.googleusercontent.com";
   const GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
   const GOOGLE_BACKUP_FILENAME = "roll-and-register-backup.json";
 
@@ -1901,6 +1901,7 @@
     if(!storageAvailable) return;
     try{
       localStorage.setItem(SAVE_KEY, JSON.stringify({ students, teachers }));
+      scheduleDriveAutoSave();
     }catch(err){
       storageAvailable = false;
       showToast('Could not autosave — storage unavailable in this browser');
@@ -3193,6 +3194,7 @@
   let gdriveEmail = null;
   let gdriveFileId = null;    // cached Drive file ID for the backup file
   let gisLoadPromise = null;
+  let lastDriveSyncAt = null;
 
   const isGoogleConfigured = GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('YOUR_CLIENT_ID');
   if(!isGoogleConfigured){
@@ -3214,21 +3216,29 @@
     return gisLoadPromise;
   }
 
+  function formatSyncTime(date){
+    if(!date) return '';
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
   function setGdriveUI(state){
     if(state === 'connected'){
-      gdriveStatus.textContent = gdriveEmail ? `Connected as ${gdriveEmail}` : 'Connected';
+      const base = gdriveEmail ? `Connected as ${gdriveEmail}` : 'Connected';
+      gdriveStatus.textContent = lastDriveSyncAt ? `${base} · synced ${formatSyncTime(lastDriveSyncAt)}` : base;
       gdriveActions.innerHTML = `
         <button type="button" class="btn-secondary" id="gdriveSaveBtn">⬆ Save to Drive</button>
         <button type="button" class="btn-secondary" id="gdriveLoadBtn">⬇ Load from Drive</button>
         <button type="button" class="btn-secondary" id="gdriveDisconnectBtn">Disconnect</button>
       `;
-      document.getElementById('gdriveSaveBtn').addEventListener('click', gdriveSave);
-      document.getElementById('gdriveLoadBtn').addEventListener('click', gdriveLoad);
-      document.getElementById('gdriveDisconnectBtn').addEventListener('click', gdriveDisconnect);
+      // Wrapped in arrow functions (not passed directly) so the click
+      // event object doesn't get forwarded as gdriveSave's `silent` arg.
+      document.getElementById('gdriveSaveBtn').addEventListener('click', () => gdriveSave(false));
+      document.getElementById('gdriveLoadBtn').addEventListener('click', () => gdriveLoad());
+      document.getElementById('gdriveDisconnectBtn').addEventListener('click', () => gdriveDisconnect());
     } else {
       gdriveStatus.textContent = state === 'connecting' ? 'Connecting…' : 'Not connected';
       gdriveActions.innerHTML = `<button type="button" class="btn-secondary" id="gdriveConnectBtn">Connect Google account</button>`;
-      document.getElementById('gdriveConnectBtn').addEventListener('click', gdriveConnect);
+      document.getElementById('gdriveConnectBtn').addEventListener('click', () => gdriveConnect());
     }
   }
 
@@ -3248,9 +3258,9 @@
     return (data.files && data.files[0]) || null;
   }
 
-  async function gdriveSave(){
+  async function gdriveSave(silent){
     try{
-      gdriveStatus.textContent = 'Saving…';
+      gdriveStatus.textContent = silent ? 'Syncing…' : 'Saving…';
       const payload = buildBackupPayload();
       const body = JSON.stringify(payload, null, 2);
 
@@ -3279,12 +3289,28 @@
         gdriveFileId = created.id;
       }
       if(!res.ok) throw new Error('Drive save failed');
+      lastDriveSyncAt = new Date();
       setGdriveUI('connected');
-      showToast('Saved to Google Drive');
+      if(!silent) showToast('Saved to Google Drive');
     }catch(err){
       setGdriveUI('connected');
-      showToast(err.message || 'Could not save to Drive');
+      // Auto-saves fail quietly in the status line rather than popping a
+      // toast on every keystroke-adjacent change — manual saves still get
+      // an explicit toast since the user is waiting on that click.
+      if(silent){ gdriveStatus.textContent = 'Auto-sync failed — click Save to Drive to retry'; }
+      else showToast(err.message || 'Could not save to Drive');
     }
+  }
+
+  // ---------- Drive auto-save ----------
+  // Debounced so rapid edits (e.g. typing in a field, adding several rows)
+  // collapse into one Drive write a couple seconds after things go quiet,
+  // instead of firing a request per keystroke.
+  let driveAutoSaveTimer = null;
+  function scheduleDriveAutoSave(){
+    if(!isGoogleConfigured || !gapiToken) return;
+    if(driveAutoSaveTimer) clearTimeout(driveAutoSaveTimer);
+    driveAutoSaveTimer = setTimeout(() => { gdriveSave(true); }, 2000);
   }
 
   async function gdriveLoad(){
@@ -3309,10 +3335,12 @@
   }
 
   function gdriveDisconnect(){
+    if(driveAutoSaveTimer){ clearTimeout(driveAutoSaveTimer); driveAutoSaveTimer = null; }
     if(gapiToken && window.google) window.google.accounts.oauth2.revoke(gapiToken, () => {});
     gapiToken = null;
     gdriveEmail = null;
     gdriveFileId = null;
+    lastDriveSyncAt = null;
     setGdriveUI('disconnected');
     showToast('Disconnected from Google');
   }
@@ -3331,13 +3359,41 @@
           // "connected" without a name — good enough for a shared office login.
           gdriveEmail = null;
           setGdriveUI('connected');
-          showToast('Connected to Google Drive');
+          await initialDriveSync();
         }
       });
       tokenClient.requestAccessToken();
     }catch(err){
       setGdriveUI('disconnected');
       showToast(err.message || 'Could not start Google sign-in');
+    }
+  }
+
+  // Runs once right after connecting, before auto-save takes over. If a
+  // backup already exists on Drive (e.g. this is a second device), pull it
+  // in first — merging is additive/skip-duplicate, so it can't erase
+  // anything local. Only pushes local data as a fresh backup if Drive has
+  // none yet, so a first-time connect from an empty browser can't stomp on
+  // an existing roster.
+  async function initialDriveSync(){
+    try{
+      const existing = await findBackupFile();
+      if(existing){
+        gdriveFileId = existing.id;
+        const res = await driveFetch(`https://www.googleapis.com/drive/v3/files/${gdriveFileId}?alt=media`);
+        if(res.ok){
+          const data = await res.json();
+          const result = mergeImportedBackup(data);
+          lastDriveSyncAt = new Date();
+          setGdriveUI('connected');
+          showToast(`Connected to Google Drive — ${result.message.toLowerCase()}`);
+          return;
+        }
+      }
+      await gdriveSave(true);
+      showToast('Connected to Google Drive — this device\'s data is now the starting backup');
+    }catch(err){
+      showToast('Connected, but the initial sync failed — try Save/Load from Drive manually');
     }
   }
 
