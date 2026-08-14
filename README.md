@@ -81,6 +81,27 @@ Select your operating system below to download the latest executable binary:
 
 ---
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="screenshots/directory-empty-state.png" alt="Student directory with search, section/school year filters, and Scan / Add student buttons" width="100%"><br/>
+      <sub>Directory view — search, filters, and OCR scan</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="screenshots/backup-import-modal.png" alt="Backup and import modal with Google Drive sync, download backup, and import backup options" width="100%"><br/>
+      <sub>Backup & import — Drive sync, download/import</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="screenshots/customize-branding-modal.png" alt="Customize modal for uploading a school logo and setting title, description, and colors" width="100%"><br/>
+      <sub>Customize — logo, colors, and branding</sub>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## 🚀 Installation Instructions
 
 <details>
