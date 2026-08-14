@@ -1,4 +1,8 @@
-const CACHE_NAME = "roll-register-v1";
+// Bump this on every deploy that changes index.html/manifest/icons. Changing
+// this string is what makes the browser see the service worker file as
+// "different" and install the update — without a change here, some browsers
+// may not even notice a new deploy happened.
+const CACHE_NAME = "roll-register-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -23,8 +27,22 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Network-first, falling back to cache. This is the actual fix for "users
+// need to clear their history to see updates": as long as they're online,
+// they always get the live file from GitHub Pages, never a stale cached
+// copy — the cache only kicks in as an offline fallback. This matters more
+// than the CACHE_NAME bump above; that bump helps precache correctly on
+// install, but this strategy is what guarantees freshness on every load.
 self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    fetch(event.request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
   );
 });
