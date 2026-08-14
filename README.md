@@ -86,9 +86,9 @@ Select your operating system below to download the latest executable binary:
 <details>
 <summary><b>💻 Windows Installation</b></summary>
 
-1. Download **`RollAndRegister.exe`** from the links above.
-2. Move the `.exe` file to your preferred folder or Desktop.
-3. Double-click **`RollAndRegister.exe`** to open and run the app.
+1. Download **`CC316-Project-win32-x64.zip`** from the links above.
+2. Extract the `.zip` file to your preferred folder or Desktop.
+3. Double-click **`CC316-Project.exe`** to open and run the app.
 </details>
 
 <details>
