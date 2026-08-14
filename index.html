@@ -70,6 +70,15 @@
   html[data-theme="dark"] .school-logo{
     background:rgba(237,232,216,0.06);
   }
+  /* ---------- Dark mode: --green is kept dark on purpose (it's also
+     used as a background), so anywhere it's used as *text* on top of
+     a dark surface needs to swap to --brass instead, or it goes
+     dark-on-dark and disappears. ---------- */
+  html[data-theme="dark"] .scan-btn{ color:var(--brass); border-color:var(--brass); }
+  html[data-theme="dark"] .sort-btn{ color:var(--brass); border-color:var(--brass); }
+  html[data-theme="dark"] .link-btn{ color:var(--brass); }
+  html[data-theme="dark"] .onboarding ol li b{ color:var(--brass); }
+  html[data-theme="dark"] .icon-edit:hover{ color:var(--brass); background:rgba(237,232,216,0.08); }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
@@ -294,16 +303,17 @@
     margin:0.35rem 0.2rem;
   }
 
-  /* ---------- Sort dropdown (header nav bar) ---------- */
+  /* ---------- Sort dropdown (toolbar, next to Section/School year) ---------- */
   .sort-dropdown{ position:relative; flex-shrink:0; }
   .sort-btn{
-    background:rgba(244,238,221,0.1);
-    border:1.5px solid var(--brass);
-    color:var(--cream);
+    background:var(--surface);
+    border:1.5px solid var(--green);
+    color:var(--green);
     font-family:'IBM Plex Mono', monospace;
-    font-size:0.76rem;
+    font-size:0.78rem;
     letter-spacing:0.03em;
-    padding:0.55rem 0.95rem;
+    height:2.6rem;
+    padding:0 0.85rem;
     border-radius:8px;
     cursor:pointer;
     display:inline-flex;
@@ -312,7 +322,7 @@
     white-space:nowrap;
     transition:background 0.2s ease;
   }
-  .sort-btn:hover{ background:rgba(244,238,221,0.18); }
+  .sort-btn:hover{ background:var(--paper-dark); }
   .sort-btn .caret{ transition:transform 0.2s ease; font-size:0.7rem; }
   .sort-dropdown.open .sort-btn .caret{ transform:rotate(180deg); }
   .sort-menu{
@@ -478,6 +488,23 @@
     font-size:1.3rem;
     color:var(--brass);
   }
+  .signin-theme-toggle-btn{
+    position:absolute;
+    top:1rem; right:1rem;
+    background:transparent;
+    border:1.5px solid var(--brass);
+    color:var(--ink);
+    border-radius:8px;
+    width:36px; height:36px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.95rem;
+    line-height:1;
+    cursor:pointer;
+    transition:background 0.2s ease;
+  }
+  .signin-theme-toggle-btn:hover{ background:var(--paper-dark); }
   .signin-card h2{
     font-family:'Fraunces', serif;
     font-size:1.5rem;
@@ -494,7 +521,7 @@
   .signin-google-btn{
     width:100%;
     display:flex; align-items:center; justify-content:center; gap:0.6rem;
-    background:var(--ink);
+    background:var(--green);
     color:var(--cream);
     border:none;
     border-radius:9px;
@@ -661,10 +688,11 @@
     display:inline-flex;
     align-items:center;
     gap:0.5rem;
+    height:2.6rem;
     background:var(--paper-dark);
     border:1px solid var(--line);
     border-radius:8px;
-    padding:0.45rem 0.7rem 0.45rem 0.85rem;
+    padding:0 0.7rem 0 0.85rem;
   }
   .section-jump label{
     font-family:'IBM Plex Mono', monospace;
@@ -733,7 +761,8 @@
     color:var(--cream);
     border:none;
     border-radius:8px;
-    padding:0.5rem 0.9rem;
+    height:2.6rem;
+    padding:0 0.9rem;
     font-family:'IBM Plex Mono', monospace;
     font-size:0.78rem;
     letter-spacing:0.03em;
@@ -750,7 +779,8 @@
     color:var(--green);
     border:1.5px solid var(--green);
     border-radius:8px;
-    padding:0.48rem 0.85rem;
+    height:2.6rem;
+    padding:0 0.85rem;
     font-family:'IBM Plex Mono', monospace;
     font-size:0.78rem;
     letter-spacing:0.03em;
@@ -1661,6 +1691,7 @@
      ============================================================ -->
 <div class="signin-gate" id="signinGate">
   <div class="signin-card">
+    <button class="signin-theme-toggle-btn" id="themeToggleBtnSignin" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     <div class="signin-mark">R&amp;R</div>
     <h2>Sign in to continue</h2>
     <p>Sign in with your Google account to sync this directory to your Drive, and pick up right where you left off on any device.</p>
@@ -1698,22 +1729,6 @@
              which side the logo sits on.
              ============================================================ -->
         <button class="customize-btn" id="customizeBtn">🎨 Customize</button>
-
-        <!-- ============================================================
-             SORT — orders the currently visible Students/Teachers list.
-             Lives here in the header nav bar (not the toolbar below) so
-             it stays level with Customize/Account/Download.
-             ============================================================ -->
-        <div class="sort-dropdown" id="sortDropdown">
-          <button class="sort-btn" id="sortBtn" aria-haspopup="true" aria-expanded="false">
-            ⇅ <span id="sortBtnLabel">Sort: A–Z</span> <span class="caret">▾</span>
-          </button>
-          <div class="sort-menu" id="sortMenu">
-            <button type="button" class="sort-option" data-sort="az"><span class="chk-ic">✓</span>Alphabetical (A–Z)</button>
-            <button type="button" class="sort-option" data-sort="latest"><span class="chk-ic">✓</span>Latest added</button>
-            <button type="button" class="sort-option" data-sort="earliest"><span class="chk-ic">✓</span>Earliest added</button>
-          </div>
-        </div>
 
         <!-- ============================================================
              DARK MODE — toggles the app's color theme. Remembered
@@ -1808,6 +1823,23 @@
           <option value="">All</option>
         </select>
       </div>
+
+      <!-- ============================================================
+           SORT — orders the currently visible Students/Teachers list.
+           Lives here in the toolbar, next to Section/School year, and
+           shares their height so the row stays level.
+           ============================================================ -->
+      <div class="sort-dropdown" id="sortDropdown">
+        <button class="sort-btn" id="sortBtn" aria-haspopup="true" aria-expanded="false">
+          ⇅ <span id="sortBtnLabel">Sort: A–Z</span> <span class="caret">▾</span>
+        </button>
+        <div class="sort-menu" id="sortMenu">
+          <button type="button" class="sort-option" data-sort="az"><span class="chk-ic">✓</span>Alphabetical (A–Z)</button>
+          <button type="button" class="sort-option" data-sort="latest"><span class="chk-ic">✓</span>Latest added</button>
+          <button type="button" class="sort-option" data-sort="earliest"><span class="chk-ic">✓</span>Earliest added</button>
+        </div>
+      </div>
+
       <button class="scan-btn" id="scanBtn">📷 Scan</button>
       <button class="add-btn" id="addBtn">+ Add student</button>
     </div>
@@ -2144,7 +2176,16 @@
     }
   });
 
-  // ---------- Sort dropdown (header nav bar) — mirrors the download dropdown above ----------
+  // ---------- Sort order (Students & Teachers lists) ----------
+  // Declared here, before the dropdown below reads them, so the app
+  // doesn't crash on load with "Cannot access before initialization".
+  const SORT_MODE_KEY = 'rollRegister_sortMode';
+  const SORT_LABELS = { az: 'A–Z', latest: 'Latest', earliest: 'Earliest' };
+  let sortMode = ['az', 'latest', 'earliest'].includes(localStorage.getItem(SORT_MODE_KEY))
+    ? localStorage.getItem(SORT_MODE_KEY)
+    : 'az';
+
+  // ---------- Sort dropdown (toolbar, next to Section/School year) ----------
   const sortDropdown = document.getElementById('sortDropdown');
   const sortBtn = document.getElementById('sortBtn');
   const sortBtnLabel = document.getElementById('sortBtnLabel');
@@ -2186,21 +2227,28 @@
 
   // ---------- Dark mode toggle ----------
   // Remembers an explicit choice per-browser; otherwise follows the
-  // system's light/dark preference on first visit.
+  // system's light/dark preference on first visit. Two buttons share
+  // this logic: the header one (post sign-in) and the sign-in card's
+  // own toggle (so theme can be set before signing in/continuing as guest).
   const THEME_KEY = 'rollRegister_theme';
   const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeToggleBtnSignin = document.getElementById('themeToggleBtnSignin');
   function applyTheme(theme){
     document.documentElement.setAttribute('data-theme', theme);
-    themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    const icon = theme === 'dark' ? '☀️' : '🌙';
+    themeToggleBtn.textContent = icon;
+    themeToggleBtnSignin.textContent = icon;
   }
   const storedTheme = localStorage.getItem(THEME_KEY);
   const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   applyTheme(storedTheme || (systemPrefersDark ? 'dark' : 'light'));
-  themeToggleBtn.addEventListener('click', () => {
+  function toggleTheme(){
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     applyTheme(next);
     localStorage.setItem(THEME_KEY, next);
-  });
+  }
+  themeToggleBtn.addEventListener('click', toggleTheme);
+  themeToggleBtnSignin.addEventListener('click', toggleTheme);
 
   // ---------- Account chip (top-corner) dropdown toggle — mirrors the download dropdown above ----------
   const accountChip = document.getElementById('accountChip');
@@ -2498,13 +2546,6 @@
   let yearFilter = '';
   let selectedStudentIds = new Set();
   let selectedTeacherIds = new Set();
-
-  // ---------- Sort order (Students & Teachers lists) ----------
-  const SORT_MODE_KEY = 'rollRegister_sortMode';
-  const SORT_LABELS = { az: 'A–Z', latest: 'Latest', earliest: 'Earliest' };
-  let sortMode = ['az', 'latest', 'earliest'].includes(localStorage.getItem(SORT_MODE_KEY))
-    ? localStorage.getItem(SORT_MODE_KEY)
-    : 'az';
 
   function sortList(arr){
     const copy = [...arr];
