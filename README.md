@@ -58,16 +58,30 @@ Want to test the app without downloading anything? You can try out the live web 
 <table>
   <tr>
     <td align="center" width="33%">
-      <img src="screenshots/directory-empty-state.png" alt="Student directory with search, section/school year filters, and Scan / Add student buttons" width="100%"><br/>
-      <sub>Directory view — search, filters, and OCR scan</sub>
+      <img src="screenshots/1.png" alt="Sign in modal with Google sync and Guest mode" width="100%"/><br/>
+      <sub><strong>1. Sign In</strong> — Google sync & guest access</sub>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/backup-import-modal.png" alt="Backup and import modal with Google Drive sync, download backup, and import backup options" width="100%"><br/>
-      <sub>Backup & import — Drive sync, download/import</sub>
+      <img src="screenshots/2.png" alt="Roll & Register student directory dashboard" width="100%"/><br/>
+      <sub><strong>2. Directory View</strong> — Search & onboarding guide</sub>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/customize-branding-modal.png" alt="Customize modal for uploading a school logo and setting title, description, and colors" width="100%"><br/>
-      <sub>Customize — logo, colors, and branding</sub>
+      <img src="screenshots/3.png" alt="Customize school modal for logo, titles, and colors" width="100%"/><br/>
+      <sub><strong>3. Customize</strong> — Branding, logo & accent colors</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="screenshots/4.png" alt="OCR student scanner modal for LRN and class list" width="100%"/><br/>
+      <sub><strong>4. OCR Scanner</strong> — Scan LRN or full class list</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="screenshots/5.png" alt="Add student form modal" width="100%"/><br/>
+      <sub><strong>5. Add Student</strong> — Manual entry form</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="screenshots/6.png" alt="Backup and import data modal" width="100%"/><br/>
+      <sub><strong>6. Backup & Import</strong> — Drive sync & JSON export</sub>
     </td>
   </tr>
 </table>
