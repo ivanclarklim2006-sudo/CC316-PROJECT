@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  // Applied before first paint so there's no light-mode flash for
+  // people who've chosen (or whose system prefers) dark mode.
+  (function(){
+    try{
+      var saved = localStorage.getItem('rollRegister_theme');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if(saved === 'dark' || (!saved && prefersDark)){
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    }catch(err){}
+  })();
+</script>
 <title>Roll & Register — Student/Teacher Directory</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1F3B2E">
@@ -25,6 +38,37 @@
     --stamp:#A23E30;
     --line:rgba(31,42,34,0.14);
     --shadow:rgba(31,42,34,0.18);
+    --surface:#fff;
+    --surface-warn:#fbf0dd;
+    --surface-selected:#FBFAF4;
+    --cream:#F4EEDD;
+    --warn-ink:#8a5a2b;
+    --warn-border:#e8cd9e;
+    color-scheme:light;
+  }
+  html[data-theme="dark"]{
+    --paper:#1B211C;
+    --paper-dark:#242C25;
+    --ink:#EDE8D8;
+    --ink-soft:#A6AFA2;
+    --green:#14261D;
+    --green-light:#20392C;
+    --brass:#C99A52;
+    --stamp:#C1584A;
+    --line:rgba(237,232,216,0.14);
+    --shadow:rgba(0,0,0,0.45);
+    --surface:#242A24;
+    --surface-warn:#3A331F;
+    --surface-selected:#24301F;
+    --warn-ink:#E8B378;
+    --warn-border:#5A4A2A;
+    color-scheme:dark;
+  }
+  html[data-theme="dark"] body{
+    background-image: linear-gradient(var(--line) 1px, transparent 1px);
+  }
+  html[data-theme="dark"] .school-logo{
+    background:rgba(237,232,216,0.06);
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -45,7 +89,7 @@
 
   header{
     background:var(--green);
-    color:var(--paper);
+    color:var(--cream);
     padding:2.6rem 1.5rem 2.2rem;
     position:relative;
     border-bottom:6px double var(--brass);
@@ -89,10 +133,12 @@
 
   .header-actions{
     display:flex;
-    flex-direction:column;
+    flex-direction:row;
+    flex-wrap:wrap;
     gap:0.5rem;
     flex-shrink:0;
-    align-items:stretch;
+    align-items:center;
+    justify-content:flex-end;
   }
   .customize-btn{
     display:inline-flex;
@@ -101,7 +147,7 @@
     gap:0.4rem;
     background:transparent;
     border:1.5px solid rgba(244,238,221,0.4);
-    color:var(--paper);
+    color:var(--cream);
     border-radius:8px;
     padding:0.5rem 0.95rem;
     font-family:'IBM Plex Mono', monospace;
@@ -111,7 +157,7 @@
     transition:background 0.2s ease, border-color 0.2s ease;
     white-space:nowrap;
   }
-  .customize-btn:hover{ background:rgba(244,238,221,0.1); border-color:var(--paper); }
+  .customize-btn:hover{ background:rgba(244,238,221,0.1); border-color:var(--cream); }
 
   .logo-upload-row{
     display:flex;
@@ -171,7 +217,7 @@
   .download-btn{
     background:rgba(244,238,221,0.1);
     border:1.5px solid var(--brass);
-    color:var(--paper);
+    color:var(--cream);
     font-family:'IBM Plex Mono', monospace;
     font-size:0.76rem;
     letter-spacing:0.04em;
@@ -248,12 +294,88 @@
     margin:0.35rem 0.2rem;
   }
 
+  /* ---------- Sort dropdown (header nav bar) ---------- */
+  .sort-dropdown{ position:relative; flex-shrink:0; }
+  .sort-btn{
+    background:rgba(244,238,221,0.1);
+    border:1.5px solid var(--brass);
+    color:var(--cream);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem;
+    letter-spacing:0.03em;
+    padding:0.55rem 0.95rem;
+    border-radius:8px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    white-space:nowrap;
+    transition:background 0.2s ease;
+  }
+  .sort-btn:hover{ background:rgba(244,238,221,0.18); }
+  .sort-btn .caret{ transition:transform 0.2s ease; font-size:0.7rem; }
+  .sort-dropdown.open .sort-btn .caret{ transform:rotate(180deg); }
+  .sort-menu{
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:4px 4px 0 rgba(0,0,0,0.22);
+    min-width:190px;
+    padding:0.4rem;
+    display:none;
+    z-index:50;
+    animation: rise 0.18s ease both;
+  }
+  .sort-dropdown.open .sort-menu{ display:block; }
+  .sort-option{
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    border-radius:7px;
+    padding:0.55rem 0.7rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.86rem;
+    color:var(--ink);
+    cursor:pointer;
+    transition:background 0.15s ease;
+  }
+  .sort-option:hover{ background:var(--paper-dark); }
+  .sort-option.active{ font-weight:600; color:var(--green); }
+  html[data-theme="dark"] .sort-option.active{ color:var(--brass); }
+  .sort-option .chk-ic{ width:1em; flex-shrink:0; opacity:0; }
+  .sort-option.active .chk-ic{ opacity:1; }
+
+  /* ---------- Dark mode toggle (header nav bar) ---------- */
+  .theme-toggle-btn{
+    background:rgba(244,238,221,0.1);
+    border:1.5px solid var(--brass);
+    color:var(--cream);
+    border-radius:8px;
+    width:38px; height:38px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1rem;
+    line-height:1;
+    cursor:pointer;
+    flex-shrink:0;
+    transition:background 0.2s ease;
+  }
+  .theme-toggle-btn:hover{ background:rgba(244,238,221,0.18); }
+
   /* ---------- Account chip (top-corner Google account switcher) ---------- */
   .account-chip{ position:relative; flex-shrink:0; }
   .account-chip-btn{
     background:rgba(244,238,221,0.1);
     border:1.5px solid var(--brass);
-    color:var(--paper);
+    color:var(--cream);
     font-family:'IBM Plex Mono', monospace;
     font-size:0.76rem;
     letter-spacing:0.03em;
@@ -373,7 +495,7 @@
     width:100%;
     display:flex; align-items:center; justify-content:center; gap:0.6rem;
     background:var(--ink);
-    color:var(--paper);
+    color:var(--cream);
     border:none;
     border-radius:9px;
     padding:0.85rem 1rem;
@@ -417,9 +539,9 @@
   .signin-guest-warning{
     font-family:'Inter', sans-serif;
     font-size:0.76rem;
-    color:#8a5a2b;
-    background:#fbf0dd;
-    border:1px solid #e8cd9e;
+    color:var(--warn-ink);
+    background:var(--surface-warn);
+    border:1px solid var(--warn-border);
     border-radius:8px;
     line-height:1.45;
     text-align:left;
@@ -441,9 +563,9 @@
     justify-content:center;
     flex-wrap:wrap;
     gap:0.5rem 1rem;
-    background:#fbf0dd;
-    border-bottom:1px solid #e8cd9e;
-    color:#8a5a2b;
+    background:var(--surface-warn);
+    border-bottom:1px solid var(--warn-border);
+    color:var(--warn-ink);
     font-family:'Inter', sans-serif;
     font-size:0.82rem;
     padding:0.6rem 1rem;
@@ -457,7 +579,7 @@
     font-family:'Inter', sans-serif;
     font-size:0.82rem;
     font-weight:600;
-    color:#8a5a2b;
+    color:var(--warn-ink);
     text-decoration:underline;
     cursor:pointer;
   }
@@ -513,7 +635,7 @@
     z-index:1;
     transition:color 0.25s ease;
   }
-  .tab-btn.active{ color:var(--paper); }
+  .tab-btn.active{ color:var(--cream); }
   .tab-highlight{
     position:absolute;
     top:4px; bottom:4px; left:4px;
@@ -574,7 +696,7 @@
     align-items:center;
     gap:0.5rem;
     background:var(--green);
-    color:var(--paper);
+    color:var(--cream);
     font-family:'IBM Plex Mono', monospace;
     font-size:0.76rem;
     letter-spacing:0.03em;
@@ -587,7 +709,7 @@
   .filter-chip button{
     background:rgba(244,238,221,0.15);
     border:none;
-    color:var(--paper);
+    color:var(--cream);
     width:20px; height:20px;
     border-radius:50%;
     cursor:pointer;
@@ -608,7 +730,7 @@
     align-items:center;
     gap:0.4rem;
     background:var(--green);
-    color:var(--paper);
+    color:var(--cream);
     border:none;
     border-radius:8px;
     padding:0.5rem 0.9rem;
@@ -624,7 +746,7 @@
     display:inline-flex;
     align-items:center;
     gap:0.4rem;
-    background:#fff;
+    background:var(--surface);
     color:var(--green);
     border:1.5px solid var(--green);
     border-radius:8px;
@@ -655,7 +777,7 @@
     cursor:pointer;
     transition:border-color 0.15s ease, background 0.15s ease;
   }
-  .scan-choice button:hover{ border-color:var(--brass); background:#fff; }
+  .scan-choice button:hover{ border-color:var(--brass); background:var(--surface); }
   .scan-choice .ic{ font-size:1.5rem; line-height:1; flex-shrink:0; }
   .scan-choice .txt b{
     display:block;
@@ -740,7 +862,7 @@
     font-family:'Inter', sans-serif;
     font-size:0.82rem;
     color:var(--ink);
-    background:#fff;
+    background:var(--surface);
     outline:none;
   }
   .review-row input[type="text"]:focus{ border-color:var(--brass); }
@@ -844,7 +966,7 @@
     font-family:'Inter', sans-serif;
     font-size:0.92rem;
     color:var(--ink);
-    background:#fff;
+    background:var(--surface);
     outline:none;
     transition:border-color 0.15s ease;
   }
@@ -905,7 +1027,7 @@
   .btn-primary{
     background:var(--green);
     border:none;
-    color:var(--paper);
+    color:var(--cream);
     border-radius:8px;
     padding:0.55rem 1.2rem;
     font-family:'Inter', sans-serif;
@@ -947,7 +1069,7 @@
     bottom:1.5rem; left:50%;
     transform:translateX(-50%) translateY(20px);
     background:var(--ink);
-    color:var(--paper);
+    color:var(--cream);
     font-family:'IBM Plex Mono', monospace;
     font-size:0.82rem;
     padding:0.7rem 1.2rem;
@@ -966,7 +1088,7 @@
     display:flex;
     align-items:center;
     gap:0.7rem;
-    background:#fff;
+    background:var(--surface);
     border:1.5px solid var(--ink);
     border-radius:10px;
     padding:0.35rem 0.35rem 0.35rem 0.9rem;
@@ -1011,7 +1133,7 @@
   }
 
   .card{
-    background:#fff;
+    background:var(--surface);
     border:1px solid var(--line);
     border-radius:12px;
     padding:1.2rem 1.2rem 1.1rem;
@@ -1132,7 +1254,7 @@
   }
   .card.selected{
     border-color:var(--green);
-    background:#FBFAF4;
+    background:var(--surface-selected);
     box-shadow:2px 2px 0 var(--shadow), 0 0 0 2px rgba(31,59,46,0.16) inset;
   }
 
@@ -1154,7 +1276,7 @@
     width:19px; height:19px;
     border:1.5px solid var(--ink-soft);
     border-radius:5px;
-    background:#fff;
+    background:var(--surface);
     display:inline-block;
     position:relative;
     transition:background 0.15s ease, border-color 0.15s ease;
@@ -1168,7 +1290,7 @@
     position:absolute;
     left:6px; top:2px;
     width:5px; height:10px;
-    border:solid var(--paper);
+    border:solid var(--cream);
     border-width:0 2px 2px 0;
     transform:rotate(45deg);
   }
@@ -1196,7 +1318,7 @@
     align-items:center;
     justify-content:space-between;
     background:var(--ink);
-    color:var(--paper);
+    color:var(--cream);
     border-radius:10px;
     padding:0.7rem 1rem;
     margin-bottom:1.1rem;
@@ -1223,14 +1345,14 @@
   .btn-ghost{
     background:none;
     border:1px solid rgba(244,238,221,0.4);
-    color:var(--paper);
+    color:var(--cream);
     border-radius:8px;
     padding:0.45rem 0.95rem;
     font-family:'Inter', sans-serif;
     font-size:0.82rem;
     cursor:pointer;
   }
-  .btn-ghost:hover{ border-color:var(--paper); }
+  .btn-ghost:hover{ border-color:var(--cream); }
 
   .confirm-modal{ max-width:400px; }
   .confirm-modal p.confirm-text{
@@ -1278,7 +1400,7 @@
   }
   .onboarding ol{
     text-align:left;
-    background:#fff;
+    background:var(--surface);
     border:1px solid var(--line);
     border-radius:12px;
     padding:1.2rem 1.2rem 1.2rem 2.3rem;
@@ -1329,7 +1451,7 @@
   .back-btn:hover{ color:var(--ink); }
 
   .profile-card{
-    background:#fff;
+    background:var(--surface);
     border:1px solid var(--line);
     border-radius:14px;
     padding:1.8rem 1.8rem 1.6rem;
@@ -1450,11 +1572,15 @@
 
     .header-top{ flex-direction:column; align-items:stretch; }
     .school-logo{ width:58px; height:58px; }
-    .header-actions{ width:100%; }
+    .header-actions{ width:100%; flex-direction:column; align-items:stretch; }
     .customize-btn{ width:100%; }
     .download-dropdown{ width:100%; }
     .download-btn{ width:100%; justify-content:center; }
     .download-menu{ left:0; right:0; width:100%; min-width:0; }
+    .sort-dropdown{ width:100%; }
+    .sort-btn{ width:100%; justify-content:center; }
+    .sort-menu{ left:0; right:0; width:100%; min-width:0; }
+    .theme-toggle-btn{ width:100%; }
 
     /* Account chip was capping at 220px, leaving it narrow and
        left-aligned next to the now full-width Customize/Download
@@ -1511,7 +1637,7 @@
     /* Larger touch targets throughout — 44px is the accepted minimum
        comfortable tap size, several buttons were sized for mouse use */
     .tab-btn, .btn-secondary, .btn-primary, .customize-btn, .download-btn,
-    .account-chip-btn, .scan-btn, .add-btn{ min-height:44px; }
+    .account-chip-btn, .scan-btn, .add-btn, .sort-btn, .theme-toggle-btn{ min-height:44px; }
   }
 
   @media (max-width: 400px){
@@ -1572,6 +1698,28 @@
              which side the logo sits on.
              ============================================================ -->
         <button class="customize-btn" id="customizeBtn">🎨 Customize</button>
+
+        <!-- ============================================================
+             SORT — orders the currently visible Students/Teachers list.
+             Lives here in the header nav bar (not the toolbar below) so
+             it stays level with Customize/Account/Download.
+             ============================================================ -->
+        <div class="sort-dropdown" id="sortDropdown">
+          <button class="sort-btn" id="sortBtn" aria-haspopup="true" aria-expanded="false">
+            ⇅ <span id="sortBtnLabel">Sort: A–Z</span> <span class="caret">▾</span>
+          </button>
+          <div class="sort-menu" id="sortMenu">
+            <button type="button" class="sort-option" data-sort="az"><span class="chk-ic">✓</span>Alphabetical (A–Z)</button>
+            <button type="button" class="sort-option" data-sort="latest"><span class="chk-ic">✓</span>Latest added</button>
+            <button type="button" class="sort-option" data-sort="earliest"><span class="chk-ic">✓</span>Earliest added</button>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             DARK MODE — toggles the app's color theme. Remembered
+             per-browser (THEME_KEY in the script below).
+             ============================================================ -->
+        <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
 
         <!-- ============================================================
              ACCOUNT CHIP — top-corner Google account status/switcher.
@@ -1929,7 +2077,7 @@
     <details style="margin-bottom:0.4rem;">
       <summary style="cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:0.76rem; color:var(--ink-soft); letter-spacing:0.03em;">Advanced: bake this data in as the file's default</summary>
       <p class="form-note" style="margin-top:0.8rem;">Copy this and paste it over the <code>students</code> / <code>teachers</code> arrays near the top of the file's script block, so this becomes the starting data for anyone opening a fresh copy.</p>
-      <textarea id="exportText" readonly style="width:100%; height:220px; font-family:'IBM Plex Mono', monospace; font-size:0.76rem; border:1.5px solid var(--line); border-radius:8px; padding:0.7rem; background:#fff; color:var(--ink); resize:vertical;"></textarea>
+      <textarea id="exportText" readonly style="width:100%; height:220px; font-family:'IBM Plex Mono', monospace; font-size:0.76rem; border:1.5px solid var(--line); border-radius:8px; padding:0.7rem; background:var(--surface); color:var(--ink); resize:vertical;"></textarea>
       <div class="modal-actions" style="padding-top:0.8rem;">
         <button type="button" class="btn-secondary" id="exportCopyBtn">Copy to clipboard</button>
       </div>
@@ -1994,6 +2142,64 @@
       downloadDropdown.classList.remove('open');
       downloadBtn.setAttribute('aria-expanded', 'false');
     }
+  });
+
+  // ---------- Sort dropdown (header nav bar) — mirrors the download dropdown above ----------
+  const sortDropdown = document.getElementById('sortDropdown');
+  const sortBtn = document.getElementById('sortBtn');
+  const sortBtnLabel = document.getElementById('sortBtnLabel');
+  const sortMenu = document.getElementById('sortMenu');
+  function updateSortMenuUI(){
+    sortBtnLabel.textContent = `Sort: ${SORT_LABELS[sortMode]}`;
+    sortMenu.querySelectorAll('.sort-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.sort === sortMode);
+    });
+  }
+  updateSortMenuUI();
+  sortBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = sortDropdown.classList.toggle('open');
+    sortBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  sortMenu.querySelectorAll('.sort-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sortMode = btn.dataset.sort;
+      localStorage.setItem(SORT_MODE_KEY, sortMode);
+      updateSortMenuUI();
+      sortDropdown.classList.remove('open');
+      sortBtn.setAttribute('aria-expanded', 'false');
+      render();
+    });
+  });
+  document.addEventListener('click', (e) => {
+    if(!sortDropdown.contains(e.target)){
+      sortDropdown.classList.remove('open');
+      sortBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      sortDropdown.classList.remove('open');
+      sortBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // ---------- Dark mode toggle ----------
+  // Remembers an explicit choice per-browser; otherwise follows the
+  // system's light/dark preference on first visit.
+  const THEME_KEY = 'rollRegister_theme';
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  const storedTheme = localStorage.getItem(THEME_KEY);
+  const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(storedTheme || (systemPrefersDark ? 'dark' : 'light'));
+  themeToggleBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    localStorage.setItem(THEME_KEY, next);
   });
 
   // ---------- Account chip (top-corner) dropdown toggle — mirrors the download dropdown above ----------
@@ -2293,6 +2499,21 @@
   let selectedStudentIds = new Set();
   let selectedTeacherIds = new Set();
 
+  // ---------- Sort order (Students & Teachers lists) ----------
+  const SORT_MODE_KEY = 'rollRegister_sortMode';
+  const SORT_LABELS = { az: 'A–Z', latest: 'Latest', earliest: 'Earliest' };
+  let sortMode = ['az', 'latest', 'earliest'].includes(localStorage.getItem(SORT_MODE_KEY))
+    ? localStorage.getItem(SORT_MODE_KEY)
+    : 'az';
+
+  function sortList(arr){
+    const copy = [...arr];
+    if(sortMode === 'latest') copy.sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0));
+    else if(sortMode === 'earliest') copy.sort((a, b) => (a.dateAdded || 0) - (b.dateAdded || 0));
+    else copy.sort((a, b) => a.name.localeCompare(b.name));
+    return copy;
+  }
+
   const selectionBar = document.getElementById('selectionBar');
   const selectionCount = document.getElementById('selectionCount');
   const selectionClearBtn = document.getElementById('selectionClearBtn');
@@ -2516,7 +2737,7 @@
         return;
       }
 
-      const list = hasFilter ? students.filter(matchStudent) : students;
+      const list = sortList(hasFilter ? students.filter(matchStudent) : students);
 
       if(sectionFilter || yearFilter){
         filterChip.classList.add('show');
@@ -2620,7 +2841,7 @@
         return;
       }
 
-      const list = hasFilter ? teachers.filter(matchTeacher) : teachers;
+      const list = sortList(hasFilter ? teachers.filter(matchTeacher) : teachers);
       hintText.textContent = hasFilter
         ? `${list.length} match${list.length === 1 ? '' : 'es'} for "${searchInput.value.trim()}"`
         : `${teachers.length} teachers on file`;
@@ -2864,7 +3085,8 @@
 
     const newStudent = {
       id, name, section, year, teacherId,
-      history:[ { year, section } ]
+      history:[ { year, section } ],
+      dateAdded: Date.now()
     };
     if(origin) newStudent.transferredFrom = origin;
     students.push(newStudent);
@@ -2989,7 +3211,7 @@
       return;
     }
 
-    const newTeacher = { id, name, subjects };
+    const newTeacher = { id, name, subjects, dateAdded: Date.now() };
     teachers.push(newTeacher);
     rebuildTeacherById();
     saveData();
@@ -3349,7 +3571,7 @@
       const year = row.querySelector('.bulk-year').value.trim();
       if(!id || !name){ skippedIncomplete++; return; }
       if(students.some(s => s.id.toLowerCase() === id.toLowerCase())){ skippedDup++; return; }
-      students.push({ id, name, section, year, teacherId: '', history: [{ year, section }] });
+      students.push({ id, name, section, year, teacherId: '', history: [{ year, section }], dateAdded: Date.now() });
       added++;
     });
 
@@ -3535,6 +3757,7 @@
   const accountSignOutBtn = document.getElementById('accountSignOutBtn');
 
   const SKIP_SIGNIN_KEY = 'rollRegister_skipSignIn';
+  const HAD_SIGNED_IN_KEY = 'rollRegister_hadSignedIn'; // just a flag: "this browser has granted Google access before" — never holds the token itself
   const isGuestMode = () => isGoogleConfigured && !gapiToken && localStorage.getItem(SKIP_SIGNIN_KEY) === '1';
 
   let gapiToken = null;       // current OAuth access token (memory only)
@@ -3553,7 +3776,13 @@
     // Show the sign-in gate on load unless this browser previously chose
     // "Continue as Guest" — re-shown every session isn't the goal, just
     // enough to offer sign-in without nagging someone who's opted out.
-    if(localStorage.getItem(SKIP_SIGNIN_KEY) !== '1'){
+    if(localStorage.getItem(HAD_SIGNED_IN_KEY) === '1'){
+      // This browser has signed in before — try to reconnect quietly in
+      // the background instead of making them click through Google's
+      // login screen again. Falls back to the normal gate/banner below
+      // if the browser's Google session has expired or needs interaction.
+      attemptSilentSignIn();
+    } else if(localStorage.getItem(SKIP_SIGNIN_KEY) !== '1'){
       signinGate.classList.add('show');
     } else {
       guestBanner.style.display = 'flex';
@@ -3737,16 +3966,30 @@
     showToast('Disconnected from Google');
   }
 
-  async function gdriveConnect(selectAccount){
+  async function gdriveConnect(selectAccount, silent){
     try{
-      setGdriveUI('connecting');
-      if(signinStatus) signinStatus.textContent = 'Connecting…';
+      if(!silent){
+        setGdriveUI('connecting');
+        if(signinStatus) signinStatus.textContent = 'Connecting…';
+      }
       await loadGis();
       const tokenClient = window.google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: `${GOOGLE_DRIVE_SCOPE} ${GOOGLE_EMAIL_SCOPE}`,
         callback: async (resp) => {
           if(resp.error){
+            if(silent){
+              // The quiet background reconnect didn't work (session expired,
+              // third-party cookies blocked, etc.) — just fall back to the
+              // normal gate/banner instead of bothering anyone with an error.
+              if(localStorage.getItem(SKIP_SIGNIN_KEY) === '1'){
+                guestBanner.style.display = 'flex';
+              } else {
+                signinGate.classList.add('show');
+              }
+              updateAccountChip();
+              return;
+            }
             setGdriveUI('disconnected');
             if(signinStatus) signinStatus.textContent = '';
             showToast('Google sign-in was cancelled or failed');
@@ -3754,6 +3997,7 @@
           }
           gapiToken = resp.access_token;
           try{ gdriveEmail = await fetchGoogleEmail(gapiToken); }catch(err){ gdriveEmail = null; }
+          localStorage.setItem(HAD_SIGNED_IN_KEY, '1');
           setGdriveUI('connected');
           if(signinStatus) signinStatus.textContent = '';
           await initialDriveSync();
@@ -3761,13 +4005,23 @@
       });
       // select_account forces Google's account chooser even if this browser
       // already has a granted session — used when switching accounts so the
-      // same account doesn't just get silently reselected.
-      tokenClient.requestAccessToken(selectAccount ? { prompt: 'select_account' } : {});
+      // same account doesn't just get silently reselected. Silent reconnect
+      // uses prompt: '' — Google issues a fresh token with no UI at all if
+      // this browser already granted access and still has a live session.
+      tokenClient.requestAccessToken(selectAccount ? { prompt: 'select_account' } : (silent ? { prompt: '' } : {}));
     }catch(err){
+      if(silent) return; // stay quiet on background failures — leave the normal gate/banner as-is
       setGdriveUI('disconnected');
       if(signinStatus) signinStatus.textContent = '';
       showToast(err.message || 'Could not start Google sign-in');
     }
+  }
+
+  // Tried automatically on page load when this browser has signed in
+  // before, so opening the site doesn't require clicking through Google's
+  // login screen every single time.
+  function attemptSilentSignIn(){
+    gdriveConnect(false, true);
   }
 
   // Switches to a different Google account on this device. Local
@@ -3822,8 +4076,10 @@
     accountChip.classList.remove('open');
     gdriveDisconnect();
     // An explicit sign-out is a deliberate choice, unlike a fresh page load —
-    // so re-offer the gate immediately regardless of any earlier guest choice.
+    // so re-offer the gate immediately regardless of any earlier guest choice,
+    // and stop trying to silently reconnect on future loads.
     localStorage.removeItem(SKIP_SIGNIN_KEY);
+    localStorage.removeItem(HAD_SIGNED_IN_KEY);
     signinGate.classList.add('show');
     guestBanner.style.display = 'none';
   });
