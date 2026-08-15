@@ -130,7 +130,7 @@
   .header-text-col{ flex:1; min-width:0; }
 
   .school-logo{
-    width:76px; height:76px;
+    width:var(--logo-size, 76px); height:var(--logo-size, 76px);
     border-radius:14px;
     object-fit:cover;
     border:2px solid var(--brass);
@@ -199,6 +199,42 @@
   }
   .file-btn:hover{ border-color:var(--brass); }
   .logo-hint{ font-size:0.74rem; color:var(--ink-soft); }
+
+  .logo-size-row{
+    display:flex;
+    align-items:center;
+    gap:0.7rem;
+  }
+  .logo-size-row input[type="range"]{
+    flex:1;
+    accent-color:var(--brass);
+    cursor:pointer;
+  }
+  .logo-size-value{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    min-width:3.2em;
+    text-align:right;
+  }
+  .logo-size-presets{
+    display:flex;
+    gap:0.4rem;
+    margin-top:0.5rem;
+  }
+  .logo-size-preset-btn{
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    color:var(--ink);
+    border-radius:7px;
+    padding:0.32rem 0.7rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.76rem;
+    cursor:pointer;
+    transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .logo-size-preset-btn:hover{ border-color:var(--brass); }
+  .logo-size-preset-btn.active{ background:var(--green); border-color:var(--green); color:var(--cream); }
 
   .color-field-row{
     display:flex;
@@ -979,6 +1015,24 @@
   .field{
     margin-bottom:0.9rem;
   }
+  .record-details{
+    border:1.5px dashed var(--line);
+    border-radius:9px;
+    padding:0.7rem 0.9rem 0.2rem;
+    margin:0.2rem 0 1.1rem;
+  }
+  .record-details[open]{ padding-bottom:0.9rem; }
+  .record-details summary{
+    cursor:pointer;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem;
+    letter-spacing:0.03em;
+    color:var(--ink);
+    padding:0.2rem 0;
+  }
+  .record-details summary .optional-tag{ display:block; margin-top:0.15rem; font-family:'Inter',sans-serif; }
+  .record-details .field-row,
+  .record-details .field:last-child{ margin-top:0.8rem; }
   .field label{
     display:block;
     font-family:'IBM Plex Mono', monospace;
@@ -1342,6 +1396,8 @@
   }
   .icon-del:hover{ color:var(--stamp); background:rgba(162,62,48,0.08); }
   .icon-edit:hover{ color:var(--green); background:rgba(31,59,46,0.08); }
+  .icon-share:hover{ color:var(--brass); background:rgba(184,134,60,0.08); }
+  html[data-theme="dark"] .icon-share:hover{ color:var(--brass); background:rgba(237,232,216,0.08); }
 
   .selection-bar{
     display:none;
@@ -1544,6 +1600,219 @@
   }
 
   .timeline{ list-style:none; margin:0; padding:0; }
+  .activity-log-list{
+    max-height:min(50vh, 420px);
+    overflow-y:auto;
+    margin:0.3rem 0 1rem;
+  }
+  .activity-log-empty{
+    color:var(--ink-soft);
+    font-size:0.85rem;
+    padding:1.2rem 0;
+    text-align:center;
+  }
+  .activity-log-entry{
+    padding:0.6rem 0;
+    border-top:1px dashed var(--line);
+  }
+  .activity-log-entry:first-child{ border-top:none; }
+  .activity-log-entry .al-top{
+    display:flex;
+    justify-content:space-between;
+    gap:0.6rem;
+    align-items:baseline;
+  }
+  .activity-log-entry .al-action{
+    font-weight:600;
+    font-size:0.88rem;
+    color:var(--ink);
+  }
+  .activity-log-entry .al-when{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .activity-log-entry .al-detail{
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    margin-top:0.15rem;
+  }
+  .activity-log-entry .al-actor{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    color:var(--brass);
+    margin-top:0.2rem;
+    display:inline-block;
+  }
+  .record-details-view{
+    list-style:none;
+    margin:0 0 0.2rem;
+    padding:0;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0.3rem 1rem;
+  }
+  .record-details-view li{
+    font-size:0.84rem;
+    color:var(--ink);
+    display:flex;
+    justify-content:space-between;
+    gap:0.5rem;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:0.25rem;
+  }
+  .record-details-view li span{ color:var(--ink-soft); }
+  @media (max-width:520px){ .record-details-view{ grid-template-columns:1fr; } }
+
+  /* ---------- Share sheet — styled after a DepEd-style permanent
+     record: republic/agency header, LRN box, identity fields, then
+     a section-history table where a grade-report's subject table
+     would normally sit. ---------- */
+  .share-sheet{
+    background:#fff;
+    color:#1a1a1a;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.6rem 1.7rem;
+    font-family:'Inter', sans-serif;
+    max-height:60vh;
+    overflow-y:auto;
+  }
+  .ss-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:1rem;
+    border-bottom:2px solid #1a1a1a;
+    padding-bottom:0.8rem;
+    margin-bottom:1rem;
+  }
+  .ss-head-text{ text-align:center; flex:1; }
+  .ss-head-text .ss-republic{ font-size:0.78rem; margin:0; }
+  .ss-head-text .ss-dept{ font-size:0.78rem; margin:0; }
+  .ss-head-text .ss-region{ font-size:0.78rem; margin:0 0 0.4rem; }
+  .ss-head-text .ss-title{ font-size:1.05rem; font-weight:700; letter-spacing:0.02em; margin:0; }
+  .ss-lrn-box{
+    border:1.5px solid #1a1a1a;
+    border-radius:4px;
+    padding:0.35rem 0.6rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.74rem;
+    white-space:nowrap;
+  }
+  .ss-lrn-box b{ display:block; font-size:0.9rem; margin-top:0.1rem; }
+  .ss-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0 1.2rem;
+    margin-bottom:0.55rem;
+    font-size:0.84rem;
+  }
+  .ss-field{ flex:1; min-width:140px; border-bottom:1px solid #999; padding-bottom:0.15rem; }
+  .ss-field .ss-label{ display:block; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.04em; color:#666; }
+  .ss-field .ss-value{ font-size:0.86rem; }
+  .ss-name-captions{ display:flex; justify-content:space-between; gap:0.5rem; margin-top:0.2rem; }
+  .ss-name-captions span{ font-size:0.58rem; text-transform:uppercase; letter-spacing:0.03em; color:#888; }
+  .ss-section-title{
+    font-weight:700;
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    margin:1.1rem 0 0.5rem;
+    border-bottom:1.5px solid #1a1a1a;
+    padding-bottom:0.25rem;
+  }
+  .ss-table{ width:100%; border-collapse:collapse; font-size:0.82rem; margin-bottom:0.8rem; }
+  .ss-table th, .ss-table td{ border:1px solid #999; padding:0.35rem 0.5rem; text-align:left; }
+  .ss-table th{ background:#f0f0f0; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.03em; }
+  .ss-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-top:1.4rem;
+    padding-top:0.8rem;
+    border-top:1px dashed #999;
+    font-size:0.68rem;
+    color:#666;
+  }
+  .ss-footer .ss-signature{ text-align:center; }
+  .ss-footer .ss-signature .ss-sig-line{ border-top:1px solid #1a1a1a; padding-top:0.2rem; margin-top:1.6rem; min-width:170px; }
+  .ss-certificate{
+    margin-top:1.3rem;
+    padding-top:1rem;
+    border-top:1.5px solid #1a1a1a;
+    font-size:0.84rem;
+    line-height:1.6;
+  }
+  .ss-certificate .ss-cert-title{
+    text-align:center;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    margin-bottom:0.6rem;
+  }
+  .ss-grade-block{ margin-bottom:1.1rem; }
+  .ss-grade-block .ss-grade-heading{
+    font-size:0.78rem;
+    font-weight:700;
+    margin:0 0 0.35rem;
+  }
+  .ss-grade-block .ss-grade-sub{ font-size:0.72rem; color:#666; margin:0 0 0.4rem; }
+  .ss-table td.ss-num, .ss-table th.ss-num{ text-align:center; width:2.4rem; }
+  .ss-eligible-line{ font-size:0.78rem; color:#333; margin:-0.3rem 0 0.9rem; }
+
+  /* ---------- Grades & permanent record editor modal ---------- */
+  .gr-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.4rem;
+    margin-bottom:1.1rem;
+  }
+  .gr-tab-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.74rem;
+    letter-spacing:0.03em;
+    padding:0.4rem 0.85rem;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:var(--paper-dark);
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .gr-tab-btn.active{ background:var(--green); color:var(--cream); border-color:var(--green); }
+  .gr-table{ width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:1rem; }
+  .gr-table th, .gr-table td{ border:1px solid var(--line); padding:0.35rem 0.4rem; text-align:left; }
+  .gr-table th{ background:var(--paper-dark); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.03em; }
+  .gr-table input[type="number"]{ width:3.4rem; padding:0.2rem; font-size:0.8rem; }
+  .gr-table input, .gr-table select{
+    border:1px solid var(--line);
+    border-radius:5px;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:inherit;
+  }
+  .gr-table select{ padding:0.2rem 0.1rem; font-size:0.74rem; }
+  .gr-final{ font-weight:700; text-align:center; }
+  .gr-core-table td:nth-child(2){ min-width:180px; font-size:0.74rem; }
+  .gr-transfer{
+    border:1.5px dashed var(--line);
+    border-radius:9px;
+    padding:0.8rem 0.9rem 0.2rem;
+    margin-top:1rem;
+  }
+
+  @media print{
+    body > *{ display:none !important; }
+    body > #shareModalOverlay{ display:block !important; position:static !important; background:none !important; padding:0 !important; }
+    #shareModalOverlay .modal{ box-shadow:none !important; border:none !important; max-width:100% !important; padding:0 !important; }
+    #shareModalOverlay .modal > *{ display:none !important; }
+    #shareModalOverlay .modal > #shareSheet{
+      display:block !important;
+      max-height:none !important; overflow:visible !important;
+      border:none !important; padding:0 !important;
+    }
+  }
   .timeline li{
     display:flex;
     justify-content:space-between;
@@ -1601,7 +1870,7 @@
     main{ padding:1.5rem 1rem 4.5rem; }
 
     .header-top{ flex-direction:column; align-items:stretch; }
-    .school-logo{ width:58px; height:58px; }
+    .school-logo{ width:min(var(--logo-size, 76px), 58px); height:min(var(--logo-size, 76px), 58px); }
     .header-actions{ width:100%; flex-direction:column; align-items:stretch; }
     .customize-btn{ width:100%; }
     .download-dropdown{ width:100%; }
@@ -1723,6 +1992,13 @@
       </div>
 
       <div class="header-actions">
+        <!-- ============================================================
+             ACTIVITY LOG — who added/edited/deleted/signed in, and when.
+             Helps on a shared Google account: after loading from Drive,
+             this shows entries other collaborators made too.
+             ============================================================ -->
+        <button class="customize-btn" id="activityLogBtn">🕘 Activity</button>
+
         <!-- ============================================================
              CUSTOMIZE — lets a school upload their own logo, edit the
              heading/title/description text, choose colors, and pick
@@ -1905,6 +2181,74 @@
         <label for="stuOrigin">Transferred from <span class="optional-tag">— optional</span></label>
         <input type="text" id="stuOrigin" placeholder="Leave blank if not a transferee">
       </div>
+
+      <details class="record-details">
+        <summary>Full permanent record details <span class="optional-tag">— optional, used on the printed/shared record</span></summary>
+        <div class="field-row">
+          <div class="field" style="flex:2;">
+            <label for="stuSurname">Surname</label>
+            <input type="text" id="stuSurname" placeholder="e.g. Dela Cruz">
+          </div>
+          <div class="field" style="flex:2;">
+            <label for="stuFirstName">First name</label>
+            <input type="text" id="stuFirstName" placeholder="e.g. Juan">
+          </div>
+          <div class="field" style="flex:0.6;">
+            <label for="stuMI">M.I.</label>
+            <input type="text" id="stuMI" maxlength="4" placeholder="D">
+          </div>
+        </div>
+        <p class="form-note" style="margin-top:-0.4rem;">On the printed record these combine as "Surname First name M.I." — matching the DepEd form's name line.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="stuSex">Sex</label>
+            <select id="stuSex">
+              <option value="">— not set —</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="stuDob">Date of birth</label>
+            <input type="date" id="stuDob">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="stuPob">Place of birth</label>
+            <input type="text" id="stuPob" placeholder="e.g. Manila City">
+          </div>
+          <div class="field">
+            <label for="stuDoe">Date of entrance</label>
+            <input type="date" id="stuDoe">
+          </div>
+        </div>
+        <div class="field">
+          <label for="stuGuardian">Parent / Guardian</label>
+          <input type="text" id="stuGuardian" placeholder="Full name">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="stuGuardianAddress">Guardian address</label>
+            <input type="text" id="stuGuardianAddress" placeholder="Address">
+          </div>
+          <div class="field">
+            <label for="stuGuardianOccupation">Guardian occupation</label>
+            <input type="text" id="stuGuardianOccupation" placeholder="Occupation">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="stuDivision">Division</label>
+            <input type="text" id="stuDivision" placeholder="e.g. Batangas City">
+          </div>
+          <div class="field">
+            <label for="stuSchool">School</label>
+            <input type="text" id="stuSchool" placeholder="School name">
+          </div>
+        </div>
+      </details>
+
       <div class="modal-actions">
         <button type="button" class="btn-secondary" id="studentCancelBtn">Cancel</button>
         <button type="submit" class="btn-primary" id="studentSubmitBtn">Save student</button>
@@ -2011,6 +2355,76 @@
 <!-- Hidden file inputs used by the scan feature -->
 <input type="file" id="scanFileInput" accept="image/*" capture="environment" style="display:none">
 
+<!-- Share student record modal (printable / "save as PDF" via browser print) -->
+<div class="modal-overlay" id="shareModalOverlay">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-head">
+      <h3>Share record</h3>
+      <button class="modal-close" id="shareModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="form-note">Opens this one student's record, formatted for printing. Use "Print / Save as PDF" — every browser's print dialog can save straight to a PDF file, which you can then attach to an email.</p>
+
+    <div class="share-sheet" id="shareSheet"></div>
+
+    <div class="modal-actions" style="justify-content:space-between; margin-top:1rem;">
+      <button type="button" class="btn-secondary" id="shareEmailBtn">✉ Email</button>
+      <div style="display:flex; gap:0.6rem;">
+        <button type="button" class="btn-secondary" id="shareCloseBtn">Close</button>
+        <button type="button" class="btn-primary" id="sharePrintBtn">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Grades & permanent record modal (Form 137-E style: per-grade subject ratings,
+     core values / learners observed values, attendance, certificate of transfer) -->
+<div class="modal-overlay" id="recordModalOverlay">
+  <div class="modal" style="max-width:820px;">
+    <div class="modal-head">
+      <h3>Grades &amp; permanent record</h3>
+      <button class="modal-close" id="recordModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="form-note">Elementary progress, core values, and attendance for Grades I–VI, DepEd Form 137-E style. Saved automatically as you type — this feeds the printed/shared record.</p>
+    <div class="gr-tabs" id="gradeTabs"></div>
+    <div id="gradeTabContent"></div>
+    <p class="ss-section-title">Certificate of transfer</p>
+    <div class="gr-transfer">
+      <div class="field">
+        <label for="grTransferEligible">Eligible for transfer and admission to Grade / Year</label>
+        <input type="text" id="grTransferEligible" placeholder="e.g. Grade VII">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="grTransferPrincipal">Principal / School head name</label>
+          <input type="text" id="grTransferPrincipal" placeholder="Full name">
+        </div>
+        <div class="field">
+          <label for="grTransferDate">Date</label>
+          <input type="date" id="grTransferDate">
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-primary" id="recordCloseBtn">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Activity log modal -->
+<div class="modal-overlay" id="activityLogModalOverlay">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-head">
+      <h3>Activity log</h3>
+      <button class="modal-close" id="activityLogModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="form-note">Who added, edited, deleted, or signed in — and when. Syncs with Google Drive backups, so on a shared account this shows what others did too.</p>
+    <div class="activity-log-list" id="activityLogList"></div>
+    <div class="modal-actions" style="justify-content:flex-end;">
+      <button type="button" class="btn-secondary" id="activityLogCloseBtn">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Customize (school branding) modal -->
 <div class="modal-overlay" id="customizeModalOverlay">
   <div class="modal" style="max-width:480px;">
@@ -2038,6 +2452,19 @@
         <option value="left">Left side</option>
         <option value="right">Right side</option>
       </select>
+    </div>
+
+    <div class="field">
+      <label for="brandLogoSizeInput">Logo size</label>
+      <div class="logo-size-row">
+        <input type="range" id="brandLogoSizeInput" min="40" max="140" step="2" value="76">
+        <span class="logo-size-value" id="brandLogoSizeValue">76px</span>
+      </div>
+      <div class="logo-size-presets" id="logoSizePresets">
+        <button type="button" class="logo-size-preset-btn" data-size="48">Small</button>
+        <button type="button" class="logo-size-preset-btn" data-size="76">Medium</button>
+        <button type="button" class="logo-size-preset-btn" data-size="110">Large</button>
+      </div>
     </div>
 
     <div class="field">
@@ -2290,6 +2717,7 @@
   const DEFAULT_PRIMARY_COLOR = '#1F3B2E'; // header background, buttons, tabs
   const DEFAULT_ACCENT_COLOR = '#B8863C';  // brass highlights, stamps, borders
   const DEFAULT_LOGO_POSITION = 'left';
+  const DEFAULT_LOGO_SIZE = 76;
 
   const brandTitleEl = document.getElementById('brandTitle');
   const brandHeadingEl = document.getElementById('brandHeading');
@@ -2320,6 +2748,8 @@
     }
     const logoPosition = (brand && brand.logoPosition) || DEFAULT_LOGO_POSITION;
     headerBrandRowEl.classList.toggle('logo-right', logoPosition === 'right');
+    const logoSize = (brand && brand.logoSize) || DEFAULT_LOGO_SIZE;
+    document.documentElement.style.setProperty('--logo-size', logoSize + 'px');
 
     const primary = (brand && brand.primaryColor) || DEFAULT_PRIMARY_COLOR;
     const accent = (brand && brand.accentColor) || DEFAULT_ACCENT_COLOR;
@@ -2366,6 +2796,9 @@
   const logoFileInput = document.getElementById('logoFileInput');
   const logoPreview = document.getElementById('logoPreview');
   const brandLogoPositionInput = document.getElementById('brandLogoPositionInput');
+  const brandLogoSizeInput = document.getElementById('brandLogoSizeInput');
+  const brandLogoSizeValue = document.getElementById('brandLogoSizeValue');
+  const logoSizePresets = document.getElementById('logoSizePresets');
   const brandTitleInput = document.getElementById('brandTitleInput');
   const brandHeadingInput = document.getElementById('brandHeadingInput');
   const brandDescriptionInput = document.getElementById('brandDescriptionInput');
@@ -2375,6 +2808,14 @@
   const brandAccentColorHex = document.getElementById('brandAccentColorHex');
   let pendingLogoDataUrl = null; // null = unchanged from current saved logo this session
 
+  function setLogoSizeUI(size){
+    brandLogoSizeInput.value = size;
+    brandLogoSizeValue.textContent = size + 'px';
+    logoSizePresets.querySelectorAll('.logo-size-preset-btn').forEach(btn => {
+      btn.classList.toggle('active', Number(btn.dataset.size) === Number(size));
+    });
+  }
+
   function openCustomizeModal(){
     const current = (() => {
       try{ return JSON.parse(localStorage.getItem(BRAND_KEY) || '{}'); }
@@ -2383,6 +2824,7 @@
     pendingLogoDataUrl = current.logo || null;
     logoPreview.src = current.logo || '';
     brandLogoPositionInput.value = current.logoPosition || DEFAULT_LOGO_POSITION;
+    setLogoSizeUI(current.logoSize || DEFAULT_LOGO_SIZE);
     brandTitleInput.value = current.title || '';
     brandHeadingInput.value = current.heading || '';
     brandDescriptionInput.value = current.description || '';
@@ -2412,6 +2854,17 @@
     document.documentElement.style.setProperty('--brass', brandAccentColorInput.value);
   });
 
+  brandLogoSizeInput.addEventListener('input', () => {
+    setLogoSizeUI(brandLogoSizeInput.value);
+    document.documentElement.style.setProperty('--logo-size', brandLogoSizeInput.value + 'px');
+  });
+  logoSizePresets.addEventListener('click', e => {
+    const btn = e.target.closest('.logo-size-preset-btn');
+    if(!btn) return;
+    setLogoSizeUI(btn.dataset.size);
+    document.documentElement.style.setProperty('--logo-size', btn.dataset.size + 'px');
+  });
+
   logoFileInput.addEventListener('change', async () => {
     const file = logoFileInput.files[0];
     if(!file) return;
@@ -2432,6 +2885,7 @@
     const brand = {
       logo: pendingLogoDataUrl || null,
       logoPosition: brandLogoPositionInput.value,
+      logoSize: Number(brandLogoSizeInput.value),
       title: brandTitleInput.value.trim(),
       heading: brandHeadingInput.value.trim(),
       description: brandDescriptionInput.value.trim(),
@@ -2449,6 +2903,7 @@
     pendingLogoDataUrl = null;
     logoPreview.src = '';
     brandLogoPositionInput.value = DEFAULT_LOGO_POSITION;
+    setLogoSizeUI(DEFAULT_LOGO_SIZE);
     brandTitleInput.value = '';
     brandHeadingInput.value = '';
     brandDescriptionInput.value = '';
@@ -2476,6 +2931,92 @@
   function rebuildTeacherById(){
     teacherById = Object.fromEntries(teachers.map(t => [t.id, t]));
   }
+
+  // ---------- Activity log ----------
+  // A lightweight audit trail: who (this browser's signed-in Google
+  // account, or "Guest" if not signed in) did what and when. Synced
+  // as part of the Drive backup payload (see buildBackupPayload /
+  // mergeImportedBackup below) so on a shared Google account, loading
+  // from Drive pulls in entries other signed-in collaborators made
+  // elsewhere — that's what lets someone notice "oh, someone else
+  // edited this since I last opened it."
+  const ACTIVITY_LOG_KEY = 'rollRegister_activityLog_v1';
+  const ACTIVITY_LOG_MAX = 300;
+  let activityLog = [];
+  function currentActor(){
+    return (typeof gdriveEmail !== 'undefined' && gdriveEmail) ? gdriveEmail : 'Guest (this device)';
+  }
+  function saveActivityLog(){
+    try{ localStorage.setItem(ACTIVITY_LOG_KEY, JSON.stringify(activityLog)); }catch(err){}
+  }
+  function loadActivityLog(){
+    try{
+      const raw = localStorage.getItem(ACTIVITY_LOG_KEY);
+      if(raw) activityLog = JSON.parse(raw) || [];
+    }catch(err){ activityLog = []; }
+  }
+  function logActivity(action, detail){
+    activityLog.unshift({ action, detail, actor: currentActor(), at: Date.now() });
+    if(activityLog.length > ACTIVITY_LOG_MAX) activityLog.length = ACTIVITY_LOG_MAX;
+    saveActivityLog();
+    if(typeof renderActivityLog === 'function') renderActivityLog();
+  }
+  // Merges another device/collaborator's log entries in on Drive load or
+  // file import, de-duped by timestamp+action+actor, newest first.
+  function mergeActivityLog(incoming){
+    if(!Array.isArray(incoming) || incoming.length === 0) return;
+    const seen = new Set(activityLog.map(e => `${e.at}|${e.action}|${e.detail}|${e.actor}`));
+    incoming.forEach(e => {
+      if(!e || !e.at || !e.action) return;
+      const key = `${e.at}|${e.action}|${e.detail}|${e.actor}`;
+      if(seen.has(key)) return;
+      seen.add(key);
+      activityLog.push(e);
+    });
+    activityLog.sort((a, b) => b.at - a.at);
+    if(activityLog.length > ACTIVITY_LOG_MAX) activityLog.length = ACTIVITY_LOG_MAX;
+    saveActivityLog();
+  }
+  loadActivityLog();
+
+  const activityLogBtn = document.getElementById('activityLogBtn');
+  const activityLogModalOverlay = document.getElementById('activityLogModalOverlay');
+  const activityLogList = document.getElementById('activityLogList');
+
+  function formatLogTime(ts){
+    const d = new Date(ts);
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return sameDay ? time : d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' · ' + time;
+  }
+  function renderActivityLog(){
+    if(!activityLogList) return;
+    if(activityLog.length === 0){
+      activityLogList.innerHTML = `<div class="activity-log-empty">Nothing logged yet — actions like adding, editing, deleting, or signing in will show up here.</div>`;
+      return;
+    }
+    activityLogList.innerHTML = activityLog.map(e => `
+      <div class="activity-log-entry">
+        <div class="al-top">
+          <span class="al-action">${escapeHtml(e.action)}</span>
+          <span class="al-when">${escapeHtml(formatLogTime(e.at))}</span>
+        </div>
+        ${e.detail ? `<div class="al-detail">${escapeHtml(e.detail)}</div>` : ''}
+        <span class="al-actor">${escapeHtml(e.actor || 'Guest (this device)')}</span>
+      </div>
+    `).join('');
+  }
+  if(activityLogBtn){
+    activityLogBtn.addEventListener('click', () => {
+      renderActivityLog();
+      activityLogModalOverlay.classList.add('show');
+    });
+    document.getElementById('activityLogModalClose').addEventListener('click', () => activityLogModalOverlay.classList.remove('show'));
+    document.getElementById('activityLogCloseBtn').addEventListener('click', () => activityLogModalOverlay.classList.remove('show'));
+    activityLogModalOverlay.addEventListener('click', e => { if(e.target === activityLogModalOverlay) activityLogModalOverlay.classList.remove('show'); });
+  }
+
 
   // ---------- Autosave (this browser only, no server / no account) ----------
   const SAVE_KEY = 'rollRegister_v1';
@@ -2670,6 +3211,401 @@
     render();
   }
 
+  // ---------- Grades & permanent record (Form 137-E: per-grade subject ratings,
+  // core values / learners observed values, attendance record, certificate of transfer) ----------
+  const GRADE_LEVELS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+  const SUBJECTS_COMMON = [
+    { key:'motherTongue', label:'Mother Tongue', levels:['I','II','III'] },
+    { key:'filipino', label:'Filipino', levels:['I','II','III','IV','V','VI'] },
+    { key:'english', label:'English', levels:['I','II','III','IV','V','VI'] },
+    { key:'math', label:'Mathematics', levels:['I','II','III','IV','V','VI'] },
+    { key:'science', label:'Science', levels:['I','II','III','IV','V','VI'] },
+    { key:'ap', label:'Araling Panlipunan (AP)', levels:['I','II','III','IV','V','VI'] },
+    { key:'esp', label:'Edukasyon sa Pagpapakatao', levels:['I','II','III','IV','V','VI'] },
+    { key:'epp', label:'EPP', levels:['IV','V','VI'] },
+    { key:'mapehMusic', label:'MAPEH — Music', levels:['I','II','III','IV','V','VI'] },
+    { key:'mapehArts', label:'MAPEH — Arts', levels:['I','II','III','IV','V','VI'] },
+    { key:'mapehPE', label:'MAPEH — Physical Education', levels:['I','II','III','IV','V','VI'] },
+    { key:'mapehHealth', label:'MAPEH — Health', levels:['I','II','III','IV','V','VI'] }
+  ];
+  function subjectsForLevel(level){ return SUBJECTS_COMMON.filter(su => su.levels.includes(level)); }
+
+  const CORE_VALUE_ROWS = [
+    { key:'diyos1', group:'Maka-Diyos', statement:"Expresses one's spiritual beliefs while respecting the spiritual beliefs of others." },
+    { key:'diyos2', group:'Maka-Diyos', statement:'Shows adherence to ethical principles by upholding truth.' },
+    { key:'tao1', group:'Makatao', statement:'Is sensitive to individual, social, and cultural differences.' },
+    { key:'tao2', group:'Makatao', statement:'Demonstrates contributions towards solidarity.' },
+    { key:'kalikasan1', group:'Makakalikasan', statement:'Cares for the environment and utilizes resources wisely, judiciously, and economically.' },
+    { key:'bansa1', group:'Makabansa', statement:'Demonstrates appropriate behavior in carrying out activities in the school, community, and country.' }
+  ];
+  const CORE_VALUE_MARKS = ['', 'AO', 'SO', 'RO', 'NO'];
+
+  function ensurePermanentRecord(s){
+    if(!s.permanentRecord) s.permanentRecord = {};
+    const pr = s.permanentRecord;
+    if(!pr.meta) pr.meta = {};
+    if(!pr.progress) pr.progress = {};
+    if(!pr.coreValues) pr.coreValues = {};
+    if(!pr.attendance) pr.attendance = {};
+    if(!pr.transfer) pr.transfer = { eligible:'', principal:'', date:'' };
+    GRADE_LEVELS.forEach(g => {
+      if(!pr.meta[g]) pr.meta[g] = { school:'', schoolYear:'', eligible:'' };
+      if(!pr.progress[g]) pr.progress[g] = { subjects:{} };
+      if(!pr.coreValues[g]) pr.coreValues[g] = { ratings:{} };
+      if(!pr.attendance[g]) pr.attendance[g] = { schoolDays:'', daysAbsent:'', causeAbsent:'', timesTardy:'', causeTardy:'', daysPresent:'' };
+    });
+    return pr;
+  }
+
+  function computeFinalRating(q){
+    const vals = ['q1','q2','q3','q4'].map(k => q && q[k] !== undefined && q[k] !== '' && q[k] !== null ? Number(q[k]) : null).filter(v => v !== null && !isNaN(v));
+    if(!vals.length) return null;
+    return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+  }
+  function computeGeneralAverage(finals){
+    const nums = finals.filter(f => f !== null && f !== undefined);
+    if(!nums.length) return null;
+    return Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 100) / 100;
+  }
+
+  const recordModalOverlay = document.getElementById('recordModalOverlay');
+  const gradeTabsEl = document.getElementById('gradeTabs');
+  const gradeTabContentEl = document.getElementById('gradeTabContent');
+  let recordStudent = null;
+  let activeGradeTab = 'I';
+
+  function openRecordModal(s){
+    recordStudent = s;
+    const pr = ensurePermanentRecord(s);
+    gradeTabsEl.innerHTML = GRADE_LEVELS.map(g => `<button type="button" class="gr-tab-btn${g === activeGradeTab ? ' active' : ''}" data-level="${g}">Grade ${g}</button>`).join('');
+    gradeTabsEl.querySelectorAll('.gr-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeGradeTab = btn.dataset.level;
+        gradeTabsEl.querySelectorAll('.gr-tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+        renderGradeTabContent();
+      });
+    });
+    document.getElementById('grTransferEligible').value = pr.transfer.eligible || '';
+    document.getElementById('grTransferPrincipal').value = pr.transfer.principal || '';
+    document.getElementById('grTransferDate').value = pr.transfer.date || '';
+    renderGradeTabContent();
+    recordModalOverlay.classList.add('show');
+  }
+  function closeRecordModal(){
+    recordModalOverlay.classList.remove('show');
+    if(view === 'profile') renderProfile();
+  }
+
+  function renderGradeTabContent(){
+    const s = recordStudent;
+    if(!s) return;
+    const pr = s.permanentRecord;
+    const level = activeGradeTab;
+    const meta = pr.meta[level];
+    const progress = pr.progress[level];
+    const coreValues = pr.coreValues[level];
+    const att = pr.attendance[level];
+    const subjects = subjectsForLevel(level);
+    const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
+    const genAvg = computeGeneralAverage(finals);
+
+    gradeTabContentEl.innerHTML = `
+      <div class="field-row">
+        <div class="field"><label for="grMetaSchool">School</label><input type="text" id="grMetaSchool" placeholder="School name" value="${escapeHtml(meta.school)}"></div>
+        <div class="field"><label for="grMetaYear">School year</label><input type="text" id="grMetaYear" placeholder="e.g. 2019-2020" value="${escapeHtml(meta.schoolYear)}"></div>
+      </div>
+      <table class="gr-table">
+        <thead><tr><th>Learning area</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th><th class="ss-num">Final</th></tr></thead>
+        <tbody>
+          ${subjects.map((su, i) => {
+            const q = progress.subjects[su.key] || {};
+            return `<tr>
+              <td>${escapeHtml(su.label)}</td>
+              ${['q1','q2','q3','q4'].map(qk => `<td><input type="number" min="60" max="100" class="gr-cell" data-subject="${su.key}" data-field="${qk}" value="${q[qk] !== undefined && q[qk] !== null ? q[qk] : ''}"></td>`).join('')}
+              <td class="gr-final" data-final-for="${su.key}">${finals[i] === null ? '—' : finals[i]}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+        <tfoot><tr><td colspan="5" style="text-align:right; font-weight:700;">General average</td><td class="gr-final" id="grGeneralAverage">${genAvg === null ? '—' : genAvg}</td></tr></tfoot>
+      </table>
+      <div class="field">
+        <label for="grEligible">Eligible for admission to Grade</label>
+        <input type="text" id="grEligible" placeholder="e.g. ${level === 'VI' ? 'Grade VII' : 'II'}" value="${escapeHtml(meta.eligible)}">
+      </div>
+
+      <p class="ss-section-title" style="margin-top:1.3rem;">Core values — learners observed values</p>
+      <table class="gr-table gr-core-table">
+        <thead><tr><th>Core value</th><th>Behavior statement</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th></tr></thead>
+        <tbody>
+          ${CORE_VALUE_ROWS.map(row => {
+            const r = coreValues.ratings[row.key] || {};
+            return `<tr>
+              <td>${escapeHtml(row.group)}</td>
+              <td>${escapeHtml(row.statement)}</td>
+              ${['q1','q2','q3','q4'].map(qk => `<td><select class="gr-core-cell" data-row="${row.key}" data-field="${qk}">
+                ${CORE_VALUE_MARKS.map(opt => `<option value="${opt}" ${((r[qk] || '') === opt) ? 'selected' : ''}>${opt || '—'}</option>`).join('')}
+              </select></td>`).join('')}
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+
+      <p class="ss-section-title" style="margin-top:1.3rem;">Attendance record</p>
+      <div class="field-row">
+        <div class="field"><label for="attSchoolDays">No. of school days</label><input type="number" min="0" id="attSchoolDays" value="${escapeHtml(att.schoolDays)}"></div>
+        <div class="field"><label for="attDaysAbsent">Days absent</label><input type="number" min="0" id="attDaysAbsent" value="${escapeHtml(att.daysAbsent)}"></div>
+      </div>
+      <div class="field"><label for="attCauseAbsent">Cause (absence)</label><input type="text" id="attCauseAbsent" value="${escapeHtml(att.causeAbsent)}"></div>
+      <div class="field-row">
+        <div class="field"><label for="attTimesTardy">Times tardy</label><input type="number" min="0" id="attTimesTardy" value="${escapeHtml(att.timesTardy)}"></div>
+        <div class="field"><label for="attDaysPresent">Days present</label><input type="number" min="0" id="attDaysPresent" value="${escapeHtml(att.daysPresent)}"></div>
+      </div>
+      <div class="field"><label for="attCauseTardy">Cause (tardy)</label><input type="text" id="attCauseTardy" value="${escapeHtml(att.causeTardy)}"></div>
+    `;
+
+    // Subject quarter cells — update data, recompute that row's final and the general average in place
+    gradeTabContentEl.querySelectorAll('.gr-cell').forEach(input => {
+      input.addEventListener('input', () => {
+        const subKey = input.dataset.subject, field = input.dataset.field;
+        if(!progress.subjects[subKey]) progress.subjects[subKey] = {};
+        progress.subjects[subKey][field] = input.value === '' ? '' : input.value;
+        const newFinal = computeFinalRating(progress.subjects[subKey]);
+        const finalCell = gradeTabContentEl.querySelector(`[data-final-for="${subKey}"]`);
+        if(finalCell) finalCell.textContent = newFinal === null ? '—' : newFinal;
+        const allFinals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
+        const newGenAvg = computeGeneralAverage(allFinals);
+        document.getElementById('grGeneralAverage').textContent = newGenAvg === null ? '—' : newGenAvg;
+        saveData();
+      });
+    });
+    gradeTabContentEl.querySelectorAll('.gr-core-cell').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const rowKey = sel.dataset.row, field = sel.dataset.field;
+        if(!coreValues.ratings[rowKey]) coreValues.ratings[rowKey] = {};
+        coreValues.ratings[rowKey][field] = sel.value;
+        saveData();
+      });
+    });
+    document.getElementById('grMetaSchool').addEventListener('input', e => { meta.school = e.target.value; saveData(); });
+    document.getElementById('grMetaYear').addEventListener('input', e => { meta.schoolYear = e.target.value; saveData(); });
+    document.getElementById('grEligible').addEventListener('input', e => { meta.eligible = e.target.value; saveData(); });
+    document.getElementById('attSchoolDays').addEventListener('input', e => { att.schoolDays = e.target.value; saveData(); });
+    document.getElementById('attDaysAbsent').addEventListener('input', e => { att.daysAbsent = e.target.value; saveData(); });
+    document.getElementById('attCauseAbsent').addEventListener('input', e => { att.causeAbsent = e.target.value; saveData(); });
+    document.getElementById('attTimesTardy').addEventListener('input', e => { att.timesTardy = e.target.value; saveData(); });
+    document.getElementById('attDaysPresent').addEventListener('input', e => { att.daysPresent = e.target.value; saveData(); });
+    document.getElementById('attCauseTardy').addEventListener('input', e => { att.causeTardy = e.target.value; saveData(); });
+  }
+
+  document.getElementById('recordModalClose').addEventListener('click', closeRecordModal);
+  document.getElementById('recordCloseBtn').addEventListener('click', closeRecordModal);
+  recordModalOverlay.addEventListener('click', e => { if(e.target === recordModalOverlay) closeRecordModal(); });
+  document.getElementById('grTransferEligible').addEventListener('input', e => {
+    if(recordStudent) { ensurePermanentRecord(recordStudent).transfer.eligible = e.target.value; saveData(); }
+  });
+  document.getElementById('grTransferPrincipal').addEventListener('input', e => {
+    if(recordStudent) { ensurePermanentRecord(recordStudent).transfer.principal = e.target.value; saveData(); }
+  });
+  document.getElementById('grTransferDate').addEventListener('change', e => {
+    if(recordStudent) { ensurePermanentRecord(recordStudent).transfer.date = e.target.value; saveData(); }
+  });
+
+  // ---------- Share record (single student, printable / "save as PDF") ----------
+  const shareModalOverlay = document.getElementById('shareModalOverlay');
+  const shareSheet = document.getElementById('shareSheet');
+  let shareStudent = null;
+
+  function currentBrandingForShare(){
+    try{ return JSON.parse(localStorage.getItem(BRAND_KEY) || 'null') || {}; }
+    catch(err){ return {}; }
+  }
+
+  function buildElementaryProgressHtml(s){
+    const pr = s.permanentRecord;
+    if(!pr) return '';
+    return `<p class="ss-section-title">Elementary school progress</p>` +
+      GRADE_LEVELS.map(level => {
+        const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
+        const progress = pr.progress[level] || { subjects:{} };
+        const subjects = subjectsForLevel(level);
+        const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
+        const genAvg = computeGeneralAverage(finals);
+        return `
+        <div class="ss-grade-block">
+          <p class="ss-grade-heading">Grade ${level} — School: ${escapeHtml(meta.school || '—')}</p>
+          <p class="ss-grade-sub">School year: ${escapeHtml(meta.schoolYear || '—')}</p>
+          <table class="ss-table">
+            <thead><tr><th>Learning area</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th><th class="ss-num">Final</th></tr></thead>
+            <tbody>
+              ${subjects.map((su, i) => {
+                const q = progress.subjects[su.key] || {};
+                return `<tr><td>${escapeHtml(su.label)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : '—'}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '—' : finals[i]}</td></tr>`;
+              }).join('')}
+            </tbody>
+            <tfoot><tr><td colspan="5" style="text-align:right; font-weight:700;">General average</td><td class="ss-num" style="font-weight:700;">${genAvg === null ? '—' : genAvg}</td></tr></tfoot>
+          </table>
+          <p class="ss-eligible-line">Eligible for admission to Grade: ${escapeHtml(meta.eligible || '—')}</p>
+        </div>`;
+      }).join('');
+  }
+
+  function buildCoreValuesHtml(s){
+    const pr = s.permanentRecord;
+    if(!pr) return '';
+    return `<p class="ss-section-title">Learners observed values</p>` +
+      GRADE_LEVELS.map(level => {
+        const meta = pr.meta[level] || {};
+        const cv = pr.coreValues[level] || { ratings:{} };
+        return `
+        <div class="ss-grade-block">
+          <p class="ss-grade-heading">Grade ${level}${meta.schoolYear ? ` — SY ${escapeHtml(meta.schoolYear)}` : ''}</p>
+          <table class="ss-table gr-core-table">
+            <thead><tr><th>Core value</th><th>Behavior statement</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th></tr></thead>
+            <tbody>
+              ${CORE_VALUE_ROWS.map(row => {
+                const r = cv.ratings[row.key] || {};
+                return `<tr><td>${escapeHtml(row.group)}</td><td>${escapeHtml(row.statement)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${r[qk] || '—'}</td>`).join('')}</tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>`;
+      }).join('');
+  }
+
+  function buildAttendanceHtml(s){
+    const pr = s.permanentRecord;
+    if(!pr) return '';
+    return `
+      <p class="ss-section-title">Attendance record</p>
+      <table class="ss-table">
+        <thead><tr><th>Grade</th><th class="ss-num">School days</th><th class="ss-num">Days absent</th><th>Cause</th><th class="ss-num">Times tardy</th><th>Cause</th><th class="ss-num">Days present</th></tr></thead>
+        <tbody>
+          ${GRADE_LEVELS.map(level => {
+            const a = pr.attendance[level] || {};
+            return `<tr><td>${level}</td><td class="ss-num">${a.schoolDays || '—'}</td><td class="ss-num">${a.daysAbsent || '—'}</td><td>${escapeHtml(a.causeAbsent || '—')}</td><td class="ss-num">${a.timesTardy || '—'}</td><td>${escapeHtml(a.causeTardy || '—')}</td><td class="ss-num">${a.daysPresent || '—'}</td></tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  function buildCertificateHtml(s){
+    const pr = s.permanentRecord;
+    const transfer = (pr && pr.transfer) || {};
+    const hasNameParts = s.surname || s.firstName || s.mi;
+    const composedName = hasNameParts
+      ? [s.surname, s.firstName, s.mi ? (s.mi.replace(/\.$/, '') + '.') : ''].filter(Boolean).join(' ')
+      : s.name;
+    return `
+      <div class="ss-certificate">
+        <p class="ss-cert-title">Certificate of transfer</p>
+        <p>To whom it may concern:</p>
+        <p>This is to certify that this is a true record of the Elementary School Permanent Record of <b>${escapeHtml(composedName)}</b>. He/She is eligible for transfer and admission to Grade / Year <b>${escapeHtml(transfer.eligible || '________________')}</b>.</p>
+      </div>`;
+  }
+
+  function openShareModal(s){
+    shareStudent = s;
+    const teacher = teacherById[s.teacherId];
+    const brand = currentBrandingForShare();
+    const schoolName = s.school || brand.title || brand.heading || DEFAULT_HEADING;
+    const sortedHistory = [...(s.history || [])].sort((a, b) => b.year.localeCompare(a.year));
+    const hasNameParts = s.surname || s.firstName || s.mi;
+    const composedName = hasNameParts
+      ? [s.surname, s.firstName, s.mi ? (s.mi.replace(/\.$/, '') + '.') : ''].filter(Boolean).join(' ')
+      : s.name;
+
+    shareSheet.innerHTML = `
+      <div class="ss-head">
+        <div class="ss-head-text">
+          <p class="ss-republic">Republic of the Philippines</p>
+          <p class="ss-dept">Department of Education</p>
+          ${s.division ? `<p class="ss-region">${escapeHtml(s.division)}</p>` : ''}
+          <p class="ss-title">STUDENT PERMANENT RECORD</p>
+        </div>
+        <div class="ss-lrn-box">LRN<b>${escapeHtml(s.id)}</b></div>
+      </div>
+
+      <div class="ss-row">
+        <div class="ss-field" style="flex:2;">
+          <span class="ss-label">Name</span>
+          <span class="ss-value">${escapeHtml(composedName)}</span>
+          ${hasNameParts ? `
+          <div class="ss-name-captions"><span>Surname</span><span>Name</span><span>M.I.</span></div>
+          ` : ''}
+        </div>
+        <div class="ss-field"><span class="ss-label">Sex</span><span class="ss-value">${escapeHtml(s.sex || '—')}</span></div>
+      </div>
+      <div class="ss-row">
+        <div class="ss-field"><span class="ss-label">Date of birth</span><span class="ss-value">${escapeHtml(s.dob || '—')}</span></div>
+        <div class="ss-field"><span class="ss-label">Place of birth</span><span class="ss-value">${escapeHtml(s.pob || '—')}</span></div>
+        <div class="ss-field"><span class="ss-label">Date of entrance</span><span class="ss-value">${escapeHtml(s.doe || '—')}</span></div>
+      </div>
+      <div class="ss-row">
+        <div class="ss-field" style="flex:2;"><span class="ss-label">Parent / Guardian</span><span class="ss-value">${escapeHtml(s.guardian || '—')}</span></div>
+        <div class="ss-field"><span class="ss-label">Occupation</span><span class="ss-value">${escapeHtml(s.guardianOccupation || '—')}</span></div>
+      </div>
+      ${s.guardianAddress ? `
+      <div class="ss-row">
+        <div class="ss-field" style="flex:1;"><span class="ss-label">Guardian address</span><span class="ss-value">${escapeHtml(s.guardianAddress)}</span></div>
+      </div>` : ''}
+      <div class="ss-row">
+        <div class="ss-field"><span class="ss-label">School</span><span class="ss-value">${escapeHtml(schoolName)}</span></div>
+        <div class="ss-field"><span class="ss-label">Section</span><span class="ss-value">${escapeHtml(s.section)}</span></div>
+        <div class="ss-field"><span class="ss-label">School year</span><span class="ss-value">${escapeHtml(s.year || '—')}</span></div>
+        <div class="ss-field"><span class="ss-label">Adviser</span><span class="ss-value">${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || '—')}</span></div>
+      </div>
+      ${s.transferredFrom ? `
+      <div class="ss-row">
+        <div class="ss-field" style="flex:1;"><span class="ss-label">Transferred from</span><span class="ss-value">${escapeHtml(s.transferredFrom)}</span></div>
+      </div>` : ''}
+
+      <p class="ss-section-title">Section history</p>
+      <table class="ss-table">
+        <thead><tr><th>School year</th><th>Section</th><th>Status</th></tr></thead>
+        <tbody>
+          ${sortedHistory.map((h, i) => `<tr><td>${escapeHtml(h.year)}</td><td>${escapeHtml(h.section)}</td><td>${i === 0 ? 'Current' : ''}</td></tr>`).join('') || '<tr><td colspan="3">No prior section records on file.</td></tr>'}
+        </tbody>
+      </table>
+
+      ${buildElementaryProgressHtml(s)}
+      ${buildCoreValuesHtml(s)}
+      ${buildAttendanceHtml(s)}
+      ${buildCertificateHtml(s)}
+
+      <div class="ss-footer">
+        <span>Generated ${escapeHtml(new Date().toLocaleDateString())} by ${escapeHtml(currentActor())}</span>
+        <div class="ss-signature"><div class="ss-sig-line">${s.permanentRecord && s.permanentRecord.transfer && s.permanentRecord.transfer.principal ? escapeHtml(s.permanentRecord.transfer.principal) : 'Principal / School head'}</div></div>
+      </div>
+      ${s.permanentRecord && s.permanentRecord.transfer && s.permanentRecord.transfer.date ? `<p style="text-align:right; font-size:0.68rem; color:#666; margin-top:0.3rem;">Date: ${escapeHtml(s.permanentRecord.transfer.date)}</p>` : ''}
+    `;
+    shareModalOverlay.classList.add('show');
+  }
+  function closeShareModal(){ shareModalOverlay.classList.remove('show'); }
+
+  document.getElementById('shareModalClose').addEventListener('click', closeShareModal);
+  document.getElementById('shareCloseBtn').addEventListener('click', closeShareModal);
+  shareModalOverlay.addEventListener('click', e => { if(e.target === shareModalOverlay) closeShareModal(); });
+
+  document.getElementById('sharePrintBtn').addEventListener('click', () => {
+    if(shareStudent) logActivity('Shared student record (print/PDF)', `${shareStudent.name} (${shareStudent.id})`);
+    window.print();
+  });
+  document.getElementById('shareEmailBtn').addEventListener('click', () => {
+    if(!shareStudent) return;
+    const s = shareStudent;
+    const teacher = teacherById[s.teacherId];
+    const subject = `Student record — ${s.name} (${s.id})`;
+    const bodyLines = [
+      `Student record for ${s.name} (LRN ${s.id})`,
+      `Section: ${s.section}   School year: ${s.year || '—'}`,
+      `Adviser: ${teacher ? teacher.name : (s.teacherId || '—')}`,
+      '',
+      'A full formatted copy of this record can be saved as a PDF from the "Print / Save as PDF" button and attached to this email.'
+    ];
+    logActivity('Shared student record (email)', `${s.name} (${s.id})`);
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+  });
+
   function renderProfile(){
     document.querySelector('.search-wrap').style.display = 'none';
     hintText.style.display = 'none';
@@ -2681,6 +3617,7 @@
     }
     const teacher = teacherById[s.teacherId];
     const sortedHistory = [...(s.history || [])].sort((a, b) => b.year.localeCompare(a.year));
+    const hasRecordDetails = s.surname || s.firstName || s.mi || s.sex || s.dob || s.pob || s.doe || s.guardian || s.guardianAddress || s.guardianOccupation || s.division || s.school;
 
     resultsEl.style.display = 'block';
     resultsEl.innerHTML = `
@@ -2695,6 +3632,19 @@
             <div><span class="tag">Transferred in</span>Came from ${escapeHtml(s.transferredFrom)}</div>
           </div>
         ` : ''}
+        ${hasRecordDetails ? `
+          <p class="section-label">Permanent record details</p>
+          <ul class="record-details-view">
+            ${(s.surname || s.firstName || s.mi) ? `<li><span>Surname / First name / M.I.</span><b>${escapeHtml(s.surname || '—')} / ${escapeHtml(s.firstName || '—')} / ${escapeHtml(s.mi || '—')}</b></li>` : ''}
+            ${s.sex ? `<li><span>Sex</span><b>${escapeHtml(s.sex)}</b></li>` : ''}
+            ${s.dob ? `<li><span>Date of birth</span><b>${escapeHtml(s.dob)}</b></li>` : ''}
+            ${s.pob ? `<li><span>Place of birth</span><b>${escapeHtml(s.pob)}</b></li>` : ''}
+            ${s.doe ? `<li><span>Date of entrance</span><b>${escapeHtml(s.doe)}</b></li>` : ''}
+            ${s.guardian ? `<li><span>Parent/Guardian</span><b>${escapeHtml(s.guardian)}</b></li>` : ''}
+            ${s.division ? `<li><span>Division</span><b>${escapeHtml(s.division)}</b></li>` : ''}
+            ${s.school ? `<li><span>School</span><b>${escapeHtml(s.school)}</b></li>` : ''}
+          </ul>
+        ` : ''}
         <p class="section-label">Section history</p>
         <ul class="timeline">
           ${sortedHistory.map((h, i) => `
@@ -2706,12 +3656,16 @@
         </ul>
         <div class="modal-actions" style="justify-content:flex-start; margin-top:1.4rem;">
           <button type="button" class="btn-secondary" id="editFromProfileBtn">Edit this student</button>
+          <button type="button" class="btn-secondary" id="recordFromProfileBtn">🎓 Grades &amp; record</button>
+          <button type="button" class="btn-secondary" id="shareFromProfileBtn">📄 Share record</button>
           <button type="button" class="btn-danger" id="deleteFromProfileBtn">Delete this student</button>
         </div>
       </div>
     `;
     document.getElementById('backBtn').addEventListener('click', backToList);
     document.getElementById('editFromProfileBtn').addEventListener('click', () => openStudentModal(s));
+    document.getElementById('recordFromProfileBtn').addEventListener('click', () => openRecordModal(s));
+    document.getElementById('shareFromProfileBtn').addEventListener('click', () => openShareModal(s));
     document.getElementById('deleteFromProfileBtn').addEventListener('click', () => confirmDeleteStudents([s.id]));
   }
 
@@ -2814,6 +3768,7 @@
             </label>
             <div class="card-head-right">
               <div class="stamp">${escapeHtml(s.section)}</div>
+              <button class="icon-del icon-share" data-share-student="${escapeHtml(s.id)}" aria-label="Share / print PDF" title="Share / print PDF">📄</button>
               <button class="icon-del icon-edit" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>
               <button class="icon-del" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
             </div>
@@ -2838,6 +3793,13 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           confirmDeleteStudents([btn.dataset.deleteStudent]);
+        });
+      });
+      resultsEl.querySelectorAll('[data-share-student]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const s = students.find(st => st.id === btn.dataset.shareStudent);
+          if(s) openShareModal(s);
         });
       });
       resultsEl.querySelectorAll('[data-edit-student]').forEach(btn => {
@@ -3013,6 +3975,7 @@
     const { type, ids } = pendingDelete;
 
     if(type === 'student'){
+      const deletedNames = students.filter(s => ids.includes(s.id)).map(s => `${s.name} (${s.id})`);
       for(let i = students.length - 1; i >= 0; i--){
         if(ids.includes(students[i].id)) students.splice(i, 1);
       }
@@ -3020,17 +3983,20 @@
       refreshDropdowns();
       if(sectionFilter && !students.some(s => s.section === sectionFilter)){ sectionFilter = ''; sectionSelect.value = ''; }
       if(yearFilter && !students.some(s => s.year === yearFilter)){ yearFilter = ''; yearSelect.value = ''; }
+      logActivity(ids.length === 1 ? 'Deleted student' : `Deleted ${ids.length} students`, deletedNames.join(', '));
       showToast(ids.length === 1 ? 'Student deleted' : `${ids.length} students deleted`);
       if(view === 'profile' && ids.includes(profileStudentId)){
         view = 'list';
         profileStudentId = null;
       }
     } else {
+      const deletedNames = teachers.filter(t => ids.includes(t.id)).map(t => `${t.name} (${t.id})`);
       for(let i = teachers.length - 1; i >= 0; i--){
         if(ids.includes(teachers[i].id)) teachers.splice(i, 1);
       }
       ids.forEach(id => selectedTeacherIds.delete(id));
       rebuildTeacherById();
+      logActivity(ids.length === 1 ? 'Deleted teacher' : `Deleted ${ids.length} teachers`, deletedNames.join(', '));
       showToast(ids.length === 1 ? 'Teacher deleted' : `${ids.length} teachers deleted`);
     }
 
@@ -3062,10 +4028,26 @@
       document.getElementById('stuYear').value = existing.year || '';
       stuTeacherSelect.value = existing.teacherId || '';
       document.getElementById('stuOrigin').value = existing.transferredFrom || '';
+      document.getElementById('stuSurname').value = existing.surname || '';
+      document.getElementById('stuFirstName').value = existing.firstName || '';
+      document.getElementById('stuMI').value = existing.mi || '';
+      document.getElementById('stuSex').value = existing.sex || '';
+      document.getElementById('stuDob').value = existing.dob || '';
+      document.getElementById('stuPob').value = existing.pob || '';
+      document.getElementById('stuDoe').value = existing.doe || '';
+      document.getElementById('stuGuardian').value = existing.guardian || '';
+      document.getElementById('stuGuardianAddress').value = existing.guardianAddress || '';
+      document.getElementById('stuGuardianOccupation').value = existing.guardianOccupation || '';
+      document.getElementById('stuDivision').value = existing.division || '';
+      document.getElementById('stuSchool').value = existing.school || '';
+      // Auto-expand the details section if any of it is already filled in
+      const hasRecordDetails = existing.surname || existing.firstName || existing.mi || existing.sex || existing.dob || existing.pob || existing.doe || existing.guardian || existing.guardianAddress || existing.guardianOccupation || existing.division || existing.school;
+      document.querySelector('#studentModalOverlay .record-details').open = !!hasRecordDetails;
     } else {
       editingStudentId = null;
       studentModalTitle.textContent = 'Add student';
       studentSubmitBtn.textContent = 'Save student';
+      document.querySelector('#studentModalOverlay .record-details').open = false;
     }
 
     studentModalOverlay.classList.add('show');
@@ -3085,6 +4067,26 @@
     const year = document.getElementById('stuYear').value.trim();
     const teacherId = stuTeacherSelect.value;
     const origin = document.getElementById('stuOrigin').value.trim();
+    const surname = document.getElementById('stuSurname').value.trim();
+    const firstName = document.getElementById('stuFirstName').value.trim();
+    const mi = document.getElementById('stuMI').value.trim();
+    const sex = document.getElementById('stuSex').value;
+    const dob = document.getElementById('stuDob').value;
+    const pob = document.getElementById('stuPob').value.trim();
+    const doe = document.getElementById('stuDoe').value;
+    const guardian = document.getElementById('stuGuardian').value.trim();
+    const guardianAddress = document.getElementById('stuGuardianAddress').value.trim();
+    const guardianOccupation = document.getElementById('stuGuardianOccupation').value.trim();
+    const division = document.getElementById('stuDivision').value.trim();
+    const school = document.getElementById('stuSchool').value.trim();
+    // Applied via a small helper below so add & edit don't duplicate this list
+    const recordDetails = { surname, firstName, mi, sex, dob, pob, doe, guardian, guardianAddress, guardianOccupation, division, school };
+    function applyRecordDetails(target){
+      Object.keys(recordDetails).forEach(key => {
+        if(recordDetails[key]) target[key] = recordDetails[key];
+        else delete target[key];
+      });
+    }
 
     // Duplicate LRN check — ignore the record we're currently editing
     const dupe = students.some(s => s.id.toLowerCase() === id.toLowerCase() && s.id !== editingStudentId);
@@ -3101,6 +4103,7 @@
       s.year = year;
       s.teacherId = teacherId;
       if(origin) s.transferredFrom = origin; else delete s.transferredFrom;
+      applyRecordDetails(s);
 
       // Keep the section-history timeline in sync with the current year/section
       s.history = s.history || [];
@@ -3108,6 +4111,7 @@
       if(histEntry) histEntry.section = section;
       else s.history.unshift({ year, section });
 
+      logActivity('Edited student', `${name} (${id})`);
       saveData();
       refreshDropdowns();
       closeStudentModal();
@@ -3130,7 +4134,9 @@
       dateAdded: Date.now()
     };
     if(origin) newStudent.transferredFrom = origin;
+    applyRecordDetails(newStudent);
     students.push(newStudent);
+    logActivity('Added student', `${name} (${id})`);
     saveData();
 
     refreshDropdowns();
@@ -3239,9 +4245,8 @@
         students.forEach(s => { if(s.teacherId === oldId) s.teacherId = id; });
       }
       rebuildTeacherById();
+      logActivity('Edited teacher', `${name} (${id})`);
       saveData();
-
-      closeTeacherModal();
       view = 'list';
       activeTab = 'teachers';
       tabsEl.dataset.active = 'teachers';
@@ -3255,6 +4260,7 @@
     const newTeacher = { id, name, subjects, dateAdded: Date.now() };
     teachers.push(newTeacher);
     rebuildTeacherById();
+    logActivity('Added teacher', `${name} (${id})`);
     saveData();
 
     closeTeacherModal();
@@ -3617,6 +4623,7 @@
     });
 
     if(added > 0){
+      logActivity(`Scanned & added ${added} student${added === 1 ? '' : 's'}`, '');
       saveData();
       refreshDropdowns();
     }
@@ -3679,7 +4686,8 @@
       exportedAt: new Date().toISOString(),
       students,
       teachers,
-      branding
+      branding,
+      activityLog
     };
   }
 
@@ -3729,10 +4737,13 @@
       brandingImported = true;
     }
 
+    mergeActivityLog(data.activityLog);
+
     if(addedStudents > 0 || addedTeachers > 0){
       rebuildTeacherById();
       saveData();
       refreshDropdowns();
+      logActivity('Imported backup', `${addedStudents} student(s), ${addedTeachers} teacher(s)`);
     }
 
     const parts = [];
@@ -4041,6 +5052,7 @@
           localStorage.setItem(HAD_SIGNED_IN_KEY, '1');
           setGdriveUI('connected');
           if(signinStatus) signinStatus.textContent = '';
+          logActivity('Signed in', gdriveEmail || '');
           await initialDriveSync();
         }
       });
