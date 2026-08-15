@@ -42,6 +42,13 @@ Want to test the app without downloading anything? You can try out the live web 
 - Manual backup: download a `.json` backup file or import one to restore/transfer data
 - Everything autosaves in the browser as you go — no account or server required to use the app
 
+### 📋 Grades & Permanent Record
+- Full DepEd Form 137-E–style permanent record per student: Elementary School Progress for Grades I–VI, with subject ratings per quarter and an auto-calculated Final Rating and General Average
+- Learners' Observed Values (core values) tracked per grade level with AO/SO/RO/NO markings across all four quarters
+- Attendance record (school days, absences, tardies, and causes) per grade level
+- Certificate of Transfer fields (eligibility, principal/school head, date) included automatically on the shared record
+- Share record as a printable, DepEd-formatted PDF — republic/agency header, LRN box, surname/first name/M.I. name line, section history, and the full permanent record — ready to print or save straight from the browser's print dialog
+
 ### 🎨 Customization
 - Branding panel to upload your school's logo, edit the heading/title/description text, and choose which side the logo sits on
 - Light and dark mode, togglable from the header or right on the sign-in screen, with the choice remembered per browser
@@ -82,6 +89,16 @@ Want to test the app without downloading anything? You can try out the live web 
     <td align="center" width="33%">
       <img src="screenshots/6.png" alt="Backup and import data modal" width="100%"/><br/>
       <sub><strong>6. Backup & Import</strong> — Drive sync & JSON export</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="screenshots/7.png" alt="Grades and permanent record modal with Form 137-E style subject ratings and core values" width="100%"/><br/>
+      <sub><strong>7. Grades & Record</strong> — Form 137-E subject ratings & core values</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="screenshots/8.png" alt="Shareable student permanent record formatted for printing to PDF" width="100%"/><br/>
+      <sub><strong>8. Share Record</strong> — Printable PDF permanent record</sub>
     </td>
   </tr>
 </table>
