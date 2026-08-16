@@ -116,29 +116,41 @@
     display:flex;
     justify-content:space-between;
     align-items:flex-start;
-    gap:1rem;
+    gap:1.2rem;
     flex-wrap:wrap;
+    position:relative;
   }
   .header-text{ flex:1; min-width:220px; }
 
-  .header-brand-row{
-    display:flex;
-    align-items:center;
-    gap:1.2rem;
-  }
-  .header-brand-row.logo-right{ flex-direction:row-reverse; }
-  .header-text-col{ flex:1; min-width:0; }
-
+  /* Logo corner badge — sits at the very top corner of the header,
+     independent of the title/description entirely (its own thing, not
+     inline with the text). The clearance reserved for it (via padding on
+     .header-top, below) is always sized to the LARGEST possible logo
+     (140px — the size slider's max), never the actual chosen size — so
+     dragging the slider anywhere from 40–140px only changes how big the
+     image looks inside its corner slot; it can never grow into, bump, or
+     overlap the title or the action buttons, because they were already
+     given clearance for the biggest case up front. Position is absolute,
+     which places it relative to the PADDING edge of .header-top — i.e.
+     inside the reserved gutter, exactly where the padding makes room. */
   .school-logo{
+    position:absolute;
+    top:0;
+    left:0;
     width:var(--logo-size, 76px); height:var(--logo-size, 76px);
     border-radius:14px;
     object-fit:cover;
     border:2px solid var(--brass);
     background:rgba(244,238,221,0.08);
-    flex-shrink:0;
     display:none;
   }
   .school-logo.show{ display:block; }
+  .school-logo.logo-right{ left:auto; right:0; }
+
+  /* Toggled in JS alongside .show/.logo-right so the reserved gutter
+     always matches which side (if any) actually has a visible logo. */
+  .header-top.has-logo-left{ padding-left:calc(140px + 1.3rem); }
+  .header-top.has-logo-right{ padding-right:calc(140px + 1.3rem); }
 
   .header-actions{
     display:flex;
@@ -1015,24 +1027,23 @@
   .field{
     margin-bottom:0.9rem;
   }
-  .record-details{
+  .record-section{
     border:1.5px dashed var(--line);
     border-radius:9px;
-    padding:0.7rem 0.9rem 0.2rem;
+    padding:0.9rem 0.9rem 0.2rem;
     margin:0.2rem 0 1.1rem;
   }
-  .record-details[open]{ padding-bottom:0.9rem; }
-  .record-details summary{
-    cursor:pointer;
+  .record-section-label{
     font-family:'IBM Plex Mono', monospace;
     font-size:0.76rem;
     letter-spacing:0.03em;
     color:var(--ink);
-    padding:0.2rem 0;
+    padding:0 0 0.2rem;
+    margin:0 0 0.7rem;
+    border-bottom:1px solid var(--line);
   }
-  .record-details summary .optional-tag{ display:block; margin-top:0.15rem; font-family:'Inter',sans-serif; }
-  .record-details .field-row,
-  .record-details .field:last-child{ margin-top:0.8rem; }
+  .record-section .field-row,
+  .record-section .field:last-child{ margin-top:0.8rem; }
   .field label{
     display:block;
     font-family:'IBM Plex Mono', monospace;
@@ -1152,7 +1163,7 @@
     position:fixed;
     bottom:1.5rem; left:50%;
     transform:translateX(-50%) translateY(20px);
-    background:var(--ink);
+    background:var(--green);
     color:var(--cream);
     font-family:'IBM Plex Mono', monospace;
     font-size:0.82rem;
@@ -1403,7 +1414,7 @@
     display:none;
     align-items:center;
     justify-content:space-between;
-    background:var(--ink);
+    background:var(--green);
     color:var(--cream);
     border-radius:10px;
     padding:0.7rem 1rem;
@@ -1665,10 +1676,12 @@
   .record-details-view li span{ color:var(--ink-soft); }
   @media (max-width:520px){ .record-details-view{ grid-template-columns:1fr; } }
 
-  /* ---------- Share sheet — styled after a DepEd-style permanent
-     record: republic/agency header, LRN box, identity fields, then
-     a section-history table where a grade-report's subject table
-     would normally sit. ---------- */
+  /* ---------- Share sheet — laid out to match the printed DepEd
+     Form 137-E "Elementary School Permanent Record": form-code +
+     LRN box top corners, centered republic/agency header, the
+     Surname/Name/M.I. identity block, a two-column Grade I–VI
+     progress grid, grouped Grade I–III / IV–VI core-values tables,
+     an attendance table, and a certificate of transfer. ---------- */
   .share-sheet{
     background:#fff;
     color:#1a1a1a;
@@ -1676,74 +1689,82 @@
     border-radius:10px;
     padding:1.6rem 1.7rem;
     font-family:'Inter', sans-serif;
+    font-size:0.82rem;
     max-height:60vh;
     overflow-y:auto;
   }
-  .ss-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:1rem;
-    border-bottom:2px solid #1a1a1a;
-    padding-bottom:0.8rem;
-    margin-bottom:1rem;
-  }
-  .ss-head-text{ text-align:center; flex:1; }
-  .ss-head-text .ss-republic{ font-size:0.78rem; margin:0; }
-  .ss-head-text .ss-dept{ font-size:0.78rem; margin:0; }
-  .ss-head-text .ss-region{ font-size:0.78rem; margin:0 0 0.4rem; }
-  .ss-head-text .ss-title{ font-size:1.05rem; font-weight:700; letter-spacing:0.02em; margin:0; }
+  .ss-topline{ display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
+  .ss-formcode{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:#333; white-space:nowrap; }
   .ss-lrn-box{
     border:1.5px solid #1a1a1a;
     border-radius:4px;
-    padding:0.35rem 0.6rem;
+    padding:0.3rem 0.6rem;
     font-family:'IBM Plex Mono', monospace;
-    font-size:0.74rem;
+    font-size:0.68rem;
     white-space:nowrap;
   }
-  .ss-lrn-box b{ display:block; font-size:0.9rem; margin-top:0.1rem; }
-  .ss-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:0 1.2rem;
-    margin-bottom:0.55rem;
-    font-size:0.84rem;
-  }
+  .ss-lrn-box b{ display:block; font-size:0.86rem; margin-top:0.1rem; }
+  .ss-head-text{ text-align:center; border-bottom:2px solid #1a1a1a; padding-bottom:0.7rem; margin:0.1rem 0 1rem; }
+  .ss-head-text .ss-republic, .ss-head-text .ss-dept, .ss-head-text .ss-region{ font-size:0.78rem; margin:0; }
+  .ss-head-text .ss-title{ font-size:1rem; font-weight:700; letter-spacing:0.02em; margin:0.3rem 0 0; text-transform:uppercase; }
+
+  .ss-nameline{ display:flex; align-items:baseline; gap:0.4rem; border-bottom:1px solid #999; padding-bottom:0.15rem; margin-bottom:0.15rem; }
+  .ss-nameline-label{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.04em; color:#666; white-space:nowrap; }
+  .ss-nameline-value{ font-size:0.9rem; flex:1; }
+  .ss-name-captions{ display:flex; gap:2.2rem; margin-bottom:0.6rem; }
+  .ss-name-captions span{ font-size:0.58rem; text-transform:uppercase; letter-spacing:0.03em; color:#888; }
+
+  .ss-row{ display:flex; flex-wrap:wrap; gap:0 1.2rem; margin-bottom:0.55rem; font-size:0.84rem; }
   .ss-field{ flex:1; min-width:140px; border-bottom:1px solid #999; padding-bottom:0.15rem; }
   .ss-field .ss-label{ display:block; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.04em; color:#666; }
   .ss-field .ss-value{ font-size:0.86rem; }
-  .ss-name-captions{ display:flex; justify-content:space-between; gap:0.5rem; margin-top:0.2rem; }
-  .ss-name-captions span{ font-size:0.58rem; text-transform:uppercase; letter-spacing:0.03em; color:#888; }
+
   .ss-section-title{
     font-weight:700;
-    font-size:0.8rem;
+    font-size:0.82rem;
+    text-align:center;
     text-transform:uppercase;
     letter-spacing:0.03em;
-    margin:1.1rem 0 0.5rem;
-    border-bottom:1.5px solid #1a1a1a;
-    padding-bottom:0.25rem;
-  }
-  .ss-table{ width:100%; border-collapse:collapse; font-size:0.82rem; margin-bottom:0.8rem; }
-  .ss-table th, .ss-table td{ border:1px solid #999; padding:0.35rem 0.5rem; text-align:left; }
-  .ss-table th{ background:#f0f0f0; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.03em; }
-  .ss-footer{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    margin-top:1.4rem;
-    padding-top:0.8rem;
-    border-top:1px dashed #999;
-    font-size:0.68rem;
-    color:#666;
-  }
-  .ss-footer .ss-signature{ text-align:center; }
-  .ss-footer .ss-signature .ss-sig-line{ border-top:1px solid #1a1a1a; padding-top:0.2rem; margin-top:1.6rem; min-width:170px; }
-  .ss-certificate{
-    margin-top:1.3rem;
-    padding-top:1rem;
+    margin:1.3rem 0 0.7rem;
+    padding:0.3rem 0;
     border-top:1.5px solid #1a1a1a;
-    font-size:0.84rem;
+    border-bottom:1.5px solid #1a1a1a;
+  }
+  .ss-table{ width:100%; border-collapse:collapse; font-size:0.74rem; margin-bottom:0.6rem; }
+  .ss-table th, .ss-table td{ border:1px solid #999; padding:0.3rem 0.4rem; text-align:left; }
+  .ss-table th{ background:#f0f0f0; font-size:0.64rem; text-transform:uppercase; letter-spacing:0.02em; text-align:center; }
+  .ss-table td.ss-num, .ss-table th.ss-num{ text-align:center; width:2.1rem; }
+
+  .ss-progress-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 1.2rem; }
+  .ss-grade-cell{ margin-bottom:1rem; break-inside:avoid; page-break-inside:avoid; }
+  .ss-grade-cell .ss-grade-heading{ font-size:0.74rem; font-weight:700; margin:0 0 0.2rem; }
+  .ss-grade-cell .ss-grade-sub{ font-size:0.68rem; color:#666; margin:0 0 0.35rem; }
+  .ss-genavg-row td{ font-weight:700; }
+  .ss-genavg-row td.ss-genavg-label{ text-align:right; }
+  .ss-eligible-line{ font-size:0.72rem; color:#333; margin:-0.1rem 0 0; }
+
+  .ss-corevalues-wrap{ break-inside:avoid; page-break-inside:avoid; margin-bottom:0.6rem; }
+  .ss-corevalues-wrap + .ss-corevalues-wrap{ margin-top:0.9rem; }
+  .ss-corevalues-table th, .ss-corevalues-table td{ font-size:0.68rem; }
+  .ss-corevalues-table td:nth-child(2){ min-width:160px; }
+  .ss-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.3rem 1.1rem;
+    font-size:0.68rem;
+    color:#444;
+    margin:0.4rem 0 1rem;
+  }
+  .ss-legend b{ font-family:'IBM Plex Mono', monospace; margin-right:0.2rem; }
+
+  .ss-certificate{
+    margin-top:0.4rem;
+    padding-top:0.9rem;
+    border-top:1.5px solid #1a1a1a;
+    font-size:0.82rem;
     line-height:1.6;
+    break-inside:avoid;
+    page-break-inside:avoid;
   }
   .ss-certificate .ss-cert-title{
     text-align:center;
@@ -1752,15 +1773,29 @@
     letter-spacing:0.03em;
     margin-bottom:0.6rem;
   }
-  .ss-grade-block{ margin-bottom:1.1rem; }
-  .ss-grade-block .ss-grade-heading{
-    font-size:0.78rem;
-    font-weight:700;
-    margin:0 0 0.35rem;
+  .ss-cert-sign{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-top:2.2rem;
   }
-  .ss-grade-block .ss-grade-sub{ font-size:0.72rem; color:#666; margin:0 0 0.4rem; }
-  .ss-table td.ss-num, .ss-table th.ss-num{ text-align:center; width:2.4rem; }
-  .ss-eligible-line{ font-size:0.78rem; color:#333; margin:-0.3rem 0 0.9rem; }
+  .ss-cert-sign .ss-cert-date-line{ font-size:0.78rem; }
+  .ss-cert-sign .ss-cert-date-line b{ display:inline-block; border-bottom:1px solid #1a1a1a; min-width:140px; padding-bottom:0.1rem; }
+  .ss-cert-sign .ss-cert-principal{ text-align:center; }
+  .ss-cert-sign .ss-cert-principal .ss-sig-line{ border-top:1px solid #1a1a1a; padding-top:0.2rem; min-width:190px; font-size:0.72rem; }
+
+  .ss-footer{
+    display:flex;
+    justify-content:space-between;
+    margin-top:1.1rem;
+    padding-top:0.6rem;
+    border-top:1px dashed #999;
+    font-size:0.64rem;
+    color:#666;
+  }
+  .ss-transferred-note{ font-size:0.76rem; color:#444; margin:-0.1rem 0 0.7rem; }
+
+  @media (max-width:520px){ .ss-progress-grid{ grid-template-columns:1fr; } }
 
   /* ---------- Grades & permanent record editor modal ---------- */
   .gr-tabs{
@@ -1803,6 +1838,10 @@
   }
 
   @media print{
+    /* Zero page margin removes room for the browser's own header/footer
+       (page title, URL, date/time) in Chromium-based browsers — the
+       whitespace is added back below, on the printed content itself. */
+    @page{ size:auto; margin:0; }
     body > *{ display:none !important; }
     body > #shareModalOverlay{ display:block !important; position:static !important; background:none !important; padding:0 !important; }
     #shareModalOverlay .modal{ box-shadow:none !important; border:none !important; max-width:100% !important; padding:0 !important; }
@@ -1810,9 +1849,12 @@
     #shareModalOverlay .modal > #shareSheet{
       display:block !important;
       max-height:none !important; overflow:visible !important;
-      border:none !important; padding:0 !important;
+      border:none !important;
+      padding:14mm 12mm !important;
+      font-size:0.78rem !important;
     }
   }
+
   .timeline li{
     display:flex;
     justify-content:space-between;
@@ -1869,8 +1911,13 @@
     header{ padding:1.9rem 1.1rem 1.7rem; }
     main{ padding:1.5rem 1rem 4.5rem; }
 
-    .header-top{ flex-direction:column; align-items:stretch; }
-    .school-logo{ width:min(var(--logo-size, 76px), 58px); height:min(var(--logo-size, 76px), 58px); }
+    .header-top{ flex-direction:column; align-items:stretch; padding-left:0 !important; padding-right:0 !important; }
+    .school-logo{
+      position:static;         /* corner-badge absolute positioning only makes sense in the wide row layout */
+      align-self:center;
+      margin-bottom:0.7rem;
+      width:min(var(--logo-size, 76px), 58px); height:min(var(--logo-size, 76px), 58px);
+    }
     .header-actions{ width:100%; flex-direction:column; align-items:stretch; }
     .customize-btn{ width:100%; }
     .download-dropdown{ width:100%; }
@@ -1945,6 +1992,29 @@
     .profile-card{ padding:1.4rem 1.3rem 1.2rem; }
     .signin-card{ padding:1.4rem 1.1rem 1.2rem; }
   }
+
+  /* ---------- Touch-device tap targets ---------- */
+  /* Keyed off (pointer: coarse) rather than a width breakpoint, so this
+     also covers tablets — which are often wider than the 640px phone
+     breakpoint above but are just as finger-operated as a phone. Small
+     icon-only buttons (edit/delete/share, modal close, grade tabs) are
+     the ones most likely to get missed taps, so they get an invisible
+     padded hit area rather than just growing visually. */
+  @media (pointer: coarse){
+    .tab-btn, .btn-secondary, .btn-primary, .btn-danger, .btn-ghost,
+    .customize-btn, .download-btn, .account-chip-btn, .scan-btn, .add-btn,
+    .sort-btn, .theme-toggle-btn, .signin-google-btn, .signin-guest-btn,
+    .gr-tab-btn, .name-btn{ min-height:44px; }
+    .icon-del, .icon-edit, .icon-share, .modal-close,
+    .signin-theme-toggle-btn, .back-btn{
+      min-width:44px;
+      min-height:44px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .chk, .chk input{ width:24px; height:24px; }
+  }
 </style>
 </head>
 <body>
@@ -1978,17 +2048,19 @@
 
 <header>
   <div class="header-inner">
-    <div class="header-top">
+    <div class="header-top" id="headerTop">
+      <!-- School logo, shown only once one is uploaded via Customize.
+           Positioned purely with CSS `order` (see .school-logo above)
+           as a real flex sibling of the title/actions — so toggling
+           left/right in Customize, or resizing the logo, only ever
+           moves the logo itself and reflows around it; the title and
+           buttons can't be pushed or overlapped. -->
+      <img class="school-logo" id="schoolLogo" alt="School logo">
+
       <div class="header-text">
-        <div class="header-brand-row" id="headerBrandRow">
-          <!-- School logo, shown only once one is uploaded via Customize -->
-          <img class="school-logo" id="schoolLogo" alt="School logo">
-          <div class="header-text-col">
-            <p class="eyebrow" id="brandTitle">School Records // Directory Search</p>
-            <h1 id="brandHeading">Roll &amp; Register</h1>
-            <p class="sub" id="brandDescription">Look up a student by name or LRN to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
-          </div>
-        </div>
+        <p class="eyebrow" id="brandTitle">School Records // Directory Search</p>
+        <h1 id="brandHeading">Roll &amp; Register</h1>
+        <p class="sub" id="brandDescription">Look up a student by name or LRN to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
       </div>
 
       <div class="header-actions">
@@ -2151,7 +2223,7 @@
       <h3 id="studentModalTitle">Add student</h3>
       <button class="modal-close" id="studentModalClose" aria-label="Close">✕</button>
     </div>
-    <p class="form-note">Saved automatically to this browser as soon as you hit save — no extra steps needed.</p>
+    <p class="form-note">Saved automatically to this browser as soon as you hit save — no extra steps needed. Every field below is captured up front, in one pass, so the record is complete from the start.</p>
     <form id="studentForm">
       <div class="field-row">
         <div class="field">
@@ -2159,95 +2231,91 @@
           <input type="text" id="stuId" placeholder="e.g. 136456789012" required>
         </div>
         <div class="field">
-          <label for="stuName">Full name</label>
-          <input type="text" id="stuName" placeholder="Jane Doe" required>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field">
           <label for="stuSection">Section</label>
           <input type="text" id="stuSection" placeholder="7-Rizal" required>
         </div>
-        <div class="field">
-          <label for="stuYear">School year</label>
-          <input type="text" id="stuYear" placeholder="2024-2025" required>
-        </div>
-      </div>
-      <div class="field">
-        <label for="stuTeacher">Adviser (teacher ID)</label>
-        <select id="stuTeacher"></select>
-      </div>
-      <div class="field">
-        <label for="stuOrigin">Transferred from <span class="optional-tag">— optional</span></label>
-        <input type="text" id="stuOrigin" placeholder="Leave blank if not a transferee">
       </div>
 
-      <details class="record-details">
-        <summary>Full permanent record details <span class="optional-tag">— optional, used on the printed/shared record</span></summary>
+      <div class="record-section">
+        <p class="record-section-label">Permanent record details — matches the DepEd Form 137-E name line</p>
         <div class="field-row">
           <div class="field" style="flex:2;">
             <label for="stuSurname">Surname</label>
-            <input type="text" id="stuSurname" placeholder="e.g. Dela Cruz">
+            <input type="text" id="stuSurname" placeholder="e.g. Dela Cruz" required>
           </div>
           <div class="field" style="flex:2;">
             <label for="stuFirstName">First name</label>
-            <input type="text" id="stuFirstName" placeholder="e.g. Juan">
+            <input type="text" id="stuFirstName" placeholder="e.g. Juan" required>
           </div>
           <div class="field" style="flex:0.6;">
             <label for="stuMI">M.I.</label>
             <input type="text" id="stuMI" maxlength="4" placeholder="D">
           </div>
         </div>
-        <p class="form-note" style="margin-top:-0.4rem;">On the printed record these combine as "Surname First name M.I." — matching the DepEd form's name line.</p>
         <div class="field-row">
           <div class="field">
             <label for="stuSex">Sex</label>
-            <select id="stuSex">
-              <option value="">— not set —</option>
+            <select id="stuSex" required>
+              <option value="" disabled selected>— select —</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
           </div>
           <div class="field">
             <label for="stuDob">Date of birth</label>
-            <input type="date" id="stuDob">
+            <input type="date" id="stuDob" required>
           </div>
         </div>
         <div class="field-row">
           <div class="field">
             <label for="stuPob">Place of birth</label>
-            <input type="text" id="stuPob" placeholder="e.g. Manila City">
+            <input type="text" id="stuPob" placeholder="e.g. Manila City" required>
           </div>
           <div class="field">
             <label for="stuDoe">Date of entrance</label>
-            <input type="date" id="stuDoe">
+            <input type="date" id="stuDoe" required>
           </div>
         </div>
         <div class="field">
           <label for="stuGuardian">Parent / Guardian</label>
-          <input type="text" id="stuGuardian" placeholder="Full name">
+          <input type="text" id="stuGuardian" placeholder="Full name" required>
         </div>
         <div class="field-row">
           <div class="field">
             <label for="stuGuardianAddress">Guardian address</label>
-            <input type="text" id="stuGuardianAddress" placeholder="Address">
+            <input type="text" id="stuGuardianAddress" placeholder="Address" required>
           </div>
           <div class="field">
             <label for="stuGuardianOccupation">Guardian occupation</label>
-            <input type="text" id="stuGuardianOccupation" placeholder="Occupation">
+            <input type="text" id="stuGuardianOccupation" placeholder="Occupation" required>
           </div>
         </div>
         <div class="field-row">
           <div class="field">
             <label for="stuDivision">Division</label>
-            <input type="text" id="stuDivision" placeholder="e.g. Batangas City">
+            <input type="text" id="stuDivision" placeholder="e.g. Batangas City" required>
           </div>
           <div class="field">
             <label for="stuSchool">School</label>
-            <input type="text" id="stuSchool" placeholder="School name">
+            <input type="text" id="stuSchool" placeholder="School name" required>
           </div>
         </div>
-      </details>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="stuYear">School year</label>
+          <input type="text" id="stuYear" placeholder="2024-2025" required>
+        </div>
+        <div class="field">
+          <label for="stuTeacher">Adviser (teacher ID)</label>
+          <select id="stuTeacher"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="stuOrigin">Transferred from <span class="optional-tag">— optional, leave blank if not a transferee</span></label>
+        <input type="text" id="stuOrigin" placeholder="Leave blank if not a transferee">
+      </div>
 
       <div class="modal-actions">
         <button type="button" class="btn-secondary" id="studentCancelBtn">Cancel</button>
@@ -2362,7 +2430,7 @@
       <h3>Share record</h3>
       <button class="modal-close" id="shareModalClose" aria-label="Close">✕</button>
     </div>
-    <p class="form-note">Opens this one student's record, formatted for printing. Use "Print / Save as PDF" — every browser's print dialog can save straight to a PDF file, which you can then attach to an email.</p>
+    <p class="form-note">Opens this one student's record, formatted for printing. Use "Print / Save as PDF" — every browser's print dialog can save straight to a PDF file, which you can then attach to an email. This app already suppresses the browser's page header/footer (site name, URL, date/time); if your browser still adds one, look for a "Headers and footers" toggle under "More settings" in the print dialog and switch it off.</p>
 
     <div class="share-sheet" id="shareSheet"></div>
 
@@ -2551,6 +2619,30 @@
 <footer>Changes save automatically in this browser — no account or server needed. <button class="link-btn" id="exportOpenBtn" style="font-size:0.76rem;">Backup / Import data</button> to move it to another device.</footer>
 
 <script>
+  // ---------- Safe storage wrapper ----------
+  // Some browsers (Safari in Private Browsing, tablets with "Block All
+  // Cookies"/strict privacy settings, sandboxed/file:// contexts, or a
+  // full storage quota) throw a SecurityError the instant localStorage
+  // is touched. An uncaught throw here — this used to call localStorage
+  // directly before anything else ran — stopped the whole script cold,
+  // so nothing below it (including every button's event listener and
+  // the sign-in screen) ever got wired up. These wrappers fail safe to
+  // an in-memory object instead, so the app still works for that one
+  // session even when persistent storage isn't available.
+  const memoryStorageFallback = {};
+  function safeGetItem(key){
+    try{ return localStorage.getItem(key); }
+    catch(err){ return Object.prototype.hasOwnProperty.call(memoryStorageFallback, key) ? memoryStorageFallback[key] : null; }
+  }
+  function safeSetItem(key, value){
+    try{ localStorage.setItem(key, value); }
+    catch(err){ memoryStorageFallback[key] = value; }
+  }
+  function safeRemoveItem(key){
+    try{ localStorage.removeItem(key); }
+    catch(err){ delete memoryStorageFallback[key]; }
+  }
+
   // ================================================================
   // DOWNLOAD LINKS — update these 3 lines whenever you publish a new
   // build, then re-upload this file. Nothing else needs to change.
@@ -2608,8 +2700,8 @@
   // doesn't crash on load with "Cannot access before initialization".
   const SORT_MODE_KEY = 'rollRegister_sortMode';
   const SORT_LABELS = { az: 'A–Z', latest: 'Latest', earliest: 'Earliest' };
-  let sortMode = ['az', 'latest', 'earliest'].includes(localStorage.getItem(SORT_MODE_KEY))
-    ? localStorage.getItem(SORT_MODE_KEY)
+  let sortMode = ['az', 'latest', 'earliest'].includes(safeGetItem(SORT_MODE_KEY))
+    ? safeGetItem(SORT_MODE_KEY)
     : 'az';
 
   // ---------- Sort dropdown (toolbar, next to Section/School year) ----------
@@ -2632,7 +2724,7 @@
   sortMenu.querySelectorAll('.sort-option').forEach(btn => {
     btn.addEventListener('click', () => {
       sortMode = btn.dataset.sort;
-      localStorage.setItem(SORT_MODE_KEY, sortMode);
+      safeSetItem(SORT_MODE_KEY, sortMode);
       updateSortMenuUI();
       sortDropdown.classList.remove('open');
       sortBtn.setAttribute('aria-expanded', 'false');
@@ -2666,13 +2758,13 @@
     themeToggleBtn.textContent = icon;
     themeToggleBtnSignin.textContent = icon;
   }
-  const storedTheme = localStorage.getItem(THEME_KEY);
+  const storedTheme = safeGetItem(THEME_KEY);
   const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   applyTheme(storedTheme || (systemPrefersDark ? 'dark' : 'light'));
   function toggleTheme(){
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     applyTheme(next);
-    localStorage.setItem(THEME_KEY, next);
+    safeSetItem(THEME_KEY, next);
   }
   themeToggleBtn.addEventListener('click', toggleTheme);
   themeToggleBtnSignin.addEventListener('click', toggleTheme);
@@ -2723,7 +2815,7 @@
   const brandHeadingEl = document.getElementById('brandHeading');
   const brandDescriptionEl = document.getElementById('brandDescription');
   const schoolLogoEl = document.getElementById('schoolLogo');
-  const headerBrandRowEl = document.getElementById('headerBrandRow');
+  const headerTopEl = document.getElementById('headerTop');
 
   // Lightens a #rrggbb color by a flat amount — used to derive the
   // hover-state shade from whatever primary color the school picks.
@@ -2739,7 +2831,8 @@
     brandTitleEl.textContent = (brand && brand.title) ? brand.title : DEFAULT_TITLE;
     brandHeadingEl.textContent = (brand && brand.heading) ? brand.heading : DEFAULT_HEADING;
     brandDescriptionEl.textContent = (brand && brand.description) ? brand.description : DEFAULT_DESCRIPTION;
-    if(brand && brand.logo){
+    const hasLogo = !!(brand && brand.logo);
+    if(hasLogo){
       schoolLogoEl.src = brand.logo;
       schoolLogoEl.classList.add('show');
     } else {
@@ -2747,7 +2840,14 @@
       schoolLogoEl.classList.remove('show');
     }
     const logoPosition = (brand && brand.logoPosition) || DEFAULT_LOGO_POSITION;
-    headerBrandRowEl.classList.toggle('logo-right', logoPosition === 'right');
+    const logoOnRight = logoPosition === 'right';
+    schoolLogoEl.classList.toggle('logo-right', logoOnRight);
+    // Reserve the fixed-max-size gutter (see .header-top.has-logo-* in CSS)
+    // on whichever side actually has a visible logo, and clear it entirely
+    // once no logo is set — kept in sync here so it can never drift out of
+    // step with the logo's own show/side state.
+    headerTopEl.classList.toggle('has-logo-left', hasLogo && !logoOnRight);
+    headerTopEl.classList.toggle('has-logo-right', hasLogo && logoOnRight);
     const logoSize = (brand && brand.logoSize) || DEFAULT_LOGO_SIZE;
     document.documentElement.style.setProperty('--logo-size', logoSize + 'px');
 
@@ -2760,12 +2860,12 @@
 
   function loadBranding(){
     try{
-      const raw = localStorage.getItem(BRAND_KEY);
+      const raw = safeGetItem(BRAND_KEY);
       if(raw) applyBranding(JSON.parse(raw));
     }catch(err){ /* fall back silently to defaults */ }
   }
   function saveBrandingToStorage(brand){
-    try{ localStorage.setItem(BRAND_KEY, JSON.stringify(brand)); }
+    try{ safeSetItem(BRAND_KEY, JSON.stringify(brand)); }
     catch(err){ showToast('Could not save — logo image may be too large'); }
   }
   loadBranding();
@@ -2818,7 +2918,7 @@
 
   function openCustomizeModal(){
     const current = (() => {
-      try{ return JSON.parse(localStorage.getItem(BRAND_KEY) || '{}'); }
+      try{ return JSON.parse(safeGetItem(BRAND_KEY) || '{}'); }
       catch(err){ return {}; }
     })();
     pendingLogoDataUrl = current.logo || null;
@@ -2899,7 +2999,7 @@
   });
 
   document.getElementById('resetBrandingBtn').addEventListener('click', () => {
-    try{ localStorage.removeItem(BRAND_KEY); }catch(err){}
+    try{ safeRemoveItem(BRAND_KEY); }catch(err){}
     pendingLogoDataUrl = null;
     logoPreview.src = '';
     brandLogoPositionInput.value = DEFAULT_LOGO_POSITION;
@@ -2947,11 +3047,11 @@
     return (typeof gdriveEmail !== 'undefined' && gdriveEmail) ? gdriveEmail : 'Guest (this device)';
   }
   function saveActivityLog(){
-    try{ localStorage.setItem(ACTIVITY_LOG_KEY, JSON.stringify(activityLog)); }catch(err){}
+    try{ safeSetItem(ACTIVITY_LOG_KEY, JSON.stringify(activityLog)); }catch(err){}
   }
   function loadActivityLog(){
     try{
-      const raw = localStorage.getItem(ACTIVITY_LOG_KEY);
+      const raw = safeGetItem(ACTIVITY_LOG_KEY);
       if(raw) activityLog = JSON.parse(raw) || [];
     }catch(err){ activityLog = []; }
   }
@@ -3025,7 +3125,7 @@
   function saveData(){
     if(!storageAvailable) return;
     try{
-      localStorage.setItem(SAVE_KEY, JSON.stringify({ students, teachers }));
+      safeSetItem(SAVE_KEY, JSON.stringify({ students, teachers }));
       scheduleDriveAutoSave();
     }catch(err){
       storageAvailable = false;
@@ -3035,7 +3135,7 @@
 
   function loadData(){
     try{
-      const raw = localStorage.getItem(SAVE_KEY);
+      const raw = safeGetItem(SAVE_KEY);
       if(!raw) return;
       const parsed = JSON.parse(raw);
       if(Array.isArray(parsed.students)) students.push(...parsed.students);
@@ -3416,73 +3516,115 @@
   let shareStudent = null;
 
   function currentBrandingForShare(){
-    try{ return JSON.parse(localStorage.getItem(BRAND_KEY) || 'null') || {}; }
+    try{ return JSON.parse(safeGetItem(BRAND_KEY) || 'null') || {}; }
     catch(err){ return {}; }
   }
 
+  // Builds one Grade-level cell for the progress grid — a school/school-year
+  // heading, the subject rating table, and the eligibility line — matching
+  // one half of a Form 137-E "Grade N – School ___" block.
+  function buildGradeCellHtml(level, pr){
+    const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
+    const progress = pr.progress[level] || { subjects:{} };
+    const subjects = subjectsForLevel(level);
+    const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
+    const genAvg = computeGeneralAverage(finals);
+    return `
+    <div class="ss-grade-cell">
+      <p class="ss-grade-heading">Grade ${level} — School: ${escapeHtml(meta.school || '_______________')}</p>
+      <p class="ss-grade-sub">School Year: ${escapeHtml(meta.schoolYear || '_______________')}</p>
+      <table class="ss-table">
+        <thead>
+          <tr><th rowspan="2">Learning Areas</th><th colspan="4">Periodic Rating</th><th rowspan="2">Final<br>Rating</th><th rowspan="2">Remarks</th></tr>
+          <tr><th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th></tr>
+        </thead>
+        <tbody>
+          ${subjects.map((su, i) => {
+            const q = progress.subjects[su.key] || {};
+            return `<tr><td>${escapeHtml(su.label)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : ''}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '' : finals[i]}</td><td></td></tr>`;
+          }).join('')}
+        </tbody>
+        <tfoot><tr class="ss-genavg-row"><td colspan="5" class="ss-genavg-label">General Average</td><td class="ss-num">${genAvg === null ? '' : genAvg}</td><td></td></tr></tfoot>
+      </table>
+      <p class="ss-eligible-line">Eligible for Admission to Grade: ${escapeHtml(meta.eligible || '_______________')}</p>
+    </div>`;
+  }
+
+  // Elementary school progress, laid out as three left/right Grade pairs
+  // (I & II, III & IV, V & VI) — the same two-column arrangement as the
+  // printed Form 137-E page.
   function buildElementaryProgressHtml(s){
     const pr = s.permanentRecord;
     if(!pr) return '';
-    return `<p class="ss-section-title">Elementary school progress</p>` +
-      GRADE_LEVELS.map(level => {
-        const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
-        const progress = pr.progress[level] || { subjects:{} };
-        const subjects = subjectsForLevel(level);
-        const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
-        const genAvg = computeGeneralAverage(finals);
-        return `
-        <div class="ss-grade-block">
-          <p class="ss-grade-heading">Grade ${level} — School: ${escapeHtml(meta.school || '—')}</p>
-          <p class="ss-grade-sub">School year: ${escapeHtml(meta.schoolYear || '—')}</p>
-          <table class="ss-table">
-            <thead><tr><th>Learning area</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th><th class="ss-num">Final</th></tr></thead>
-            <tbody>
-              ${subjects.map((su, i) => {
-                const q = progress.subjects[su.key] || {};
-                return `<tr><td>${escapeHtml(su.label)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : '—'}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '—' : finals[i]}</td></tr>`;
-              }).join('')}
-            </tbody>
-            <tfoot><tr><td colspan="5" style="text-align:right; font-weight:700;">General average</td><td class="ss-num" style="font-weight:700;">${genAvg === null ? '—' : genAvg}</td></tr></tfoot>
-          </table>
-          <p class="ss-eligible-line">Eligible for admission to Grade: ${escapeHtml(meta.eligible || '—')}</p>
-        </div>`;
-      }).join('');
+    const pairs = [['I','II'], ['III','IV'], ['V','VI']];
+    return `<p class="ss-section-title">II. Elementary School Progress</p>` +
+      `<div class="ss-progress-grid">` +
+      pairs.map(([a, b]) => buildGradeCellHtml(a, pr) + buildGradeCellHtml(b, pr)).join('') +
+      `</div>`;
+  }
+
+  // One grouped core-values table covering three grade levels side by
+  // side (each with its own SY heading and 1–4 quarter columns), matching
+  // the "Grade I–III" / "Grade IV–VI" tables on the printed form.
+  function buildCoreValuesGroupHtml(levels, pr){
+    // Consecutive rows that share a core value ("Maka-Diyos", etc.) are
+    // merged into a single left-hand cell with rowspan, as on the form.
+    const groupSpans = [];
+    CORE_VALUE_ROWS.forEach((row, i) => {
+      if(i > 0 && CORE_VALUE_ROWS[i - 1].group === row.group) groupSpans[groupSpans.length - 1].span++;
+      else groupSpans.push({ group:row.group, span:1, startIndex:i });
+    });
+    const groupStartIndex = {};
+    groupSpans.forEach(g => { groupStartIndex[g.startIndex] = g; });
+
+    return `
+    <div class="ss-corevalues-wrap">
+      <table class="ss-table ss-corevalues-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Core Values</th>
+            <th rowspan="2">Behavior Statements</th>
+            ${levels.map(level => {
+              const meta = pr.meta[level] || {};
+              return `<th colspan="4">Grade ${level} SY: ${escapeHtml(meta.schoolYear || '____')}</th>`;
+            }).join('')}
+          </tr>
+          <tr>${levels.map(() => `<th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${CORE_VALUE_ROWS.map((row, i) => {
+            const groupCell = groupStartIndex[i] ? `<td rowspan="${groupStartIndex[i].span}">${escapeHtml(row.group)}</td>` : '';
+            const quarterCells = levels.map(level => {
+              const cv = (pr.coreValues[level] || { ratings:{} }).ratings[row.key] || {};
+              return ['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${escapeHtml(cv[qk] || '')}</td>`).join('');
+            }).join('');
+            return `<tr>${groupCell}<td>${escapeHtml(row.statement)}</td>${quarterCells}</tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
   }
 
   function buildCoreValuesHtml(s){
     const pr = s.permanentRecord;
     if(!pr) return '';
-    return `<p class="ss-section-title">Learners observed values</p>` +
-      GRADE_LEVELS.map(level => {
-        const meta = pr.meta[level] || {};
-        const cv = pr.coreValues[level] || { ratings:{} };
-        return `
-        <div class="ss-grade-block">
-          <p class="ss-grade-heading">Grade ${level}${meta.schoolYear ? ` — SY ${escapeHtml(meta.schoolYear)}` : ''}</p>
-          <table class="ss-table gr-core-table">
-            <thead><tr><th>Core value</th><th>Behavior statement</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th></tr></thead>
-            <tbody>
-              ${CORE_VALUE_ROWS.map(row => {
-                const r = cv.ratings[row.key] || {};
-                return `<tr><td>${escapeHtml(row.group)}</td><td>${escapeHtml(row.statement)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${r[qk] || '—'}</td>`).join('')}</tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>`;
-      }).join('');
+    return `<p class="ss-section-title">III. Learners Observed Values</p>` +
+      buildCoreValuesGroupHtml(['I', 'II', 'III'], pr) +
+      buildCoreValuesGroupHtml(['IV', 'V', 'VI'], pr) +
+      `<p class="ss-legend"><span><b>AO</b> Always Observed</span><span><b>SO</b> Sometimes Observed</span><span><b>RO</b> Rarely Observed</span><span><b>NO</b> Not Observed</span></p>`;
   }
 
   function buildAttendanceHtml(s){
     const pr = s.permanentRecord;
     if(!pr) return '';
     return `
-      <p class="ss-section-title">Attendance record</p>
+      <p class="ss-section-title">IV. Attendance Record</p>
       <table class="ss-table">
-        <thead><tr><th>Grade</th><th class="ss-num">School days</th><th class="ss-num">Days absent</th><th>Cause</th><th class="ss-num">Times tardy</th><th>Cause</th><th class="ss-num">Days present</th></tr></thead>
+        <thead><tr><th>Grade</th><th class="ss-num">No. of<br>School Days</th><th class="ss-num">No. of School<br>Days Absent</th><th>Cause</th><th class="ss-num">No. of Times<br>Tardy</th><th>Cause</th><th class="ss-num">No. of School<br>Days Present</th></tr></thead>
         <tbody>
           ${GRADE_LEVELS.map(level => {
             const a = pr.attendance[level] || {};
-            return `<tr><td>${level}</td><td class="ss-num">${a.schoolDays || '—'}</td><td class="ss-num">${a.daysAbsent || '—'}</td><td>${escapeHtml(a.causeAbsent || '—')}</td><td class="ss-num">${a.timesTardy || '—'}</td><td>${escapeHtml(a.causeTardy || '—')}</td><td class="ss-num">${a.daysPresent || '—'}</td></tr>`;
+            return `<tr><td>${level}</td><td class="ss-num">${escapeHtml(a.schoolDays || '')}</td><td class="ss-num">${escapeHtml(a.daysAbsent || '')}</td><td>${escapeHtml(a.causeAbsent || '')}</td><td class="ss-num">${escapeHtml(a.timesTardy || '')}</td><td>${escapeHtml(a.causeTardy || '')}</td><td class="ss-num">${escapeHtml(a.daysPresent || '')}</td></tr>`;
           }).join('')}
         </tbody>
       </table>`;
@@ -3497,9 +3639,15 @@
       : s.name;
     return `
       <div class="ss-certificate">
-        <p class="ss-cert-title">Certificate of transfer</p>
+        <p class="ss-cert-title">Certificate of Transfer</p>
         <p>To whom it may concern:</p>
         <p>This is to certify that this is a true record of the Elementary School Permanent Record of <b>${escapeHtml(composedName)}</b>. He/She is eligible for transfer and admission to Grade / Year <b>${escapeHtml(transfer.eligible || '________________')}</b>.</p>
+        <div class="ss-cert-sign">
+          <p class="ss-cert-date-line">Date: <b>${escapeHtml(transfer.date || '')}</b></p>
+          <div class="ss-cert-principal">
+            <div class="ss-sig-line">${escapeHtml(transfer.principal || 'Principal / School Head')}</div>
+          </div>
+        </div>
       </div>`;
   }
 
@@ -3515,51 +3663,46 @@
       : s.name;
 
     shareSheet.innerHTML = `
-      <div class="ss-head">
-        <div class="ss-head-text">
-          <p class="ss-republic">Republic of the Philippines</p>
-          <p class="ss-dept">Department of Education</p>
-          ${s.division ? `<p class="ss-region">${escapeHtml(s.division)}</p>` : ''}
-          <p class="ss-title">STUDENT PERMANENT RECORD</p>
-        </div>
+      <div class="ss-topline">
+        <span class="ss-formcode">DepEd Form 137-E</span>
         <div class="ss-lrn-box">LRN<b>${escapeHtml(s.id)}</b></div>
       </div>
+      <div class="ss-head-text">
+        <p class="ss-republic">Republic of the Philippines</p>
+        <p class="ss-dept">Department of Education</p>
+        <p class="ss-region">${s.division ? escapeHtml(s.division) : 'Region ______________'}</p>
+        <p class="ss-title">Elementary School Permanent Record</p>
+      </div>
 
+      <div class="ss-nameline">
+        <span class="ss-nameline-label">Name:</span>
+        <span class="ss-nameline-value">${escapeHtml(composedName)}</span>
+      </div>
+      <div class="ss-name-captions"><span>Surname</span><span>Name</span><span>M.I.</span></div>
       <div class="ss-row">
-        <div class="ss-field" style="flex:2;">
-          <span class="ss-label">Name</span>
-          <span class="ss-value">${escapeHtml(composedName)}</span>
-          ${hasNameParts ? `
-          <div class="ss-name-captions"><span>Surname</span><span>Name</span><span>M.I.</span></div>
-          ` : ''}
-        </div>
-        <div class="ss-field"><span class="ss-label">Sex</span><span class="ss-value">${escapeHtml(s.sex || '—')}</span></div>
+        <div class="ss-field"><span class="ss-label">Division</span><span class="ss-value">${escapeHtml(s.division || '—')}</span></div>
+        <div class="ss-field"><span class="ss-label">School</span><span class="ss-value">${escapeHtml(schoolName)}</span></div>
       </div>
       <div class="ss-row">
+        <div class="ss-field"><span class="ss-label">Sex</span><span class="ss-value">${escapeHtml(s.sex || '—')}</span></div>
         <div class="ss-field"><span class="ss-label">Date of birth</span><span class="ss-value">${escapeHtml(s.dob || '—')}</span></div>
         <div class="ss-field"><span class="ss-label">Place of birth</span><span class="ss-value">${escapeHtml(s.pob || '—')}</span></div>
         <div class="ss-field"><span class="ss-label">Date of entrance</span><span class="ss-value">${escapeHtml(s.doe || '—')}</span></div>
       </div>
       <div class="ss-row">
-        <div class="ss-field" style="flex:2;"><span class="ss-label">Parent / Guardian</span><span class="ss-value">${escapeHtml(s.guardian || '—')}</span></div>
+        <div class="ss-field" style="flex:1.4;"><span class="ss-label">Parent / Guardian — Name</span><span class="ss-value">${escapeHtml(s.guardian || '—')}</span></div>
+        <div class="ss-field"><span class="ss-label">Address</span><span class="ss-value">${escapeHtml(s.guardianAddress || '—')}</span></div>
         <div class="ss-field"><span class="ss-label">Occupation</span><span class="ss-value">${escapeHtml(s.guardianOccupation || '—')}</span></div>
       </div>
-      ${s.guardianAddress ? `
+
       <div class="ss-row">
-        <div class="ss-field" style="flex:1;"><span class="ss-label">Guardian address</span><span class="ss-value">${escapeHtml(s.guardianAddress)}</span></div>
-      </div>` : ''}
-      <div class="ss-row">
-        <div class="ss-field"><span class="ss-label">School</span><span class="ss-value">${escapeHtml(schoolName)}</span></div>
         <div class="ss-field"><span class="ss-label">Section</span><span class="ss-value">${escapeHtml(s.section)}</span></div>
         <div class="ss-field"><span class="ss-label">School year</span><span class="ss-value">${escapeHtml(s.year || '—')}</span></div>
         <div class="ss-field"><span class="ss-label">Adviser</span><span class="ss-value">${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || '—')}</span></div>
       </div>
-      ${s.transferredFrom ? `
-      <div class="ss-row">
-        <div class="ss-field" style="flex:1;"><span class="ss-label">Transferred from</span><span class="ss-value">${escapeHtml(s.transferredFrom)}</span></div>
-      </div>` : ''}
+      ${s.transferredFrom ? `<p class="ss-transferred-note">Transferred from: ${escapeHtml(s.transferredFrom)}</p>` : ''}
 
-      <p class="ss-section-title">Section history</p>
+      <p class="ss-section-title">I. Section History</p>
       <table class="ss-table">
         <thead><tr><th>School year</th><th>Section</th><th>Status</th></tr></thead>
         <tbody>
@@ -3574,9 +3717,7 @@
 
       <div class="ss-footer">
         <span>Generated ${escapeHtml(new Date().toLocaleDateString())} by ${escapeHtml(currentActor())}</span>
-        <div class="ss-signature"><div class="ss-sig-line">${s.permanentRecord && s.permanentRecord.transfer && s.permanentRecord.transfer.principal ? escapeHtml(s.permanentRecord.transfer.principal) : 'Principal / School head'}</div></div>
       </div>
-      ${s.permanentRecord && s.permanentRecord.transfer && s.permanentRecord.transfer.date ? `<p style="text-align:right; font-size:0.68rem; color:#666; margin-top:0.3rem;">Date: ${escapeHtml(s.permanentRecord.transfer.date)}</p>` : ''}
     `;
     shareModalOverlay.classList.add('show');
   }
@@ -3585,6 +3726,21 @@
   document.getElementById('shareModalClose').addEventListener('click', closeShareModal);
   document.getElementById('shareCloseBtn').addEventListener('click', closeShareModal);
   shareModalOverlay.addEventListener('click', e => { if(e.target === shareModalOverlay) closeShareModal(); });
+
+  // Swap the browser tab title to a clean, student-specific name while
+  // printing — this is what Chromium/Firefox use both as a fallback
+  // print-header label and as the suggested "Save as PDF" filename, so
+  // it replaces the app name with something meant for the document.
+  let savedDocTitle = null;
+  window.addEventListener('beforeprint', () => {
+    if(shareModalOverlay.classList.contains('show') && shareStudent){
+      savedDocTitle = document.title;
+      document.title = `Permanent Record - ${shareStudent.name} (${shareStudent.id})`;
+    }
+  });
+  window.addEventListener('afterprint', () => {
+    if(savedDocTitle !== null){ document.title = savedDocTitle; savedDocTitle = null; }
+  });
 
   document.getElementById('sharePrintBtn').addEventListener('click', () => {
     if(shareStudent) logActivity('Shared student record (print/PDF)', `${shareStudent.name} (${shareStudent.id})`);
@@ -4023,7 +4179,6 @@
       studentModalTitle.textContent = 'Edit student';
       studentSubmitBtn.textContent = 'Save changes';
       document.getElementById('stuId').value = existing.id;
-      document.getElementById('stuName').value = existing.name;
       document.getElementById('stuSection').value = existing.section;
       document.getElementById('stuYear').value = existing.year || '';
       stuTeacherSelect.value = existing.teacherId || '';
@@ -4040,14 +4195,10 @@
       document.getElementById('stuGuardianOccupation').value = existing.guardianOccupation || '';
       document.getElementById('stuDivision').value = existing.division || '';
       document.getElementById('stuSchool').value = existing.school || '';
-      // Auto-expand the details section if any of it is already filled in
-      const hasRecordDetails = existing.surname || existing.firstName || existing.mi || existing.sex || existing.dob || existing.pob || existing.doe || existing.guardian || existing.guardianAddress || existing.guardianOccupation || existing.division || existing.school;
-      document.querySelector('#studentModalOverlay .record-details').open = !!hasRecordDetails;
     } else {
       editingStudentId = null;
       studentModalTitle.textContent = 'Add student';
       studentSubmitBtn.textContent = 'Save student';
-      document.querySelector('#studentModalOverlay .record-details').open = false;
     }
 
     studentModalOverlay.classList.add('show');
@@ -4062,7 +4213,6 @@
   studentForm.addEventListener('submit', e => {
     e.preventDefault();
     const id = document.getElementById('stuId').value.trim();
-    const name = document.getElementById('stuName').value.trim();
     const section = document.getElementById('stuSection').value.trim();
     const year = document.getElementById('stuYear').value.trim();
     const teacherId = stuTeacherSelect.value;
@@ -4070,6 +4220,9 @@
     const surname = document.getElementById('stuSurname').value.trim();
     const firstName = document.getElementById('stuFirstName').value.trim();
     const mi = document.getElementById('stuMI').value.trim();
+    // The everyday "name" used in lists/search/exports is composed from the
+    // permanent-record name parts — one name field to fill in, not two.
+    const name = [firstName, mi ? (mi.replace(/\.$/, '') + '.') : '', surname].filter(Boolean).join(' ');
     const sex = document.getElementById('stuSex').value;
     const dob = document.getElementById('stuDob').value;
     const pob = document.getElementById('stuPob').value.trim();
@@ -4367,6 +4520,15 @@
     }
     return '';
   }
+  // Splits an OCR-guessed "First Last" style name into surname/first-name
+  // fields (last word = surname). Rough on purpose — the scan flow always
+  // asks the user to review before saving.
+  function splitGuessedName(fullName){
+    const parts = (fullName || '').trim().split(/\s+/).filter(Boolean);
+    if(!parts.length) return { surname:'', firstName:'' };
+    if(parts.length === 1) return { surname:parts[0], firstName:'' };
+    return { surname:parts[parts.length - 1], firstName:parts.slice(0, -1).join(' ') };
+  }
   function parseSingleStudent(text){
     const id = guessIdFromText(text);
     const section = guessSectionFromText(text);
@@ -4560,7 +4722,9 @@
         const guess = parseSingleStudent(text);
         openStudentModal();
         document.getElementById('stuId').value = guess.id;
-        document.getElementById('stuName').value = guess.name;
+        const guessNameParts = splitGuessedName(guess.name);
+        document.getElementById('stuSurname').value = guessNameParts.surname;
+        document.getElementById('stuFirstName').value = guessNameParts.firstName;
         document.getElementById('stuSection').value = guess.section;
         document.getElementById('stuYear').value = guess.year;
         showToast('Scanned — please review before saving');
@@ -4680,7 +4844,7 @@
   // ---------- Shared backup payload builder (used by manual download AND Drive sync) ----------
   function buildBackupPayload(){
     let branding = null;
-    try{ branding = JSON.parse(localStorage.getItem(BRAND_KEY) || 'null'); }catch(err){}
+    try{ branding = JSON.parse(safeGetItem(BRAND_KEY) || 'null'); }catch(err){}
     return {
       type: 'roll-and-register-backup',
       exportedAt: new Date().toISOString(),
@@ -4810,7 +4974,7 @@
 
   const SKIP_SIGNIN_KEY = 'rollRegister_skipSignIn';
   const HAD_SIGNED_IN_KEY = 'rollRegister_hadSignedIn'; // just a flag: "this browser has granted Google access before" — never holds the token itself
-  const isGuestMode = () => isGoogleConfigured && !gapiToken && localStorage.getItem(SKIP_SIGNIN_KEY) === '1';
+  const isGuestMode = () => isGoogleConfigured && !gapiToken && safeGetItem(SKIP_SIGNIN_KEY) === '1';
 
   let gapiToken = null;       // current OAuth access token (memory only)
   let gdriveEmail = null;
@@ -4828,13 +4992,13 @@
     // Show the sign-in gate on load unless this browser previously chose
     // "Continue as Guest" — re-shown every session isn't the goal, just
     // enough to offer sign-in without nagging someone who's opted out.
-    if(localStorage.getItem(HAD_SIGNED_IN_KEY) === '1'){
+    if(safeGetItem(HAD_SIGNED_IN_KEY) === '1'){
       // This browser has signed in before — try to reconnect quietly in
       // the background instead of making them click through Google's
       // login screen again. Falls back to the normal gate/banner below
       // if the browser's Google session has expired or needs interaction.
       attemptSilentSignIn();
-    } else if(localStorage.getItem(SKIP_SIGNIN_KEY) !== '1'){
+    } else if(safeGetItem(SKIP_SIGNIN_KEY) !== '1'){
       signinGate.classList.add('show');
     } else {
       guestBanner.style.display = 'flex';
@@ -5034,7 +5198,7 @@
               // The quiet background reconnect didn't work (session expired,
               // third-party cookies blocked, etc.) — just fall back to the
               // normal gate/banner instead of bothering anyone with an error.
-              if(localStorage.getItem(SKIP_SIGNIN_KEY) === '1'){
+              if(safeGetItem(SKIP_SIGNIN_KEY) === '1'){
                 guestBanner.style.display = 'flex';
               } else {
                 signinGate.classList.add('show');
@@ -5049,7 +5213,7 @@
           }
           gapiToken = resp.access_token;
           try{ gdriveEmail = await fetchGoogleEmail(gapiToken); }catch(err){ gdriveEmail = null; }
-          localStorage.setItem(HAD_SIGNED_IN_KEY, '1');
+          safeSetItem(HAD_SIGNED_IN_KEY, '1');
           setGdriveUI('connected');
           if(signinStatus) signinStatus.textContent = '';
           logActivity('Signed in', gdriveEmail || '');
@@ -5111,7 +5275,7 @@
 
   signinGoogleBtn.addEventListener('click', () => gdriveConnect(false));
   signinGuestBtn.addEventListener('click', () => {
-    localStorage.setItem(SKIP_SIGNIN_KEY, '1');
+    safeSetItem(SKIP_SIGNIN_KEY, '1');
     signinGate.classList.remove('show');
     guestBanner.style.display = 'flex';
     updateAccountChip();
@@ -5131,8 +5295,8 @@
     // An explicit sign-out is a deliberate choice, unlike a fresh page load —
     // so re-offer the gate immediately regardless of any earlier guest choice,
     // and stop trying to silently reconnect on future loads.
-    localStorage.removeItem(SKIP_SIGNIN_KEY);
-    localStorage.removeItem(HAD_SIGNED_IN_KEY);
+    safeRemoveItem(SKIP_SIGNIN_KEY);
+    safeRemoveItem(HAD_SIGNED_IN_KEY);
     signinGate.classList.add('show');
     guestBanner.style.display = 'none';
   });
