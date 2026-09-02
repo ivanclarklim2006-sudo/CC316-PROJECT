@@ -70,10 +70,6 @@
   html[data-theme="dark"] .school-logo{
     background:rgba(237,232,216,0.06);
   }
-  /* ---------- Dark mode: --green is kept dark on purpose (it's also
-     used as a background), so anywhere it's used as *text* on top of
-     a dark surface needs to swap to --brass instead, or it goes
-     dark-on-dark and disappears. ---------- */
   html[data-theme="dark"] .scan-btn{ color:var(--brass); border-color:var(--brass); }
   html[data-theme="dark"] .sort-btn{ color:var(--brass); border-color:var(--brass); }
   html[data-theme="dark"] .link-btn{ color:var(--brass); }
@@ -94,6 +90,11 @@
   }
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  /* Admin/Teacher Role Hiding */
+  body[data-role="teacher"] .admin-only {
+    display: none !important;
   }
 
   header{
@@ -122,17 +123,6 @@
   }
   .header-text{ flex:1; min-width:220px; }
 
-  /* Logo corner badge — sits at the very top corner of the header,
-     independent of the title/description entirely (its own thing, not
-     inline with the text). The clearance reserved for it (via padding on
-     .header-top, below) is always sized to the LARGEST possible logo
-     (140px — the size slider's max), never the actual chosen size — so
-     dragging the slider anywhere from 40–140px only changes how big the
-     image looks inside its corner slot; it can never grow into, bump, or
-     overlap the title or the action buttons, because they were already
-     given clearance for the biggest case up front. Position is absolute,
-     which places it relative to the PADDING edge of .header-top — i.e.
-     inside the reserved gutter, exactly where the padding makes room. */
   .school-logo{
     position:absolute;
     top:0;
@@ -147,8 +137,6 @@
   .school-logo.show{ display:block; }
   .school-logo.logo-right{ left:auto; right:0; }
 
-  /* Toggled in JS alongside .show/.logo-right so the reserved gutter
-     always matches which side (if any) actually has a visible logo. */
   .header-top.has-logo-left{ padding-left:calc(140px + 1.3rem); }
   .header-top.has-logo-right{ padding-right:calc(140px + 1.3rem); }
 
@@ -179,6 +167,18 @@
     white-space:nowrap;
   }
   .customize-btn:hover{ background:rgba(244,238,221,0.1); border-color:var(--cream); }
+
+  .role-selector {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%23F4EEDD'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    padding-right: 1.8rem;
+  }
+  .role-selector option {
+    background: var(--paper);
+    color: var(--ink);
+  }
 
   .logo-upload-row{
     display:flex;
@@ -351,7 +351,6 @@
     margin:0.35rem 0.2rem;
   }
 
-  /* ---------- Sort dropdown (toolbar, next to Section/School year) ---------- */
   .sort-dropdown{ position:relative; flex-shrink:0; }
   .sort-btn{
     background:var(--surface);
@@ -410,7 +409,6 @@
   .sort-option .chk-ic{ width:1em; flex-shrink:0; opacity:0; }
   .sort-option.active .chk-ic{ opacity:1; }
 
-  /* ---------- Dark mode toggle (header nav bar) ---------- */
   .theme-toggle-btn{
     background:rgba(244,238,221,0.1);
     border:1.5px solid var(--brass);
@@ -428,7 +426,6 @@
   }
   .theme-toggle-btn:hover{ background:rgba(244,238,221,0.18); }
 
-  /* ---------- Account chip (top-corner Google account switcher) ---------- */
   .account-chip{ position:relative; flex-shrink:0; }
   .account-chip-btn{
     background:rgba(244,238,221,0.1);
@@ -497,7 +494,6 @@
     border:none; border-top:1px dashed var(--line); margin:0.3rem 0.2rem;
   }
 
-  /* ---------- Sign-in gate (shown on load until connected) ---------- */
   .signin-gate{
     display:none;
     position:fixed; inset:0;
@@ -1070,6 +1066,12 @@
   .field-row .field{ flex:1; }
   .field .optional-tag{ color:var(--ink-soft); text-transform:none; letter-spacing:0; font-family:'Inter',sans-serif; font-size:0.72rem; }
 
+  /* Birth Cert Image Custom Styles */
+  .bc-preview-wrap { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+  .bc-img { max-width: 140px; max-height: 140px; object-fit: cover; border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+  .bc-img:hover { transform: scale(1.02); border-color: var(--brass); }
+  .bc-display-row { display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap; }
+  
   .subject-rows{ margin-bottom:0.6rem; }
   .subject-row{
     display:flex;
@@ -1676,12 +1678,7 @@
   .record-details-view li span{ color:var(--ink-soft); }
   @media (max-width:520px){ .record-details-view{ grid-template-columns:1fr; } }
 
-  /* ---------- Share sheet — laid out to match the printed DepEd
-     Form 137-E "Elementary School Permanent Record": form-code +
-     LRN box top corners, centered republic/agency header, the
-     Surname/Name/M.I. identity block, a two-column Grade I–VI
-     progress grid, grouped Grade I–III / IV–VI core-values tables,
-     an attendance table, and a certificate of transfer. ---------- */
+  /* ---------- Share sheet (SF10) & SF9 templates ---------- */
   .share-sheet{
     background:#fff;
     color:#1a1a1a;
@@ -1694,7 +1691,7 @@
     overflow-y:auto;
   }
   .ss-topline{ display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
-  .ss-formcode{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:#333; white-space:nowrap; }
+  .ss-formcode{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:#333; white-space:nowrap; font-weight: bold; }
   .ss-lrn-box{
     border:1.5px solid #1a1a1a;
     border-radius:4px;
@@ -1730,10 +1727,23 @@
     border-top:1.5px solid #1a1a1a;
     border-bottom:1.5px solid #1a1a1a;
   }
+  
+  /* Shared Print Tables */
   .ss-table{ width:100%; border-collapse:collapse; font-size:0.74rem; margin-bottom:0.6rem; }
   .ss-table th, .ss-table td{ border:1px solid #999; padding:0.3rem 0.4rem; text-align:left; }
   .ss-table th{ background:#f0f0f0; font-size:0.64rem; text-transform:uppercase; letter-spacing:0.02em; text-align:center; }
   .ss-table td.ss-num, .ss-table th.ss-num{ text-align:center; width:2.1rem; }
+  
+  /* SF9 Specific Additions */
+  .sf9-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .sf9-section-header { font-weight: 700; font-size: 0.8rem; background: #e0e0e0; padding: 4px; text-align: center; border: 1px solid #1a1a1a; text-transform: uppercase; }
+  .sf9-school-info { text-align: center; font-size: 0.75rem; margin-bottom: 1rem; }
+  .sf9-student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.75rem; }
+  .sf9-student-info div { border-bottom: 1px solid #666; padding-bottom: 2px; }
+  .sf9-student-info span { font-weight: 700; }
+  .sf9-sign-area { display: flex; justify-content: space-around; margin-top: 1.5rem; }
+  .sf9-sign-box { text-align: center; font-size: 0.75rem; width: 40%; }
+  .sf9-sign-box div { border-top: 1px solid #1a1a1a; padding-top: 2px; }
 
   .ss-progress-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 1.2rem; }
   .ss-grade-cell{ margin-bottom:1rem; break-inside:avoid; page-break-inside:avoid; }
@@ -1795,7 +1805,10 @@
   }
   .ss-transferred-note{ font-size:0.76rem; color:#444; margin:-0.1rem 0 0.7rem; }
 
-  @media (max-width:520px){ .ss-progress-grid{ grid-template-columns:1fr; } }
+  @media (max-width:520px){ 
+    .ss-progress-grid{ grid-template-columns:1fr; } 
+    .sf9-two-col { grid-template-columns: 1fr; }
+  }
 
   /* ---------- Grades & permanent record editor modal ---------- */
   .gr-tabs{
@@ -1838,15 +1851,14 @@
   }
 
   @media print{
-    /* Zero page margin removes room for the browser's own header/footer
-       (page title, URL, date/time) in Chromium-based browsers — the
-       whitespace is added back below, on the printed content itself. */
     @page{ size:auto; margin:0; }
     body > *{ display:none !important; }
-    body > #shareModalOverlay{ display:block !important; position:static !important; background:none !important; padding:0 !important; }
-    #shareModalOverlay .modal{ box-shadow:none !important; border:none !important; max-width:100% !important; padding:0 !important; }
-    #shareModalOverlay .modal > *{ display:none !important; }
-    #shareModalOverlay .modal > #shareSheet{
+    
+    /* Reveal whichever modal has class .print-active */
+    body > .print-active { display:block !important; position:static !important; background:none !important; padding:0 !important; }
+    .print-active .modal { box-shadow:none !important; border:none !important; max-width:100% !important; padding:0 !important; }
+    .print-active .modal > * { display:none !important; }
+    .print-active .modal > .share-sheet {
       display:block !important;
       max-height:none !important; overflow:visible !important;
       border:none !important;
@@ -1913,7 +1925,7 @@
 
     .header-top{ flex-direction:column; align-items:stretch; padding-left:0 !important; padding-right:0 !important; }
     .school-logo{
-      position:static;         /* corner-badge absolute positioning only makes sense in the wide row layout */
+      position:static;
       align-self:center;
       margin-bottom:0.7rem;
       width:min(var(--logo-size, 76px), 58px); height:min(var(--logo-size, 76px), 58px);
@@ -1928,9 +1940,6 @@
     .sort-menu{ left:0; right:0; width:100%; min-width:0; }
     .theme-toggle-btn{ width:100%; }
 
-    /* Account chip was capping at 220px, leaving it narrow and
-       left-aligned next to the now full-width Customize/Download
-       buttons above and below it — match their width instead. */
     .account-chip{ width:100%; }
     .account-chip-btn{ width:100%; max-width:none; justify-content:center; }
     .account-menu{ left:0; right:0; width:100%; min-width:0; }
@@ -1956,8 +1965,6 @@
     .onboarding{ padding:2.2rem 0.9rem; }
     .onboarding ol{ padding:1.1rem 1rem 1.1rem 1.9rem; }
 
-    /* Review table becomes a horizontally-scrollable strip so every
-       field stays readable instead of being squeezed into slivers */
     .review-table-wrap{ overflow-x:auto; }
     .review-row{
       grid-template-columns:24px 110px 140px 110px 100px 28px;
@@ -1966,24 +1973,16 @@
     }
     .review-row.header{ position:sticky; top:0; left:0; }
 
-    /* ---------- Sign-in gate & guest mode ---------- */
     .signin-card{ padding:1.7rem 1.3rem 1.4rem; border-radius:14px; }
     .signin-card h2{ font-size:1.3rem; }
     .signin-card .signin-mark{ width:48px; height:48px; font-size:1.1rem; }
     .guest-banner{ font-size:0.72rem; padding:0.55rem 0.8rem; }
 
-    /* ---------- Backup/Drive modal ---------- */
     .gdrive-box{ flex-direction:column; align-items:stretch; }
     .gdrive-actions{ width:100%; }
     .gdrive-actions button{ flex:1; }
 
-    /* ---------- Scan choice buttons — full width, larger tap targets ---------- */
     .scan-choice button{ padding:1rem 1.1rem; }
-
-    /* Larger touch targets throughout — 44px is the accepted minimum
-       comfortable tap size, several buttons were sized for mouse use */
-    .tab-btn, .btn-secondary, .btn-primary, .customize-btn, .download-btn,
-    .account-chip-btn, .scan-btn, .add-btn, .sort-btn, .theme-toggle-btn{ min-height:44px; }
   }
 
   @media (max-width: 400px){
@@ -1993,18 +1992,11 @@
     .signin-card{ padding:1.4rem 1.1rem 1.2rem; }
   }
 
-  /* ---------- Touch-device tap targets ---------- */
-  /* Keyed off (pointer: coarse) rather than a width breakpoint, so this
-     also covers tablets — which are often wider than the 640px phone
-     breakpoint above but are just as finger-operated as a phone. Small
-     icon-only buttons (edit/delete/share, modal close, grade tabs) are
-     the ones most likely to get missed taps, so they get an invisible
-     padded hit area rather than just growing visually. */
   @media (pointer: coarse){
     .tab-btn, .btn-secondary, .btn-primary, .btn-danger, .btn-ghost,
     .customize-btn, .download-btn, .account-chip-btn, .scan-btn, .add-btn,
     .sort-btn, .theme-toggle-btn, .signin-google-btn, .signin-guest-btn,
-    .gr-tab-btn, .name-btn{ min-height:44px; }
+    .gr-tab-btn, .name-btn, .role-selector{ min-height:44px; }
     .icon-del, .icon-edit, .icon-share, .modal-close,
     .signin-theme-toggle-btn, .back-btn{
       min-width:44px;
@@ -2017,17 +2009,9 @@
   }
 </style>
 </head>
-<body>
+<body data-role="admin">
 
-<!-- ============================================================
-     SIGN-IN GATE — shown on load until a Google account connects.
-     Hidden entirely if GOOGLE_CLIENT_ID isn't configured (see script
-     below), so the app still works normally during development or
-     if Drive sync is never set up. The "Continue as Guest" button
-     keeps the app usable even if Google sign-in is unavailable
-     (offline, verification pending, no Google account, etc.) — remove
-     it in the script below if you want sign-in to be a hard requirement.
-     ============================================================ -->
+<!-- Sign-in Gate -->
 <div class="signin-gate" id="signinGate">
   <div class="signin-card">
     <button class="signin-theme-toggle-btn" id="themeToggleBtnSignin" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
@@ -2049,12 +2033,6 @@
 <header>
   <div class="header-inner">
     <div class="header-top" id="headerTop">
-      <!-- School logo, shown only once one is uploaded via Customize.
-           Positioned purely with CSS `order` (see .school-logo above)
-           as a real flex sibling of the title/actions — so toggling
-           left/right in Customize, or resizing the logo, only ever
-           moves the logo itself and reflows around it; the title and
-           buttons can't be pushed or overlapped. -->
       <img class="school-logo" id="schoolLogo" alt="School logo">
 
       <div class="header-text">
@@ -2064,33 +2042,16 @@
       </div>
 
       <div class="header-actions">
-        <!-- ============================================================
-             ACTIVITY LOG — who added/edited/deleted/signed in, and when.
-             Helps on a shared Google account: after loading from Drive,
-             this shows entries other collaborators made too.
-             ============================================================ -->
+        <!-- Admin/Teacher Role Switcher -->
+        <select id="roleSelector" class="customize-btn role-selector">
+          <option value="admin">👑 Admin</option>
+          <option value="teacher">📝 Teacher</option>
+        </select>
+
         <button class="customize-btn" id="activityLogBtn">🕘 Activity</button>
-
-        <!-- ============================================================
-             CUSTOMIZE — lets a school upload their own logo, edit the
-             heading/title/description text, choose colors, and pick
-             which side the logo sits on.
-             ============================================================ -->
-        <button class="customize-btn" id="customizeBtn">🎨 Customize</button>
-
-        <!-- ============================================================
-             DARK MODE — toggles the app's color theme. Remembered
-             per-browser (THEME_KEY in the script below).
-             ============================================================ -->
+        <button class="customize-btn admin-only" id="customizeBtn">🎨 Customize</button>
         <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
 
-        <!-- ============================================================
-             ACCOUNT CHIP — top-corner Google account status/switcher.
-             Hidden until GOOGLE_CLIENT_ID is configured (see script
-             below). Its label/menu are driven by updateAccountChip()
-             in the script, kept in sync with the sign-in gate and the
-             Backup & Import modal's Drive panel.
-             ============================================================ -->
         <div class="account-chip" id="accountChip" style="display:none;">
           <button type="button" class="account-chip-btn" id="accountChipBtn" aria-haspopup="true" aria-expanded="false">
             <span class="acc-dot" id="accountChipDot"></span>
@@ -2104,11 +2065,6 @@
           </div>
         </div>
 
-        <!-- ============================================================
-             DOWNLOAD DROPDOWN — the menu itself. Link targets live in
-             DOWNLOAD_LINKS near the top of the script block below — edit
-             the links there, not here, and they'll flow through automatically.
-             ============================================================ -->
         <div class="download-dropdown" id="downloadDropdown">
           <button class="download-btn" id="downloadBtn" aria-haspopup="true" aria-expanded="false">
             ⬇ Download <span class="caret">▾</span>
@@ -2134,14 +2090,6 @@
   </div>
 </header>
 
-<!-- ============================================================
-     GUEST MODE BANNER — shown whenever someone chose "Continue as
-     Guest" and hasn't signed in since. Not just a one-time gate
-     message: stays visible on every page load in guest mode as an
-     ongoing reminder, since forgetting to back up is exactly the
-     failure mode this is meant to prevent. Driven by updateAccountChip()
-     in the script below.
-     ============================================================ -->
 <div class="guest-banner" id="guestBanner" style="display:none;">
   <span>⚠ Guest mode — nothing is syncing to the cloud.</span>
   <span class="guest-banner-actions">
@@ -2172,11 +2120,6 @@
         </select>
       </div>
 
-      <!-- ============================================================
-           SORT — orders the currently visible Students/Teachers list.
-           Lives here in the toolbar, next to Section/School year, and
-           shares their height so the row stays level.
-           ============================================================ -->
       <div class="sort-dropdown" id="sortDropdown">
         <button class="sort-btn" id="sortBtn" aria-haspopup="true" aria-expanded="false">
           ⇅ <span id="sortBtnLabel">Sort: A–Z</span> <span class="caret">▾</span>
@@ -2188,8 +2131,8 @@
         </div>
       </div>
 
-      <button class="scan-btn" id="scanBtn">📷 Scan</button>
-      <button class="add-btn" id="addBtn">+ Add student</button>
+      <button class="scan-btn admin-only" id="scanBtn">📷 Scan</button>
+      <button class="add-btn admin-only" id="addBtn">+ Add student</button>
     </div>
   </div>
 
@@ -2205,11 +2148,11 @@
   </div>
   <p class="hint" id="hintText">0 students on file</p>
 
-  <div class="selection-bar" id="selectionBar">
+  <div class="selection-bar admin-only" id="selectionBar">
     <span id="selectionCount">0 selected</span>
     <div class="sel-actions">
       <button class="btn-ghost" id="selectionClearBtn">Clear</button>
-      <button class="btn-danger" id="selectionDeleteBtn">Delete selected</button>
+      <button class="btn-danger admin-only" id="selectionDeleteBtn">Delete selected</button>
     </div>
   </div>
 
@@ -2234,6 +2177,28 @@
           <label for="stuSection">Section</label>
           <input type="text" id="stuSection" placeholder="7-Rizal" required>
         </div>
+      </div>
+
+      <!-- Birth Certificate File Uploader -->
+      <div class="record-section">
+        <p class="record-section-label">Birth Certificate Images</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="stuBcFrontFile">Front Picture</label>
+            <input type="file" id="stuBcFrontFile" accept="image/*">
+            <div class="bc-preview-wrap">
+              <img id="stuBcFrontPreview" class="bc-img" style="display:none;" alt="Front BC Preview">
+            </div>
+          </div>
+          <div class="field">
+            <label for="stuBcBackFile">Back Picture</label>
+            <input type="file" id="stuBcBackFile" accept="image/*">
+            <div class="bc-preview-wrap">
+              <img id="stuBcBackPreview" class="bc-img" style="display:none;" alt="Back BC Preview">
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-secondary" style="font-size:0.7rem; padding:0.3rem 0.6rem; margin-top:0.4rem;" id="clearBcBtn">Clear Images</button>
       </div>
 
       <div class="record-section">
@@ -2357,6 +2322,12 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Image Viewer Modal (For Birth Cert Full Size) -->
+<div class="modal-overlay" id="imageViewerOverlay" style="z-index:999; padding: 2rem; align-items:center;">
+  <button class="modal-close" id="imageViewerClose" style="position:absolute; top:20px; right:20px;">✕</button>
+  <img id="imageViewerImg" style="max-width:100%; max-height:100%; border-radius:10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+</div>
+
 <!-- Scan chooser modal -->
 <div class="modal-overlay" id="scanChooserOverlay">
   <div class="modal">
@@ -2379,8 +2350,6 @@
     </div>
   </div>
 </div>
-
-<!-- Single-scan result note (feeds into the Add Student/Teacher modal) -->
 
 <!-- Bulk review modal (class list) -->
 <div class="modal-overlay" id="bulkReviewOverlay">
@@ -2420,20 +2389,17 @@
   </div>
 </div>
 
-<!-- Hidden file inputs used by the scan feature -->
 <input type="file" id="scanFileInput" accept="image/*" capture="environment" style="display:none">
 
-<!-- Share student record modal (printable / "save as PDF" via browser print) -->
+<!-- Share SF10 (Form 137) record modal (printable / "save as PDF") -->
 <div class="modal-overlay" id="shareModalOverlay">
   <div class="modal" style="max-width:640px;">
     <div class="modal-head">
-      <h3>Share record</h3>
+      <h3>Share SF10 (Form 137)</h3>
       <button class="modal-close" id="shareModalClose" aria-label="Close">✕</button>
     </div>
-    <p class="form-note">Opens this one student's record, formatted for printing. Use "Print / Save as PDF" — every browser's print dialog can save straight to a PDF file, which you can then attach to an email. This app already suppresses the browser's page header/footer (site name, URL, date/time); if your browser still adds one, look for a "Headers and footers" toggle under "More settings" in the print dialog and switch it off.</p>
-
+    <p class="form-note">Opens this one student's permanent record, formatted for printing. Use "Print / Save as PDF".</p>
     <div class="share-sheet" id="shareSheet"></div>
-
     <div class="modal-actions" style="justify-content:space-between; margin-top:1rem;">
       <button type="button" class="btn-secondary" id="shareEmailBtn">✉ Email</button>
       <div style="display:flex; gap:0.6rem;">
@@ -2444,8 +2410,26 @@
   </div>
 </div>
 
-<!-- Grades & permanent record modal (Form 137-E style: per-grade subject ratings,
-     core values / learners observed values, attendance, certificate of transfer) -->
+<!-- Share SF9 (Report Card) modal -->
+<div class="modal-overlay" id="sf9ModalOverlay">
+  <div class="modal" style="max-width:760px;">
+    <div class="modal-head">
+      <h3>Share SF9 (Report Card)</h3>
+      <button class="modal-close" id="sf9ModalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="field" style="max-width:200px;">
+      <label for="sf9GradeSelect">Select Grade to Print</label>
+      <select id="sf9GradeSelect"></select>
+    </div>
+    <div class="share-sheet" id="sf9Sheet"></div>
+    <div class="modal-actions" style="justify-content:flex-end; margin-top:1rem;">
+      <button type="button" class="btn-secondary" id="sf9CloseBtn">Close</button>
+      <button type="button" class="btn-primary" id="sf9PrintBtn">🖨 Print / Save as PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Grades & permanent record modal -->
 <div class="modal-overlay" id="recordModalOverlay">
   <div class="modal" style="max-width:820px;">
     <div class="modal-head">
@@ -2620,15 +2604,6 @@
 
 <script>
   // ---------- Safe storage wrapper ----------
-  // Some browsers (Safari in Private Browsing, tablets with "Block All
-  // Cookies"/strict privacy settings, sandboxed/file:// contexts, or a
-  // full storage quota) throw a SecurityError the instant localStorage
-  // is touched. An uncaught throw here — this used to call localStorage
-  // directly before anything else ran — stopped the whole script cold,
-  // so nothing below it (including every button's event listener and
-  // the sign-in screen) ever got wired up. These wrappers fail safe to
-  // an in-memory object instead, so the app still works for that one
-  // session even when persistent storage isn't available.
   const memoryStorageFallback = {};
   function safeGetItem(key){
     try{ return localStorage.getItem(key); }
@@ -2643,15 +2618,20 @@
     catch(err){ delete memoryStorageFallback[key]; }
   }
 
-  // ================================================================
-  // DOWNLOAD LINKS — update these 3 lines whenever you publish a new
-  // build, then re-upload this file. Nothing else needs to change.
-  //
-  //   windows -> direct link to your latest .exe (e.g. a GitHub
-  //              Releases asset URL — see the repo's "Releases" tab)
-  //   android -> direct link to your latest .apk (same idea)
-  //   github  -> your repo's URL, for the "Source code" menu item
-  // ================================================================
+  // ---------- Admin / Teacher Role Sync ----------
+  const roleSelector = document.getElementById('roleSelector');
+  let currentRole = safeGetItem('rr_role') || 'admin';
+  roleSelector.value = currentRole;
+  document.body.setAttribute('data-role', currentRole);
+
+  roleSelector.addEventListener('change', (e) => {
+    currentRole = e.target.value;
+    safeSetItem('rr_role', currentRole);
+    document.body.setAttribute('data-role', currentRole);
+    render(); 
+  });
+
+  // ---------- DOWNLOAD LINKS ----------
   const DOWNLOAD_LINKS = {
     windows: "https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/latest/download/RollAndRegister-Setup.exe",
     android: "https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/latest/download/RollAndRegister.apk",
@@ -2662,17 +2642,10 @@
   document.getElementById('dlAndroid').href = DOWNLOAD_LINKS.android;
   document.getElementById('dlGithub').href = DOWNLOAD_LINKS.github;
 
-  // ================================================================
-  // GOOGLE DRIVE SYNC CONFIG — replace with your own OAuth Client ID
-  // from Google Cloud Console (APIs & Services > Credentials > Create
-  // Credentials > OAuth client ID > Web application). Add this site's
-  // exact URL under "Authorized JavaScript origins" there.
-  // Leave the placeholder as-is to keep the "Connect Google account"
-  // button hidden until it's configured.
-  // ================================================================
+  // ---------- GOOGLE DRIVE SYNC CONFIG ----------
   const GOOGLE_CLIENT_ID = "539917251167-crisqpt23rcb9q069ht82gesh92dmf0v.apps.googleusercontent.com";
   const GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
-  const GOOGLE_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email"; // lets the account chip show which Google account is signed in
+  const GOOGLE_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email"; 
   const GOOGLE_BACKUP_FILENAME = "roll-and-register-backup.json";
 
   const downloadDropdown = document.getElementById('downloadDropdown');
@@ -2695,16 +2668,13 @@
     }
   });
 
-  // ---------- Sort order (Students & Teachers lists) ----------
-  // Declared here, before the dropdown below reads them, so the app
-  // doesn't crash on load with "Cannot access before initialization".
+  // ---------- Sort order ----------
   const SORT_MODE_KEY = 'rollRegister_sortMode';
   const SORT_LABELS = { az: 'A–Z', latest: 'Latest', earliest: 'Earliest' };
   let sortMode = ['az', 'latest', 'earliest'].includes(safeGetItem(SORT_MODE_KEY))
     ? safeGetItem(SORT_MODE_KEY)
     : 'az';
 
-  // ---------- Sort dropdown (toolbar, next to Section/School year) ----------
   const sortDropdown = document.getElementById('sortDropdown');
   const sortBtn = document.getElementById('sortBtn');
   const sortBtnLabel = document.getElementById('sortBtnLabel');
@@ -2745,10 +2715,6 @@
   });
 
   // ---------- Dark mode toggle ----------
-  // Remembers an explicit choice per-browser; otherwise follows the
-  // system's light/dark preference on first visit. Two buttons share
-  // this logic: the header one (post sign-in) and the sign-in card's
-  // own toggle (so theme can be set before signing in/continuing as guest).
   const THEME_KEY = 'rollRegister_theme';
   const themeToggleBtn = document.getElementById('themeToggleBtn');
   const themeToggleBtnSignin = document.getElementById('themeToggleBtnSignin');
@@ -2769,15 +2735,11 @@
   themeToggleBtn.addEventListener('click', toggleTheme);
   themeToggleBtnSignin.addEventListener('click', toggleTheme);
 
-  // ---------- Account chip (top-corner) dropdown toggle — mirrors the download dropdown above ----------
+  // ---------- Account chip ----------
   const accountChip = document.getElementById('accountChip');
   const accountChipBtn = document.getElementById('accountChipBtn');
   accountChipBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    // Signed out: clicking the chip is a faster path to sign in than
-    // opening a menu that would only offer switch/sign-out anyway.
-    // gapiToken is declared further down in this same script block but is
-    // always initialized by the time a click can happen.
     if(!gapiToken){ gdriveConnect(false); return; }
     const isOpen = accountChip.classList.toggle('open');
     accountChipBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
@@ -2795,19 +2757,13 @@
     }
   });
 
-  // ================================================================
-  // SCHOOL BRANDING — lets a school upload their own logo and set a
-  // title/description without touching any code. Saved in this
-  // browser only (same as the roster autosave), under its own key so
-  // it never mixes with student/teacher data. "Roll & Register" is
-  // intentionally NOT part of this — it's fixed in the HTML above.
-  // ================================================================
+  // ---------- SCHOOL BRANDING ----------
   const BRAND_KEY = 'rollRegister_branding_v1';
   const DEFAULT_TITLE = 'School Records // Directory Search';
   const DEFAULT_HEADING = 'Roll & Register';
   const DEFAULT_DESCRIPTION = 'Look up a student by name or LRN to see their section and adviser — or look up a teacher to see every subject and section they hold.';
-  const DEFAULT_PRIMARY_COLOR = '#1F3B2E'; // header background, buttons, tabs
-  const DEFAULT_ACCENT_COLOR = '#B8863C';  // brass highlights, stamps, borders
+  const DEFAULT_PRIMARY_COLOR = '#1F3B2E'; 
+  const DEFAULT_ACCENT_COLOR = '#B8863C';  
   const DEFAULT_LOGO_POSITION = 'left';
   const DEFAULT_LOGO_SIZE = 76;
 
@@ -2817,8 +2773,6 @@
   const schoolLogoEl = document.getElementById('schoolLogo');
   const headerTopEl = document.getElementById('headerTop');
 
-  // Lightens a #rrggbb color by a flat amount — used to derive the
-  // hover-state shade from whatever primary color the school picks.
   function lightenColor(hex, amount){
     const num = parseInt(hex.replace('#', ''), 16);
     const r = Math.min(255, (num >> 16) + amount);
@@ -2842,10 +2796,6 @@
     const logoPosition = (brand && brand.logoPosition) || DEFAULT_LOGO_POSITION;
     const logoOnRight = logoPosition === 'right';
     schoolLogoEl.classList.toggle('logo-right', logoOnRight);
-    // Reserve the fixed-max-size gutter (see .header-top.has-logo-* in CSS)
-    // on whichever side actually has a visible logo, and clear it entirely
-    // once no logo is set — kept in sync here so it can never drift out of
-    // step with the logo's own show/side state.
     headerTopEl.classList.toggle('has-logo-left', hasLogo && !logoOnRight);
     headerTopEl.classList.toggle('has-logo-right', hasLogo && logoOnRight);
     const logoSize = (brand && brand.logoSize) || DEFAULT_LOGO_SIZE;
@@ -2862,7 +2812,7 @@
     try{
       const raw = safeGetItem(BRAND_KEY);
       if(raw) applyBranding(JSON.parse(raw));
-    }catch(err){ /* fall back silently to defaults */ }
+    }catch(err){ }
   }
   function saveBrandingToStorage(brand){
     try{ safeSetItem(BRAND_KEY, JSON.stringify(brand)); }
@@ -2870,9 +2820,7 @@
   }
   loadBranding();
 
-  // Shrinks an uploaded logo before storing it, so it doesn't eat into
-  // this browser's storage quota (same idea as the OCR photo downscale).
-  function resizeImageToDataURL(file, maxDim = 300){
+  function resizeImageToDataURL(file, maxDim = 300, compression = 0.9){
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
@@ -2884,7 +2832,8 @@
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/png'));
+        // Uses jpeg and compresses well for offline storage if compression passed
+        resolve(canvas.toDataURL(compression < 1 ? 'image/jpeg' : 'image/png', compression));
       };
       img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read that image')); };
       img.src = url;
@@ -2906,7 +2855,7 @@
   const brandAccentColorInput = document.getElementById('brandAccentColorInput');
   const brandPrimaryColorHex = document.getElementById('brandPrimaryColorHex');
   const brandAccentColorHex = document.getElementById('brandAccentColorHex');
-  let pendingLogoDataUrl = null; // null = unchanged from current saved logo this session
+  let pendingLogoDataUrl = null; 
 
   function setLogoSizeUI(size){
     brandLogoSizeInput.value = size;
@@ -2936,14 +2885,13 @@
   }
   function closeCustomizeModal(){
     customizeModalOverlay.classList.remove('show');
-    loadBranding(); // discard any live color preview that wasn't saved
+    loadBranding(); 
   }
 
   customizeBtn.addEventListener('click', openCustomizeModal);
   document.getElementById('customizeModalClose').addEventListener('click', closeCustomizeModal);
   customizeModalOverlay.addEventListener('click', e => { if(e.target === customizeModalOverlay) closeCustomizeModal(); });
 
-  // Live-preview colors as the school picks them, without saving yet
   brandPrimaryColorInput.addEventListener('input', () => {
     brandPrimaryColorHex.textContent = brandPrimaryColorInput.value;
     document.documentElement.style.setProperty('--green', brandPrimaryColorInput.value);
@@ -2969,7 +2917,7 @@
     const file = logoFileInput.files[0];
     if(!file) return;
     try{
-      pendingLogoDataUrl = await resizeImageToDataURL(file);
+      pendingLogoDataUrl = await resizeImageToDataURL(file, 300, 1.0);
       logoPreview.src = pendingLogoDataUrl;
     }catch(err){
       showToast('Could not read that image — try a different file');
@@ -3016,15 +2964,8 @@
     showToast('Reset to default');
   });
 
-  // ---- Data: starts empty. Use "+ Add student/teacher" in the app, or paste
-  // your own records here in the same shape as the commented example below.
-  // Note: the "id" field holds the student's LRN — the UI now labels it
-  // "Student LRN", the field name in the data just stayed "id" for simplicity. ----
-  // { id:"136456789012", name:"Maria Santos", section:"7-Rizal", year:"2024-2025", teacherId:"T-201",
-  //   history:[ {year:"2024-2025", section:"7-Rizal"} ], transferredFrom:"Optional Prior School" }
+  // ---------- Data arrays ----------
   const students = [];
-
-  // { id:"T-201", name:"Mr. Ramon Ibañez", subjects:[{subject:"Mathematics", section:"7-Rizal"}] }
   const teachers = [];
 
   let teacherById = {};
@@ -3033,13 +2974,6 @@
   }
 
   // ---------- Activity log ----------
-  // A lightweight audit trail: who (this browser's signed-in Google
-  // account, or "Guest" if not signed in) did what and when. Synced
-  // as part of the Drive backup payload (see buildBackupPayload /
-  // mergeImportedBackup below) so on a shared Google account, loading
-  // from Drive pulls in entries other signed-in collaborators made
-  // elsewhere — that's what lets someone notice "oh, someone else
-  // edited this since I last opened it."
   const ACTIVITY_LOG_KEY = 'rollRegister_activityLog_v1';
   const ACTIVITY_LOG_MAX = 300;
   let activityLog = [];
@@ -3061,8 +2995,6 @@
     saveActivityLog();
     if(typeof renderActivityLog === 'function') renderActivityLog();
   }
-  // Merges another device/collaborator's log entries in on Drive load or
-  // file import, de-duped by timestamp+action+actor, newest first.
   function mergeActivityLog(incoming){
     if(!Array.isArray(incoming) || incoming.length === 0) return;
     const seen = new Set(activityLog.map(e => `${e.at}|${e.action}|${e.detail}|${e.actor}`));
@@ -3117,8 +3049,7 @@
     activityLogModalOverlay.addEventListener('click', e => { if(e.target === activityLogModalOverlay) activityLogModalOverlay.classList.remove('show'); });
   }
 
-
-  // ---------- Autosave (this browser only, no server / no account) ----------
+  // ---------- Autosave ----------
   const SAVE_KEY = 'rollRegister_v1';
   let storageAvailable = true;
 
@@ -3141,7 +3072,7 @@
       if(Array.isArray(parsed.students)) students.push(...parsed.students);
       if(Array.isArray(parsed.teachers)) teachers.push(...parsed.teachers);
     }catch(err){
-      storageAvailable = false; // silent — toast UI isn't wired up yet this early
+      storageAvailable = false; 
     }
   }
   loadData();
@@ -3181,7 +3112,7 @@
 
   let activeTab = 'students';
   let query = '';
-  let view = 'list'; // 'list' or 'profile'
+  let view = 'list'; 
   let profileStudentId = null;
   let sectionFilter = '';
   let yearFilter = '';
@@ -3311,8 +3242,16 @@
     render();
   }
 
-  // ---------- Grades & permanent record (Form 137-E: per-grade subject ratings,
-  // core values / learners observed values, attendance record, certificate of transfer) ----------
+  // ---------- View BC Image ----------
+  function viewImage(src){
+    document.getElementById('imageViewerImg').src = src;
+    document.getElementById('imageViewerOverlay').classList.add('show');
+  }
+  document.getElementById('imageViewerClose').addEventListener('click', () => {
+    document.getElementById('imageViewerOverlay').classList.remove('show');
+  });
+
+  // ---------- Grades & permanent record (Form 137-E) ----------
   const GRADE_LEVELS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
   const SUBJECTS_COMMON = [
     { key:'motherTongue', label:'Mother Tongue', levels:['I','II','III'] },
@@ -3463,7 +3402,6 @@
       <div class="field"><label for="attCauseTardy">Cause (tardy)</label><input type="text" id="attCauseTardy" value="${escapeHtml(att.causeTardy)}"></div>
     `;
 
-    // Subject quarter cells — update data, recompute that row's final and the general average in place
     gradeTabContentEl.querySelectorAll('.gr-cell').forEach(input => {
       input.addEventListener('input', () => {
         const subKey = input.dataset.subject, field = input.dataset.field;
@@ -3510,7 +3448,7 @@
     if(recordStudent) { ensurePermanentRecord(recordStudent).transfer.date = e.target.value; saveData(); }
   });
 
-  // ---------- Share record (single student, printable / "save as PDF") ----------
+  // ---------- Share SF10 record (single student, printable / "save as PDF") ----------
   const shareModalOverlay = document.getElementById('shareModalOverlay');
   const shareSheet = document.getElementById('shareSheet');
   let shareStudent = null;
@@ -3520,9 +3458,6 @@
     catch(err){ return {}; }
   }
 
-  // Builds one Grade-level cell for the progress grid — a school/school-year
-  // heading, the subject rating table, and the eligibility line — matching
-  // one half of a Form 137-E "Grade N – School ___" block.
   function buildGradeCellHtml(level, pr){
     const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
     const progress = pr.progress[level] || { subjects:{} };
@@ -3550,9 +3485,6 @@
     </div>`;
   }
 
-  // Elementary school progress, laid out as three left/right Grade pairs
-  // (I & II, III & IV, V & VI) — the same two-column arrangement as the
-  // printed Form 137-E page.
   function buildElementaryProgressHtml(s){
     const pr = s.permanentRecord;
     if(!pr) return '';
@@ -3563,12 +3495,7 @@
       `</div>`;
   }
 
-  // One grouped core-values table covering three grade levels side by
-  // side (each with its own SY heading and 1–4 quarter columns), matching
-  // the "Grade I–III" / "Grade IV–VI" tables on the printed form.
   function buildCoreValuesGroupHtml(levels, pr){
-    // Consecutive rows that share a core value ("Maka-Diyos", etc.) are
-    // merged into a single left-hand cell with rowspan, as on the form.
     const groupSpans = [];
     CORE_VALUE_ROWS.forEach((row, i) => {
       if(i > 0 && CORE_VALUE_ROWS[i - 1].group === row.group) groupSpans[groupSpans.length - 1].span++;
@@ -3664,14 +3591,14 @@
 
     shareSheet.innerHTML = `
       <div class="ss-topline">
-        <span class="ss-formcode">DepEd Form 137-E</span>
+        <span class="ss-formcode">SF10-ES (Form 137-E)</span>
         <div class="ss-lrn-box">LRN<b>${escapeHtml(s.id)}</b></div>
       </div>
       <div class="ss-head-text">
         <p class="ss-republic">Republic of the Philippines</p>
         <p class="ss-dept">Department of Education</p>
         <p class="ss-region">${s.division ? escapeHtml(s.division) : 'Region ______________'}</p>
-        <p class="ss-title">Elementary School Permanent Record</p>
+        <p class="ss-title">Learner's Permanent Academic Record</p>
       </div>
 
       <div class="ss-nameline">
@@ -3719,23 +3646,27 @@
         <span>Generated ${escapeHtml(new Date().toLocaleDateString())} by ${escapeHtml(currentActor())}</span>
       </div>
     `;
+    
+    // Tag this overlay for printing
+    document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('print-active'));
+    shareModalOverlay.classList.add('print-active');
     shareModalOverlay.classList.add('show');
   }
-  function closeShareModal(){ shareModalOverlay.classList.remove('show'); }
+  function closeShareModal(){ 
+    shareModalOverlay.classList.remove('show');
+    shareModalOverlay.classList.remove('print-active');
+  }
 
   document.getElementById('shareModalClose').addEventListener('click', closeShareModal);
   document.getElementById('shareCloseBtn').addEventListener('click', closeShareModal);
   shareModalOverlay.addEventListener('click', e => { if(e.target === shareModalOverlay) closeShareModal(); });
 
-  // Swap the browser tab title to a clean, student-specific name while
-  // printing — this is what Chromium/Firefox use both as a fallback
-  // print-header label and as the suggested "Save as PDF" filename, so
-  // it replaces the app name with something meant for the document.
   let savedDocTitle = null;
   window.addEventListener('beforeprint', () => {
-    if(shareModalOverlay.classList.contains('show') && shareStudent){
+    if((shareModalOverlay.classList.contains('show') || sf9ModalOverlay.classList.contains('show')) && shareStudent){
       savedDocTitle = document.title;
-      document.title = `Permanent Record - ${shareStudent.name} (${shareStudent.id})`;
+      let type = shareModalOverlay.classList.contains('show') ? 'SF10' : 'SF9';
+      document.title = `${type} - ${shareStudent.name} (${shareStudent.id})`;
     }
   });
   window.addEventListener('afterprint', () => {
@@ -3743,14 +3674,14 @@
   });
 
   document.getElementById('sharePrintBtn').addEventListener('click', () => {
-    if(shareStudent) logActivity('Shared student record (print/PDF)', `${shareStudent.name} (${shareStudent.id})`);
+    if(shareStudent) logActivity('Shared student record SF10 (print/PDF)', `${shareStudent.name} (${shareStudent.id})`);
     window.print();
   });
   document.getElementById('shareEmailBtn').addEventListener('click', () => {
     if(!shareStudent) return;
     const s = shareStudent;
     const teacher = teacherById[s.teacherId];
-    const subject = `Student record — ${s.name} (${s.id})`;
+    const subject = `Student record SF10 — ${s.name} (${s.id})`;
     const bodyLines = [
       `Student record for ${s.name} (LRN ${s.id})`,
       `Section: ${s.section}   School year: ${s.year || '—'}`,
@@ -3758,9 +3689,206 @@
       '',
       'A full formatted copy of this record can be saved as a PDF from the "Print / Save as PDF" button and attached to this email.'
     ];
-    logActivity('Shared student record (email)', `${s.name} (${s.id})`);
+    logActivity('Shared student record SF10 (email)', `${s.name} (${s.id})`);
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
   });
+
+  // ---------- Share SF9 record (Report Card) ----------
+  const sf9ModalOverlay = document.getElementById('sf9ModalOverlay');
+  const sf9Sheet = document.getElementById('sf9Sheet');
+  const sf9GradeSelect = document.getElementById('sf9GradeSelect');
+
+  function buildSF9Html(s, level) {
+    const pr = ensurePermanentRecord(s);
+    const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
+    const progress = pr.progress[level] || { subjects:{} };
+    const coreValues = pr.coreValues[level] || { ratings:{} };
+    const att = pr.attendance[level] || {};
+    
+    const subjects = subjectsForLevel(level);
+    const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
+    const genAvg = computeGeneralAverage(finals);
+
+    const teacher = teacherById[s.teacherId];
+    const brand = currentBrandingForShare();
+    const schoolName = meta.school || s.school || brand.title || brand.heading || DEFAULT_HEADING;
+
+    const hasNameParts = s.surname || s.firstName || s.mi;
+    const composedName = hasNameParts
+      ? [s.surname, s.firstName, s.mi ? (s.mi.replace(/\.$/, '') + '.') : ''].filter(Boolean).join(' ')
+      : s.name;
+    
+    // Core Values Table
+    const groupSpans = [];
+    CORE_VALUE_ROWS.forEach((row, i) => {
+      if(i > 0 && CORE_VALUE_ROWS[i - 1].group === row.group) groupSpans[groupSpans.length - 1].span++;
+      else groupSpans.push({ group:row.group, span:1, startIndex:i });
+    });
+    const groupStartIndex = {};
+    groupSpans.forEach(g => { groupStartIndex[g.startIndex] = g; });
+
+    let coreValuesHtml = `
+      <div class="sf9-section-header">Report on Learner's Observed Values</div>
+      <table class="ss-table ss-corevalues-table" style="margin-top:0.4rem;">
+        <thead>
+          <tr>
+            <th rowspan="2">Core Values</th>
+            <th rowspan="2">Behavior Statements</th>
+            <th colspan="4">Quarter</th>
+          </tr>
+          <tr><th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th></tr>
+        </thead>
+        <tbody>
+          ${CORE_VALUE_ROWS.map((row, i) => {
+            const groupCell = groupStartIndex[i] ? `<td rowspan="${groupStartIndex[i].span}">${escapeHtml(row.group)}</td>` : '';
+            const cv = coreValues.ratings[row.key] || {};
+            const quarterCells = ['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${escapeHtml(cv[qk] || '')}</td>`).join('');
+            return `<tr>${groupCell}<td>${escapeHtml(row.statement)}</td>${quarterCells}</tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <p class="ss-legend" style="justify-content:center; margin-bottom: 0;"><span><b>AO</b> Always Observed</span><span><b>SO</b> Sometimes Observed</span><span><b>RO</b> Rarely Observed</span><span><b>NO</b> Not Observed</span></p>
+    `;
+
+    // Attendance Table
+    let attendanceHtml = `
+      <div class="sf9-section-header" style="margin-top:1.5rem;">Report on Attendance</div>
+      <table class="ss-table" style="margin-top:0.4rem;">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>No. of School Days</td>
+            <td colspan="4" class="ss-num" style="color:#666;">(Recorded Annually)</td>
+            <td class="ss-num">${escapeHtml(att.schoolDays || '')}</td>
+          </tr>
+          <tr>
+            <td>No. of Days Present</td>
+            <td colspan="4" class="ss-num" style="color:#666;"></td>
+            <td class="ss-num">${escapeHtml(att.daysPresent || '')}</td>
+          </tr>
+          <tr>
+            <td>No. of Days Absent</td>
+            <td colspan="4" class="ss-num" style="color:#666;"></td>
+            <td class="ss-num">${escapeHtml(att.daysAbsent || '')}</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    return `
+      <div class="ss-topline">
+        <span class="ss-formcode">SF9 (Report Card)</span>
+        <div class="ss-lrn-box">LRN<b>${escapeHtml(s.id)}</b></div>
+      </div>
+      <div class="ss-head-text">
+        <p class="ss-republic">Republic of the Philippines</p>
+        <p class="ss-dept">Department of Education</p>
+        <p class="ss-region">${s.division ? escapeHtml(s.division) : 'Region ______________'}</p>
+        <p class="ss-title">Learner's Progress Report Card</p>
+      </div>
+
+      <div class="sf9-school-info">
+        <b>${escapeHtml(schoolName)}</b><br>
+        School Year: ${escapeHtml(meta.schoolYear || s.year || '____')}
+      </div>
+
+      <div class="sf9-student-info">
+        <div>Name: <span>${escapeHtml(composedName)}</span></div>
+        <div>Age/Sex: <span>${escapeHtml(s.sex || '—')}</span></div>
+        <div>Grade: <span>${escapeHtml(level)}</span></div>
+        <div>Section: <span>${escapeHtml(s.section || '—')}</span></div>
+      </div>
+
+      <div class="sf9-two-col">
+        <div>
+          <div class="sf9-section-header">Report on Learning Progress and Achievement</div>
+          <table class="ss-table" style="margin-top:0.4rem;">
+            <thead>
+              <tr><th rowspan="2">Learning Areas</th><th colspan="4">Quarter</th><th rowspan="2">Final<br>Grade</th><th rowspan="2">Remarks</th></tr>
+              <tr><th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th></tr>
+            </thead>
+            <tbody>
+              ${subjects.map((su, i) => {
+                const q = progress.subjects[su.key] || {};
+                let remarks = finals[i] !== null ? (finals[i] >= 75 ? 'Passed' : 'Failed') : '';
+                return `<tr><td>${escapeHtml(su.label)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : ''}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '' : finals[i]}</td><td style="font-size:0.65rem;">${remarks}</td></tr>`;
+              }).join('')}
+            </tbody>
+            <tfoot>
+              <tr class="ss-genavg-row"><td colspan="5" class="ss-genavg-label">General Average</td><td class="ss-num">${genAvg === null ? '' : genAvg}</td><td style="font-size:0.65rem;">${genAvg !== null ? (genAvg >= 75 ? 'Passed' : 'Failed') : ''}</td></tr>
+            </tfoot>
+          </table>
+          <p style="font-size:0.68rem; margin-top: -0.2rem;"><b>Descriptors:</b> Outstanding (90-100), Very Satisfactory (85-89), Satisfactory (80-84), Fairly Satisfactory (75-79), Did Not Meet Expectations (Below 75)</p>
+        </div>
+        <div>
+          ${coreValuesHtml}
+          ${attendanceHtml}
+        </div>
+      </div>
+
+      <div class="sf9-sign-area">
+        <div class="sf9-sign-box">
+           <br><br>
+           <div>${escapeHtml(pr.transfer.principal || 'Principal')}</div>
+           <span>Principal</span>
+        </div>
+        <div class="sf9-sign-box">
+           <br><br>
+           <div>${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || 'Teacher')}</div>
+           <span>Teacher</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSF9ForGrade(level) {
+    if(shareStudent) {
+      sf9Sheet.innerHTML = buildSF9Html(shareStudent, level);
+    }
+  }
+
+  function openSF9Modal(s){
+    shareStudent = s;
+    sf9GradeSelect.innerHTML = GRADE_LEVELS.map(g => `<option value="${g}">Grade ${g}</option>`).join('');
+    // Pick the most likely grade based on section history, or default to I
+    let startGrade = 'I'; 
+    if(s.permanentRecord && s.permanentRecord.meta){
+      // simple heuristic: pick the highest grade that has a schoolYear filled
+      for(let i=GRADE_LEVELS.length-1; i>=0; i--) {
+        if(s.permanentRecord.meta[GRADE_LEVELS[i]] && s.permanentRecord.meta[GRADE_LEVELS[i]].schoolYear) {
+          startGrade = GRADE_LEVELS[i];
+          break;
+        }
+      }
+    }
+    sf9GradeSelect.value = startGrade;
+    renderSF9ForGrade(startGrade);
+    
+    // Tag this overlay for printing
+    document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('print-active'));
+    sf9ModalOverlay.classList.add('print-active');
+    sf9ModalOverlay.classList.add('show');
+  }
+  function closeSF9Modal(){ 
+    sf9ModalOverlay.classList.remove('show');
+    sf9ModalOverlay.classList.remove('print-active');
+  }
+
+  sf9GradeSelect.addEventListener('change', e => renderSF9ForGrade(e.target.value));
+  document.getElementById('sf9ModalClose').addEventListener('click', closeSF9Modal);
+  document.getElementById('sf9CloseBtn').addEventListener('click', closeSF9Modal);
+  sf9ModalOverlay.addEventListener('click', e => { if(e.target === sf9ModalOverlay) closeSF9Modal(); });
+
+  document.getElementById('sf9PrintBtn').addEventListener('click', () => {
+    if(shareStudent) logActivity('Shared student record SF9 (print/PDF)', `${shareStudent.name} (${shareStudent.id})`);
+    window.print();
+  });
+
 
   function renderProfile(){
     document.querySelector('.search-wrap').style.display = 'none';
@@ -3788,6 +3916,15 @@
             <div><span class="tag">Transferred in</span>Came from ${escapeHtml(s.transferredFrom)}</div>
           </div>
         ` : ''}
+
+        ${(s.birthCertFront || s.birthCertBack) ? `
+          <p class="section-label">Birth Certificate</p>
+          <div class="bc-display-row" style="margin-bottom: 1.4rem;">
+             ${s.birthCertFront ? `<img src="${s.birthCertFront}" class="bc-img" onclick="viewImage(this.src)" title="Front Picture">` : ''}
+             ${s.birthCertBack ? `<img src="${s.birthCertBack}" class="bc-img" onclick="viewImage(this.src)" title="Back Picture">` : ''}
+          </div>
+        ` : ''}
+
         ${hasRecordDetails ? `
           <p class="section-label">Permanent record details</p>
           <ul class="record-details-view">
@@ -3810,19 +3947,26 @@
             </li>
           `).join('') || '<li>No prior section records on file.</li>'}
         </ul>
-        <div class="modal-actions" style="justify-content:flex-start; margin-top:1.4rem;">
-          <button type="button" class="btn-secondary" id="editFromProfileBtn">Edit this student</button>
-          <button type="button" class="btn-secondary" id="recordFromProfileBtn">🎓 Grades &amp; record</button>
-          <button type="button" class="btn-secondary" id="shareFromProfileBtn">📄 Share record</button>
-          <button type="button" class="btn-danger" id="deleteFromProfileBtn">Delete this student</button>
+        <div class="modal-actions" style="justify-content:flex-start; margin-top:1.4rem; flex-wrap:wrap;">
+          <button type="button" class="btn-secondary admin-only" id="editFromProfileBtn">Edit student</button>
+          <button type="button" class="btn-secondary" id="recordFromProfileBtn">🎓 Grades (SF10)</button>
+          <button type="button" class="btn-secondary" id="shareFromProfileBtn">📄 View SF10 (Form 137)</button>
+          <button type="button" class="btn-secondary" id="sf9FromProfileBtn">📄 View SF9 (Report Card)</button>
+          <button type="button" class="btn-danger admin-only" id="deleteFromProfileBtn">Delete student</button>
         </div>
       </div>
     `;
     document.getElementById('backBtn').addEventListener('click', backToList);
-    document.getElementById('editFromProfileBtn').addEventListener('click', () => openStudentModal(s));
+    
+    const editBtn = document.getElementById('editFromProfileBtn');
+    if(editBtn) editBtn.addEventListener('click', () => openStudentModal(s));
+    
     document.getElementById('recordFromProfileBtn').addEventListener('click', () => openRecordModal(s));
     document.getElementById('shareFromProfileBtn').addEventListener('click', () => openShareModal(s));
-    document.getElementById('deleteFromProfileBtn').addEventListener('click', () => confirmDeleteStudents([s.id]));
+    document.getElementById('sf9FromProfileBtn').addEventListener('click', () => openSF9Modal(s));
+    
+    const delBtn = document.getElementById('deleteFromProfileBtn');
+    if(delBtn) delBtn.addEventListener('click', () => confirmDeleteStudents([s.id]));
   }
 
   function jumpToTeacher(teacherId){
@@ -3881,10 +4025,11 @@
               <li><b>Tap a student's name</b> to see their full section history, and check the boxes on any card to delete several at once.</li>
               <li>When you're ready to keep your data permanently, use <b>"export current data"</b> in the footer.</li>
             </ol>
-            <button class="add-btn" id="onboardingAddStudent">+ Add your first student</button>
+            <button class="add-btn admin-only" id="onboardingAddStudent">+ Add your first student</button>
           </div>
         `;
-        document.getElementById('onboardingAddStudent').addEventListener('click', openStudentModal);
+        const obs = document.getElementById('onboardingAddStudent');
+        if(obs) obs.addEventListener('click', openStudentModal);
         return;
       }
 
@@ -3916,17 +4061,21 @@
         const card = document.createElement('div');
         card.className = 'card' + (selectedStudentIds.has(s.id) ? ' selected' : '');
         card.style.animationDelay = (i * 0.03) + 's';
+        
+        const adminTools = `
+          <button class="icon-del icon-edit admin-only" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>
+          <button class="icon-del admin-only" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
+        `;
+
         card.innerHTML = `
           <div class="card-head">
-            <label class="chk">
+            <label class="chk admin-only">
               <input type="checkbox" class="select-chk" data-select-student="${escapeHtml(s.id)}" ${selectedStudentIds.has(s.id) ? 'checked' : ''}>
               <span class="chk-box"></span>
             </label>
             <div class="card-head-right">
               <div class="stamp">${escapeHtml(s.section)}</div>
-              <button class="icon-del icon-share" data-share-student="${escapeHtml(s.id)}" aria-label="Share / print PDF" title="Share / print PDF">📄</button>
-              <button class="icon-del icon-edit" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>
-              <button class="icon-del" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
+              ${adminTools}
             </div>
           </div>
           <p class="id">${escapeHtml(s.id)}</p>
@@ -3934,7 +4083,6 @@
           <div class="row"><span class="label">Section</span><span class="value">${escapeHtml(s.section)}</span></div>
           <div class="row"><span class="label">School Year</span><span class="value">${escapeHtml(s.year || '—')}</span></div>
           <div class="row"><span class="label">Adviser</span><span class="value"><button class="link-btn" data-teacher="${escapeHtml(s.teacherId)}">${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || '—')}</button></span></div>
-          <div class="row"><span class="label">Teacher ID</span><span class="value">${escapeHtml(s.teacherId || '—')}</span></div>
         `;
         resultsEl.appendChild(card);
       });
@@ -3949,13 +4097,6 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           confirmDeleteStudents([btn.dataset.deleteStudent]);
-        });
-      });
-      resultsEl.querySelectorAll('[data-share-student]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const s = students.find(st => st.id === btn.dataset.shareStudent);
-          if(s) openShareModal(s);
         });
       });
       resultsEl.querySelectorAll('[data-edit-student]').forEach(btn => {
@@ -3993,10 +4134,11 @@
               <li>Once saved, they'll show up as an <b>adviser option</b> when you add students.</li>
               <li>Check the boxes on teacher cards to <b>select and delete several at once</b>.</li>
             </ol>
-            <button class="add-btn" id="onboardingAddTeacher">+ Add your first teacher</button>
+            <button class="add-btn admin-only" id="onboardingAddTeacher">+ Add your first teacher</button>
           </div>
         `;
-        document.getElementById('onboardingAddTeacher').addEventListener('click', openTeacherModal);
+        const otb = document.getElementById('onboardingAddTeacher');
+        if(otb) otb.addEventListener('click', openTeacherModal);
         return;
       }
 
@@ -4016,16 +4158,21 @@
         const card = document.createElement('div');
         card.className = 'card' + (selectedTeacherIds.has(t.id) ? ' selected' : '');
         card.style.animationDelay = (i * 0.03) + 's';
+        
+        const adminTools = `
+          <button class="icon-del icon-edit admin-only" data-edit-teacher="${escapeHtml(t.id)}" aria-label="Edit teacher" title="Edit teacher">✏️</button>
+          <button class="icon-del admin-only" data-delete-teacher="${escapeHtml(t.id)}" aria-label="Delete teacher" title="Delete teacher">🗑</button>
+        `;
+
         card.innerHTML = `
           <div class="card-head">
-            <label class="chk">
+            <label class="chk admin-only">
               <input type="checkbox" class="select-chk" data-select-teacher="${escapeHtml(t.id)}" ${selectedTeacherIds.has(t.id) ? 'checked' : ''}>
               <span class="chk-box"></span>
             </label>
             <div class="card-head-right">
               <div class="stamp">${t.subjects.length} held</div>
-              <button class="icon-del icon-edit" data-edit-teacher="${escapeHtml(t.id)}" aria-label="Edit teacher" title="Edit teacher">✏️</button>
-              <button class="icon-del" data-delete-teacher="${escapeHtml(t.id)}" aria-label="Delete teacher" title="Delete teacher">🗑</button>
+              ${adminTools}
             </div>
           </div>
           <p class="id">${escapeHtml(t.id)}</p>
@@ -4082,7 +4229,7 @@
   const confirmText = document.getElementById('confirmText');
   const confirmSubText = document.getElementById('confirmSubText');
   const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  let pendingDelete = null; // { type: 'student' | 'teacher', ids: [...] }
+  let pendingDelete = null; 
 
   function openConfirmModal({ title, text, sub }){
     confirmTitle.textContent = title;
@@ -4167,13 +4314,59 @@
   const stuTeacherSelect = document.getElementById('stuTeacher');
   const studentModalTitle = document.getElementById('studentModalTitle');
   const studentSubmitBtn = document.getElementById('studentSubmitBtn');
-  let editingStudentId = null; // null = adding new; otherwise the original LRN being edited
+  let editingStudentId = null; 
+  let pendingBcFront = null;
+  let pendingBcBack = null;
+
+  function updateBcPreviewUI() {
+    const frontPreview = document.getElementById('stuBcFrontPreview');
+    if(pendingBcFront) {
+      frontPreview.src = pendingBcFront;
+      frontPreview.style.display = 'block';
+    } else {
+      frontPreview.src = '';
+      frontPreview.style.display = 'none';
+      document.getElementById('stuBcFrontFile').value = '';
+    }
+
+    const backPreview = document.getElementById('stuBcBackPreview');
+    if(pendingBcBack) {
+      backPreview.src = pendingBcBack;
+      backPreview.style.display = 'block';
+    } else {
+      backPreview.src = '';
+      backPreview.style.display = 'none';
+      document.getElementById('stuBcBackFile').value = '';
+    }
+  }
+
+  document.getElementById('stuBcFrontFile').addEventListener('change', async (e) => {
+    if(e.target.files[0]) {
+       pendingBcFront = await resizeImageToDataURL(e.target.files[0], 800, 0.7);
+       updateBcPreviewUI();
+    }
+  });
+
+  document.getElementById('stuBcBackFile').addEventListener('change', async (e) => {
+    if(e.target.files[0]) {
+       pendingBcBack = await resizeImageToDataURL(e.target.files[0], 800, 0.7);
+       updateBcPreviewUI();
+    }
+  });
+
+  document.getElementById('clearBcBtn').addEventListener('click', () => {
+    pendingBcFront = null;
+    pendingBcBack = null;
+    updateBcPreviewUI();
+  });
 
   function openStudentModal(existing){
     stuTeacherSelect.innerHTML = '<option value="">— none yet —</option>' +
       teachers.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.id)} — ${escapeHtml(t.name)}</option>`).join('');
     studentForm.reset();
-
+    pendingBcFront = null;
+    pendingBcBack = null;
+    
     if(existing){
       editingStudentId = existing.id;
       studentModalTitle.textContent = 'Edit student';
@@ -4195,12 +4388,16 @@
       document.getElementById('stuGuardianOccupation').value = existing.guardianOccupation || '';
       document.getElementById('stuDivision').value = existing.division || '';
       document.getElementById('stuSchool').value = existing.school || '';
+
+      if(existing.birthCertFront) pendingBcFront = existing.birthCertFront;
+      if(existing.birthCertBack) pendingBcBack = existing.birthCertBack;
     } else {
       editingStudentId = null;
       studentModalTitle.textContent = 'Add student';
       studentSubmitBtn.textContent = 'Save student';
     }
 
+    updateBcPreviewUI();
     studentModalOverlay.classList.add('show');
     document.getElementById('stuId').focus();
   }
@@ -4220,8 +4417,6 @@
     const surname = document.getElementById('stuSurname').value.trim();
     const firstName = document.getElementById('stuFirstName').value.trim();
     const mi = document.getElementById('stuMI').value.trim();
-    // The everyday "name" used in lists/search/exports is composed from the
-    // permanent-record name parts — one name field to fill in, not two.
     const name = [firstName, mi ? (mi.replace(/\.$/, '') + '.') : '', surname].filter(Boolean).join(' ');
     const sex = document.getElementById('stuSex').value;
     const dob = document.getElementById('stuDob').value;
@@ -4232,16 +4427,18 @@
     const guardianOccupation = document.getElementById('stuGuardianOccupation').value.trim();
     const division = document.getElementById('stuDivision').value.trim();
     const school = document.getElementById('stuSchool').value.trim();
-    // Applied via a small helper below so add & edit don't duplicate this list
+    
     const recordDetails = { surname, firstName, mi, sex, dob, pob, doe, guardian, guardianAddress, guardianOccupation, division, school };
     function applyRecordDetails(target){
       Object.keys(recordDetails).forEach(key => {
         if(recordDetails[key]) target[key] = recordDetails[key];
         else delete target[key];
       });
+      // Attach birth certs
+      if(pendingBcFront) target.birthCertFront = pendingBcFront; else delete target.birthCertFront;
+      if(pendingBcBack) target.birthCertBack = pendingBcBack; else delete target.birthCertBack;
     }
 
-    // Duplicate LRN check — ignore the record we're currently editing
     const dupe = students.some(s => s.id.toLowerCase() === id.toLowerCase() && s.id !== editingStudentId);
     if(dupe){
       showToast(`Student LRN "${id}" already exists`);
@@ -4258,7 +4455,6 @@
       if(origin) s.transferredFrom = origin; else delete s.transferredFrom;
       applyRecordDetails(s);
 
-      // Keep the section-history timeline in sync with the current year/section
       s.history = s.history || [];
       const histEntry = s.history.find(h => h.year === year);
       if(histEntry) histEntry.section = section;
@@ -4315,7 +4511,7 @@
   const teacherModalTitle = document.getElementById('teacherModalTitle');
   const teacherSubmitBtn = document.getElementById('teacherSubmitBtn');
   let subjectRowCount = 0;
-  let editingTeacherId = null; // null = adding new; otherwise the original ID being edited
+  let editingTeacherId = null; 
 
   function addSubjectRow(subject = '', section = ''){
     subjectRowCount++;
@@ -4393,7 +4589,6 @@
       t.name = name;
       t.subjects = subjects;
 
-      // If the teacher's ID changed, update any students that list them as adviser
       if(oldId !== id){
         students.forEach(s => { if(s.teacherId === oldId) s.teacherId = id; });
       }
@@ -4461,7 +4656,7 @@
     return tesseractLoadPromise;
   }
 
-  let pendingScanMode = null; // 'student-single' | 'student-bulk' | 'teacher-single'
+  let pendingScanMode = null; 
 
   function openScanChooser(){
     scanChooserTitle.textContent = activeTab === 'students' ? 'Scan students' : 'Scan a teacher';
@@ -4491,11 +4686,12 @@
     scanChooserOverlay.classList.add('show');
   }
 
-  scanBtn.addEventListener('click', openScanChooser);
+  const scanBtnEl = document.getElementById('scanBtn');
+  if(scanBtnEl) scanBtnEl.addEventListener('click', openScanChooser);
+
   document.getElementById('scanChooserClose').addEventListener('click', () => scanChooserOverlay.classList.remove('show'));
   scanChooserOverlay.addEventListener('click', e => { if(e.target === scanChooserOverlay) scanChooserOverlay.classList.remove('show'); });
 
-  // ---- parsing heuristics (best-effort guesses — user reviews everything after) ----
   function guessIdFromText(text){
     const m = text.match(/\b([A-Z]{1,6}-\d{3,7})\b/) || text.match(/\b(\d{4,10})\b/);
     return m ? m[1] : '';
@@ -4520,9 +4716,6 @@
     }
     return '';
   }
-  // Splits an OCR-guessed "First Last" style name into surname/first-name
-  // fields (last word = surname). Rough on purpose — the scan flow always
-  // asks the user to review before saving.
   function splitGuessedName(fullName){
     const parts = (fullName || '').trim().split(/\s+/).filter(Boolean);
     if(!parts.length) return { surname:'', firstName:'' };
@@ -4558,21 +4751,6 @@
     return rows;
   }
 
-  // Phone camera photos are often huge (12MP+) and low-contrast under
-  // ordinary indoor lighting — both hurt OCR accuracy. This pass:
-  //   1) upscales small/low-res crops so character strokes are thick
-  //      enough for Tesseract to resolve, and caps huge photos so OCR
-  //      doesn't stall lower-end phones,
-  //   2) converts to grayscale,
-  //   3) stretches contrast against the image's own darkest/lightest
-  //      pixels (so a dim or glare-y photo doesn't get lost in the
-  //      midtones), then
-  //   4) applies local adaptive thresholding (a blurred-mean comparison,
-  //      not one fixed cutoff) so text stays legible across uneven
-  //      lighting/shadows on the page — a fixed global threshold washes
-  //      out one side of an unevenly-lit photo.
-  // Net effect: crisp black text on a flat white background, which is
-  // exactly what Tesseract is tuned for, instead of a noisy color photo.
   function preprocessForOCR(file, { maxDim = 2200, minDim = 1000 } = {}){
     return new Promise((resolve) => {
       const img = new Image();
@@ -4598,7 +4776,6 @@
           const n = w * h;
           const gray = new Uint8ClampedArray(n);
 
-          // Grayscale (luminosity-weighted) + track min/max for contrast stretch.
           let lo = 255, hi = 0;
           for(let i = 0, p = 0; i < n; i++, p += 4){
             const g = 0.299 * px[p] + 0.587 * px[p+1] + 0.114 * px[p+2];
@@ -4612,23 +4789,16 @@
             stretched[i] = ((gray[i] - lo) / range) * 255;
           }
 
-          // Fast box-blur (two-pass) to approximate a local mean per
-          // pixel — this is the "adaptive" part of the threshold.
           const radius = Math.max(8, Math.round(Math.min(w, h) * 0.02));
           const blurred = boxBlur(stretched, w, h, radius);
 
-          // A pixel is text (black) if it's noticeably darker than its
-          // local neighborhood average; otherwise it's background (white).
-          const bias = 12; // small tolerance so flat regions stay white
+          const bias = 12; 
           for(let i = 0, p = 0; i < n; i++, p += 4){
             const v = stretched[i] < (blurred[i] - bias) ? 0 : 255;
             px[p] = px[p+1] = px[p+2] = v;
           }
           ctx.putImageData(imgData, 0, 0);
         }catch(e){
-          // getImageData can fail on some browsers for cross-origin/edge
-          // cases — fall back to the plain resized (color) image rather
-          // than blocking the scan entirely.
         }
 
         canvas.toBlob(blob => resolve(blob || file), 'image/png');
@@ -4638,7 +4808,6 @@
     });
   }
 
-  // Simple separable box blur used for local-mean thresholding above.
   function boxBlur(src, w, h, radius){
     const tmp = new Float32Array(w * h);
     const out = new Float32Array(w * h);
@@ -4682,12 +4851,6 @@
       const scannable = await preprocessForOCR(file);
       ocrStatusText.textContent = 'Loading scanner…';
       await loadTesseract();
-      // PSM 4 = "single column of text of variable sizes" — fits a
-      // printed class list (one entry per line, ragged widths) better
-      // than the default "fully automatic" mode, which sometimes
-      // fragments a list into separate blocks and drops lines. PSM 6 =
-      // "uniform block of text" — fits a single ID card/record, which is
-      // usually a tight, uniform cluster of lines.
       const psm = mode === 'student-bulk' ? '4' : '6';
       const result = await window.Tesseract.recognize(scannable, 'eng', {
         tessedit_pageseg_mode: psm,
@@ -4699,9 +4862,6 @@
       });
       let text = result.data.text || '';
 
-      // If the tuned PSM came back empty (can happen on layouts it
-      // doesn't expect), fall back to Tesseract's automatic mode once
-      // before giving up, using the same cleaned-up image.
       if(!text.trim()){
         ocrStatusText.textContent = 'Retrying with a different mode…';
         const retry = await window.Tesseract.recognize(scannable, 'eng', {
@@ -4743,7 +4903,6 @@
     }
   });
 
-  // ---- bulk review table (class list) ----
   let bulkRowCount = 0;
   function openBulkReview(rows){
     bulkReviewRows.innerHTML = '';
@@ -4805,7 +4964,6 @@
     showToast(msg);
   });
 
-  // ---------- Export data ----------
   const exportModalOverlay = document.getElementById('exportModalOverlay');
   const exportText = document.getElementById('exportText');
 
@@ -4841,7 +4999,6 @@
     }
   });
 
-  // ---------- Shared backup payload builder (used by manual download AND Drive sync) ----------
   function buildBackupPayload(){
     let branding = null;
     try{ branding = JSON.parse(safeGetItem(BRAND_KEY) || 'null'); }catch(err){}
@@ -4855,7 +5012,6 @@
     };
   }
 
-  // ---------- Backup download (.json) ----------
   document.getElementById('downloadBackupBtn').addEventListener('click', () => {
     const payload = buildBackupPayload();
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -4870,493 +5026,8 @@
     showToast('Backup downloaded');
   });
 
-  // ---------- Shared import-merge logic (used by manual file import AND Drive sync) ----------
-  // Adds students/teachers from a parsed backup object, skipping duplicates
-  // by ID. Returns a summary object; does NOT close the modal or re-render
-  // by itself so callers (file import vs Drive load) can decide when to.
   function mergeImportedBackup(data){
     const importedStudents = Array.isArray(data.students) ? data.students : [];
     const importedTeachers = Array.isArray(data.teachers) ? data.teachers : [];
 
-    let addedStudents = 0, skippedStudents = 0;
-    importedStudents.forEach(s => {
-      if(!s || !s.id || !s.name) return;
-      if(students.some(existing => existing.id.toLowerCase() === String(s.id).toLowerCase())){ skippedStudents++; return; }
-      students.push(s);
-      addedStudents++;
-    });
-
-    let addedTeachers = 0, skippedTeachers = 0;
-    importedTeachers.forEach(t => {
-      if(!t || !t.id || !t.name) return;
-      if(teachers.some(existing => existing.id.toLowerCase() === String(t.id).toLowerCase())){ skippedTeachers++; return; }
-      teachers.push(t);
-      addedTeachers++;
-    });
-
-    let brandingImported = false;
-    if(data.branding && (data.branding.logo || data.branding.title || data.branding.description)){
-      saveBrandingToStorage(data.branding);
-      applyBranding(data.branding);
-      brandingImported = true;
-    }
-
-    mergeActivityLog(data.activityLog);
-
-    if(addedStudents > 0 || addedTeachers > 0){
-      rebuildTeacherById();
-      saveData();
-      refreshDropdowns();
-      logActivity('Imported backup', `${addedStudents} student(s), ${addedTeachers} teacher(s)`);
-    }
-
-    const parts = [];
-    if(addedStudents > 0) parts.push(`${addedStudents} student${addedStudents === 1 ? '' : 's'}`);
-    if(addedTeachers > 0) parts.push(`${addedTeachers} teacher${addedTeachers === 1 ? '' : 's'}`);
-    let message = parts.length ? `Imported ${parts.join(' & ')}` : 'Nothing new to import';
-    const skippedTotal = skippedStudents + skippedTeachers;
-    if(skippedTotal > 0) message += ` — skipped ${skippedTotal} duplicate${skippedTotal === 1 ? '' : 's'}`;
-    if(brandingImported) message += ' · logo/title restored';
-
-    return { addedStudents, addedTeachers, skippedStudents, skippedTeachers, brandingImported, message };
-  }
-
-  // ---------- Backup import (.json) ----------
-  const importFileInput = document.getElementById('importFileInput');
-  document.getElementById('importBackupBtn').addEventListener('click', () => {
-    importFileInput.value = '';
-    importFileInput.click();
-  });
-
-  importFileInput.addEventListener('change', () => {
-    const file = importFileInput.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      let data;
-      try{ data = JSON.parse(reader.result); }
-      catch(err){ showToast('That file is not a valid backup (bad JSON)'); return; }
-
-      const result = mergeImportedBackup(data);
-
-      exportModalOverlay.classList.remove('show');
-      view = 'list';
-      render();
-      showToast(result.message);
-    };
-    reader.onerror = () => showToast('Could not read that file');
-    reader.readAsText(file);
-  });
-
-  // ---------- Google Drive sync ----------
-  // Uses Google Identity Services for sign-in and the Drive API's hidden
-  // "appDataFolder" space to store one backup file per Google account —
-  // that folder isn't visible in the account's regular Drive, it's just
-  // storage for this app. Reuses buildBackupPayload() / mergeImportedBackup()
-  // above so Drive sync behaves exactly like the manual download/import.
-  const gdriveBox = document.getElementById('gdriveBox');
-  const gdriveStatus = document.getElementById('gdriveStatus');
-  const gdriveActions = document.getElementById('gdriveActions');
-
-  const signinGate = document.getElementById('signinGate');
-  const signinGoogleBtn = document.getElementById('signinGoogleBtn');
-  const signinGuestBtn = document.getElementById('signinGuestBtn');
-  const signinStatus = document.getElementById('signinStatus');
-  const guestBanner = document.getElementById('guestBanner');
-  const guestBannerBackupBtn = document.getElementById('guestBannerBackupBtn');
-  const guestBannerSigninBtn = document.getElementById('guestBannerSigninBtn');
-  const accountChipDot = document.getElementById('accountChipDot');
-  const accountChipLabel = document.getElementById('accountChipLabel');
-  const accountMenu = document.getElementById('accountMenu');
-  const accountMenuNote = document.getElementById('accountMenuNote');
-  const accountSwitchBtn = document.getElementById('accountSwitchBtn');
-  const accountSignOutBtn = document.getElementById('accountSignOutBtn');
-
-  const SKIP_SIGNIN_KEY = 'rollRegister_skipSignIn';
-  const HAD_SIGNED_IN_KEY = 'rollRegister_hadSignedIn'; // just a flag: "this browser has granted Google access before" — never holds the token itself
-  const isGuestMode = () => isGoogleConfigured && !gapiToken && safeGetItem(SKIP_SIGNIN_KEY) === '1';
-
-  let gapiToken = null;       // current OAuth access token (memory only)
-  let gdriveEmail = null;
-  let gdriveFileId = null;    // cached Drive file ID for the backup file
-  let gisLoadPromise = null;
-  let lastDriveSyncAt = null;
-
-  const isGoogleConfigured = GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('YOUR_CLIENT_ID');
-  if(!isGoogleConfigured){
-    // Hide the whole box until a real Client ID is set, rather than show
-    // a button that can only fail — see the GOOGLE_CLIENT_ID comment above.
-    gdriveBox.style.display = 'none';
-  } else {
-    accountChip.style.display = '';
-    // Show the sign-in gate on load unless this browser previously chose
-    // "Continue as Guest" — re-shown every session isn't the goal, just
-    // enough to offer sign-in without nagging someone who's opted out.
-    if(safeGetItem(HAD_SIGNED_IN_KEY) === '1'){
-      // This browser has signed in before — try to reconnect quietly in
-      // the background instead of making them click through Google's
-      // login screen again. Falls back to the normal gate/banner below
-      // if the browser's Google session has expired or needs interaction.
-      attemptSilentSignIn();
-    } else if(safeGetItem(SKIP_SIGNIN_KEY) !== '1'){
-      signinGate.classList.add('show');
-    } else {
-      guestBanner.style.display = 'flex';
-    }
-  }
-
-  function loadGis(){
-    if(window.google && window.google.accounts && window.google.accounts.oauth2) return Promise.resolve();
-    if(gisLoadPromise) return gisLoadPromise;
-    gisLoadPromise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.onload = resolve;
-      script.onerror = () => reject(new Error('Could not load Google Sign-In — check your internet connection.'));
-      document.head.appendChild(script);
-    });
-    return gisLoadPromise;
-  }
-
-  async function fetchGoogleEmail(token){
-    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if(!res.ok) return null;
-    const data = await res.json();
-    return data.email || null;
-  }
-
-  function formatSyncTime(date){
-    if(!date) return '';
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
-  // Keeps the top-corner account chip in sync with whatever setGdriveUI
-  // just did to the Backup & Import modal — one state, two surfaces.
-  function updateAccountChip(){
-    if(!isGoogleConfigured) return;
-    if(gapiToken){
-      accountChipDot.style.background = '#8fae86';
-      accountChipLabel.textContent = gdriveEmail || 'Connected';
-      accountMenuNote.textContent = lastDriveSyncAt
-        ? `${gdriveEmail || 'Signed in'} · synced ${formatSyncTime(lastDriveSyncAt)}`
-        : (gdriveEmail || 'Signed in');
-      signinGate.classList.remove('show');
-      guestBanner.style.display = 'none';
-    } else if(isGuestMode()){
-      accountChipDot.style.background = '#d8a84e';
-      accountChipLabel.textContent = 'Guest mode';
-      accountMenuNote.textContent = 'Guest mode — not syncing';
-      guestBanner.style.display = 'flex';
-    } else {
-      accountChipDot.style.background = '#b08a8a';
-      accountChipLabel.textContent = 'Sign in';
-      accountMenuNote.textContent = 'Not connected';
-      guestBanner.style.display = 'none';
-    }
-  }
-
-  function setGdriveUI(state){
-    if(state === 'connected'){
-      const base = gdriveEmail ? `Connected as ${gdriveEmail}` : 'Connected';
-      gdriveStatus.textContent = lastDriveSyncAt ? `${base} · synced ${formatSyncTime(lastDriveSyncAt)}` : base;
-      gdriveActions.innerHTML = `
-        <button type="button" class="btn-secondary" id="gdriveSaveBtn">⬆ Save to Drive</button>
-        <button type="button" class="btn-secondary" id="gdriveLoadBtn">⬇ Load from Drive</button>
-        <button type="button" class="btn-secondary" id="gdriveDisconnectBtn">Disconnect</button>
-      `;
-      // Wrapped in arrow functions (not passed directly) so the click
-      // event object doesn't get forwarded as gdriveSave's `silent` arg.
-      document.getElementById('gdriveSaveBtn').addEventListener('click', () => gdriveSave(false));
-      document.getElementById('gdriveLoadBtn').addEventListener('click', () => gdriveLoad());
-      document.getElementById('gdriveDisconnectBtn').addEventListener('click', () => gdriveDisconnect());
-    } else {
-      gdriveStatus.textContent = state === 'connecting' ? 'Connecting…' : 'Not connected';
-      gdriveActions.innerHTML = `<button type="button" class="btn-secondary" id="gdriveConnectBtn">Connect Google account</button>`;
-      document.getElementById('gdriveConnectBtn').addEventListener('click', () => gdriveConnect());
-    }
-    updateAccountChip();
-  }
-
-  async function driveFetch(url, options = {}){
-    const res = await fetch(url, {
-      ...options,
-      headers: { ...(options.headers || {}), Authorization: `Bearer ${gapiToken}` }
-    });
-    if(res.status === 401){ gdriveDisconnect(); throw new Error('Google session expired — please reconnect.'); }
-    return res;
-  }
-
-  async function findBackupFile(){
-    const q = encodeURIComponent(`name='${GOOGLE_BACKUP_FILENAME}' and trashed=false`);
-    const res = await driveFetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,modifiedTime)`);
-    const data = await res.json();
-    return (data.files && data.files[0]) || null;
-  }
-
-  async function gdriveSave(silent){
-    try{
-      gdriveStatus.textContent = silent ? 'Syncing…' : 'Saving…';
-      const payload = buildBackupPayload();
-      const body = JSON.stringify(payload, null, 2);
-
-      if(!gdriveFileId){
-        const existing = await findBackupFile();
-        if(existing) gdriveFileId = existing.id;
-      }
-
-      let res;
-      if(gdriveFileId){
-        res = await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${gdriveFileId}?uploadType=media`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body
-        });
-      } else {
-        const metadata = { name: GOOGLE_BACKUP_FILENAME, parents: ['appDataFolder'] };
-        const form = new FormData();
-        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        form.append('file', new Blob([body], { type: 'application/json' }));
-        res = await driveFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
-          method: 'POST',
-          body: form
-        });
-        const created = await res.json();
-        gdriveFileId = created.id;
-      }
-      if(!res.ok) throw new Error('Drive save failed');
-      lastDriveSyncAt = new Date();
-      setGdriveUI('connected');
-      if(!silent) showToast('Saved to Google Drive');
-    }catch(err){
-      setGdriveUI('connected');
-      // Auto-saves fail quietly in the status line rather than popping a
-      // toast on every keystroke-adjacent change — manual saves still get
-      // an explicit toast since the user is waiting on that click.
-      if(silent){ gdriveStatus.textContent = 'Auto-sync failed — click Save to Drive to retry'; }
-      else showToast(err.message || 'Could not save to Drive');
-    }
-  }
-
-  // ---------- Drive auto-save ----------
-  // Debounced so rapid edits (e.g. typing in a field, adding several rows)
-  // collapse into one Drive write a couple seconds after things go quiet,
-  // instead of firing a request per keystroke.
-  let driveAutoSaveTimer = null;
-  function scheduleDriveAutoSave(){
-    if(!isGoogleConfigured || !gapiToken) return;
-    if(driveAutoSaveTimer) clearTimeout(driveAutoSaveTimer);
-    driveAutoSaveTimer = setTimeout(() => { gdriveSave(true); }, 2000);
-  }
-
-  async function gdriveLoad(){
-    try{
-      gdriveStatus.textContent = 'Loading…';
-      const existing = await findBackupFile();
-      if(!existing){ setGdriveUI('connected'); showToast('No backup found in this Google account yet'); return; }
-      gdriveFileId = existing.id;
-      const res = await driveFetch(`https://www.googleapis.com/drive/v3/files/${gdriveFileId}?alt=media`);
-      if(!res.ok) throw new Error('Drive load failed');
-      const data = await res.json();
-      const result = mergeImportedBackup(data);
-      setGdriveUI('connected');
-      exportModalOverlay.classList.remove('show');
-      view = 'list';
-      render();
-      showToast(result.message);
-    }catch(err){
-      setGdriveUI('connected');
-      showToast(err.message || 'Could not load from Drive');
-    }
-  }
-
-  function gdriveDisconnect(){
-    if(driveAutoSaveTimer){ clearTimeout(driveAutoSaveTimer); driveAutoSaveTimer = null; }
-    if(gapiToken && window.google) window.google.accounts.oauth2.revoke(gapiToken, () => {});
-    gapiToken = null;
-    gdriveEmail = null;
-    gdriveFileId = null;
-    lastDriveSyncAt = null;
-    setGdriveUI('disconnected');
-    showToast('Disconnected from Google');
-  }
-
-  async function gdriveConnect(selectAccount, silent){
-    try{
-      if(!silent){
-        setGdriveUI('connecting');
-        if(signinStatus) signinStatus.textContent = 'Connecting…';
-      }
-      await loadGis();
-      const tokenClient = window.google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: `${GOOGLE_DRIVE_SCOPE} ${GOOGLE_EMAIL_SCOPE}`,
-        callback: async (resp) => {
-          if(resp.error){
-            if(silent){
-              // The quiet background reconnect didn't work (session expired,
-              // third-party cookies blocked, etc.) — just fall back to the
-              // normal gate/banner instead of bothering anyone with an error.
-              if(safeGetItem(SKIP_SIGNIN_KEY) === '1'){
-                guestBanner.style.display = 'flex';
-              } else {
-                signinGate.classList.add('show');
-              }
-              updateAccountChip();
-              return;
-            }
-            setGdriveUI('disconnected');
-            if(signinStatus) signinStatus.textContent = '';
-            showToast('Google sign-in was cancelled or failed');
-            return;
-          }
-          gapiToken = resp.access_token;
-          try{ gdriveEmail = await fetchGoogleEmail(gapiToken); }catch(err){ gdriveEmail = null; }
-          safeSetItem(HAD_SIGNED_IN_KEY, '1');
-          setGdriveUI('connected');
-          if(signinStatus) signinStatus.textContent = '';
-          logActivity('Signed in', gdriveEmail || '');
-          await initialDriveSync();
-        }
-      });
-      // select_account forces Google's account chooser even if this browser
-      // already has a granted session — used when switching accounts so the
-      // same account doesn't just get silently reselected. Silent reconnect
-      // uses prompt: '' — Google issues a fresh token with no UI at all if
-      // this browser already granted access and still has a live session.
-      tokenClient.requestAccessToken(selectAccount ? { prompt: 'select_account' } : (silent ? { prompt: '' } : {}));
-    }catch(err){
-      if(silent) return; // stay quiet on background failures — leave the normal gate/banner as-is
-      setGdriveUI('disconnected');
-      if(signinStatus) signinStatus.textContent = '';
-      showToast(err.message || 'Could not start Google sign-in');
-    }
-  }
-
-  // Tried automatically on page load when this browser has signed in
-  // before, so opening the site doesn't require clicking through Google's
-  // login screen every single time.
-  function attemptSilentSignIn(){
-    gdriveConnect(false, true);
-  }
-
-  // Switches to a different Google account on this device. Local
-  // students/teachers are cleared first (branding is left alone — that's
-  // treated as this device/school's look, not per-account data) so the
-  // account we switch TO can't get contaminated by whatever the previous
-  // account's data was; initialDriveSync() then either pulls that account's
-  // existing backup in, or starts a fresh one if it has none yet.
-  async function switchAccount(){
-    const proceed = confirm('Switch Google account? This device will show the selected account\'s own data. Anything not yet synced from the current account will be saved first.');
-    if(!proceed) return;
-
-    if(gapiToken){
-      await gdriveSave(true).catch(() => {}); // best-effort flush before leaving this account
-      if(window.google) window.google.accounts.oauth2.revoke(gapiToken, () => {});
-    }
-    if(driveAutoSaveTimer){ clearTimeout(driveAutoSaveTimer); driveAutoSaveTimer = null; }
-    gapiToken = null;
-    gdriveEmail = null;
-    gdriveFileId = null;
-    lastDriveSyncAt = null;
-
-    students.length = 0;
-    teachers.length = 0;
-    rebuildTeacherById();
-    saveData();
-    refreshDropdowns();
-    view = 'list';
-    render();
-
-    setGdriveUI('disconnected');
-    await gdriveConnect(true);
-  }
-
-  signinGoogleBtn.addEventListener('click', () => gdriveConnect(false));
-  signinGuestBtn.addEventListener('click', () => {
-    safeSetItem(SKIP_SIGNIN_KEY, '1');
-    signinGate.classList.remove('show');
-    guestBanner.style.display = 'flex';
-    updateAccountChip();
-  });
-  guestBannerBackupBtn.addEventListener('click', () => {
-    exportText.value = buildExportCode();
-    exportModalOverlay.classList.add('show');
-  });
-  guestBannerSigninBtn.addEventListener('click', () => gdriveConnect(false));
-  accountSwitchBtn.addEventListener('click', () => {
-    accountChip.classList.remove('open');
-    switchAccount();
-  });
-  accountSignOutBtn.addEventListener('click', () => {
-    accountChip.classList.remove('open');
-    gdriveDisconnect();
-    // An explicit sign-out is a deliberate choice, unlike a fresh page load —
-    // so re-offer the gate immediately regardless of any earlier guest choice,
-    // and stop trying to silently reconnect on future loads.
-    safeRemoveItem(SKIP_SIGNIN_KEY);
-    safeRemoveItem(HAD_SIGNED_IN_KEY);
-    signinGate.classList.add('show');
-    guestBanner.style.display = 'none';
-  });
-
-  // Runs once right after connecting, before auto-save takes over. If a
-  // backup already exists on Drive (e.g. this is a second device), pull it
-  // in first — merging is additive/skip-duplicate, so it can't erase
-  // anything local. Only pushes local data as a fresh backup if Drive has
-  // none yet, so a first-time connect from an empty browser can't stomp on
-  // an existing roster.
-  async function initialDriveSync(){
-    try{
-      const existing = await findBackupFile();
-      if(existing){
-        gdriveFileId = existing.id;
-        const res = await driveFetch(`https://www.googleapis.com/drive/v3/files/${gdriveFileId}?alt=media`);
-        if(res.ok){
-          const data = await res.json();
-          const result = mergeImportedBackup(data);
-          lastDriveSyncAt = new Date();
-          setGdriveUI('connected');
-          showToast(`Connected to Google Drive — ${result.message.toLowerCase()}`);
-          return;
-        }
-      }
-      await gdriveSave(true);
-      showToast('Connected to Google Drive — this device\'s data is now the starting backup');
-    }catch(err){
-      showToast('Connected, but the initial sync failed — try Save/Load from Drive manually');
-    }
-  }
-
-  if(isGoogleConfigured) setGdriveUI('disconnected');
-
-  render();
-
-  if('serviceWorker' in navigator){
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js').then(reg => {
-        // If a new service worker takes over control (i.e. a new version was
-        // just deployed and activated), the old cached JS for this page is
-        // stale — reload once to pick up the new index.html cleanly. The
-        // guard avoids reloading on the very first-ever install.
-        let refreshed = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if(refreshed) return;
-          refreshed = true;
-          window.location.reload();
-        });
-
-        // Ask the browser to check for a newer service-worker.js whenever
-        // this tab regains focus — covers the "left a tab open for days"
-        // case, since otherwise updates are only checked on navigation.
-        document.addEventListener('visibilitychange', () => {
-          if(document.visibilityState === 'visible') reg.update().catch(() => {});
-        });
-      }).catch(() => {});
-    });
-  }
-</script>
-
-</body>
-</html>
+    let addedStudents = 0, skippedStudents = I seem to be encountering an error. Can I try something else for you?
