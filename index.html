@@ -5030,4 +5030,107 @@
     const importedStudents = Array.isArray(data.students) ? data.students : [];
     const importedTeachers = Array.isArray(data.teachers) ? data.teachers : [];
 
-    let addedStudents = 0, skippedStudents = I seem to be encountering an error. Can I try something else for you?
+   let addedStudents = 0, skippedStudents = 0, addedTeachers = 0, skippedTeachers = 0;
+
+    importedTeachers.forEach(t => {
+      if(!t || !t.id) return;
+      if(teachers.some(tc => tc.id.toLowerCase() === t.id.toLowerCase())){
+        skippedTeachers++; return;
+      }
+      teachers.push(t);
+      addedTeachers++;
+    });
+    rebuildTeacherById();
+
+    importedStudents.forEach(s => {
+      if(!s || !s.id) return;
+      if(students.some(st => st.id.toLowerCase() === s.id.toLowerCase())){
+        skippedStudents++; return;
+      }
+      students.push(s);
+      addedStudents++;
+    });
+
+    if(data.branding && typeof applyBranding === 'function' && typeof saveBrandingToStorage === 'function'){
+       saveBrandingToStorage(data.branding);
+       applyBranding(data.branding);
+    }
+
+    if(data.activityLog && Array.isArray(data.activityLog)){
+       mergeActivityLog(data.activityLog);
+    }
+
+    saveData();
+    refreshDropdowns();
+    render();
+
+    let msg = [];
+    if(addedStudents > 0) msg.push(`Added ${addedStudents} student(s)`);
+    if(addedTeachers > 0) msg.push(`Added ${addedTeachers} teacher(s)`);
+    if(skippedStudents > 0 || skippedTeachers > 0) msg.push(`Skipped ${skippedStudents + skippedTeachers} duplicates`);
+    if(msg.length === 0) msg.push('Nothing new to import');
+    showToast(msg.join(' · '));
+  }
+
+  document.getElementById('importBackupBtn').addEventListener('click', () => {
+    document.getElementById('importFileInput').click();
+  });
+
+  document.getElementById('importFileInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try{
+        const data = JSON.parse(ev.target.result);
+        if(data.type !== 'roll-and-register-backup'){
+          showToast('Invalid backup file format');
+          return;
+        }
+        mergeImportedBackup(data);
+        exportModalOverlay.classList.remove('show');
+        e.target.value = '';
+      }catch(err){
+        showToast('Could not read backup file');
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // ---------- Initialization & Guest mode logic ----------
+  const signinGate = document.getElementById('signinGate');
+  const guestBanner = document.getElementById('guestBanner');
+  const guestBannerBackupBtn = document.getElementById('guestBannerBackupBtn');
+  const guestBannerSigninBtn = document.getElementById('guestBannerSigninBtn');
+  let isGuestMode = safeGetItem('rr_guest_mode') === 'true';
+
+  document.getElementById('signinGuestBtn').addEventListener('click', () => {
+    isGuestMode = true;
+    safeSetItem('rr_guest_mode', 'true');
+    signinGate.classList.remove('show');
+    guestBanner.style.display = 'flex';
+    logActivity('Signed in as Guest', '');
+    render();
+  });
+
+  if(guestBannerBackupBtn) guestBannerBackupBtn.addEventListener('click', () => {
+    exportModalOverlay.classList.add('show');
+  });
+
+  if(guestBannerSigninBtn) guestBannerSigninBtn.addEventListener('click', () => {
+     safeRemoveItem('rr_guest_mode');
+     location.reload();
+  });
+
+  // Placeholder for Google Drive Sync stub so UI doesn't crash if called
+  let gapiToken = null;
+  let gdriveEmail = null;
+  function gdriveConnect(interactive){}
+  function scheduleDriveAutoSave(){}
+
+  // Start the application
+  render();
+
+</script>
+</body>
+</html>
