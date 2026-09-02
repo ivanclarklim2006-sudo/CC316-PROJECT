@@ -2620,12 +2620,28 @@
 
   // ---------- Admin / Teacher Role Sync ----------
   const roleSelector = document.getElementById('roleSelector');
-  let currentRole = safeGetItem('rr_role') || 'admin';
+  // Default to teacher on first load for safety, unless they previously unlocked admin
+  let currentRole = safeGetItem('rr_role') || 'teacher'; 
   roleSelector.value = currentRole;
   document.body.setAttribute('data-role', currentRole);
 
   roleSelector.addEventListener('change', (e) => {
-    currentRole = e.target.value;
+    const selectedRole = e.target.value;
+
+    // Check password if trying to switch to Admin
+    if (selectedRole === 'admin') {
+      const password = prompt("Enter Admin Password:");
+      
+      if (password !== "0000") {
+        alert("Incorrect password.");
+        // Revert dropdown back to teacher
+        roleSelector.value = 'teacher';
+        return; 
+      }
+    }
+
+    // If password is correct (or switching to teacher), apply the change
+    currentRole = selectedRole;
     safeSetItem('rr_role', currentRole);
     document.body.setAttribute('data-role', currentRole);
     render(); 
