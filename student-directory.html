@@ -70,6 +70,10 @@
   html[data-theme="dark"] .school-logo{
     background:rgba(237,232,216,0.06);
   }
+  /* ---------- Dark mode: --green is kept dark on purpose (it's also
+     used as a background), so anywhere it's used as *text* on top of
+     a dark surface needs to swap to --brass instead, or it goes
+     dark-on-dark and disappears. ---------- */
   html[data-theme="dark"] .scan-btn{ color:var(--brass); border-color:var(--brass); }
   html[data-theme="dark"] .sort-btn{ color:var(--brass); border-color:var(--brass); }
   html[data-theme="dark"] .link-btn{ color:var(--brass); }
@@ -92,11 +96,6 @@
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
   }
 
-  /* Admin/Teacher Role Hiding */
-  body[data-role="teacher"] .admin-only {
-    display: none !important;
-  }
-
   header{
     background:var(--green);
     color:var(--cream);
@@ -117,28 +116,29 @@
     display:flex;
     justify-content:space-between;
     align-items:flex-start;
-    gap:1.2rem;
+    gap:1rem;
     flex-wrap:wrap;
-    position:relative;
   }
   .header-text{ flex:1; min-width:220px; }
 
+  .header-brand-row{
+    display:flex;
+    align-items:center;
+    gap:1.2rem;
+  }
+  .header-brand-row.logo-right{ flex-direction:row-reverse; }
+  .header-text-col{ flex:1; min-width:0; }
+
   .school-logo{
-    position:absolute;
-    top:0;
-    left:0;
-    width:var(--logo-size, 76px); height:var(--logo-size, 76px);
+    width:76px; height:76px;
     border-radius:14px;
     object-fit:cover;
     border:2px solid var(--brass);
     background:rgba(244,238,221,0.08);
+    flex-shrink:0;
     display:none;
   }
   .school-logo.show{ display:block; }
-  .school-logo.logo-right{ left:auto; right:0; }
-
-  .header-top.has-logo-left{ padding-left:calc(140px + 1.3rem); }
-  .header-top.has-logo-right{ padding-right:calc(140px + 1.3rem); }
 
   .header-actions{
     display:flex;
@@ -167,18 +167,6 @@
     white-space:nowrap;
   }
   .customize-btn:hover{ background:rgba(244,238,221,0.1); border-color:var(--cream); }
-
-  .role-selector {
-    appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%23F4EEDD'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 0.7rem center;
-    padding-right: 1.8rem;
-  }
-  .role-selector option {
-    background: var(--paper);
-    color: var(--ink);
-  }
 
   .logo-upload-row{
     display:flex;
@@ -211,42 +199,6 @@
   }
   .file-btn:hover{ border-color:var(--brass); }
   .logo-hint{ font-size:0.74rem; color:var(--ink-soft); }
-
-  .logo-size-row{
-    display:flex;
-    align-items:center;
-    gap:0.7rem;
-  }
-  .logo-size-row input[type="range"]{
-    flex:1;
-    accent-color:var(--brass);
-    cursor:pointer;
-  }
-  .logo-size-value{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.78rem;
-    color:var(--ink-soft);
-    min-width:3.2em;
-    text-align:right;
-  }
-  .logo-size-presets{
-    display:flex;
-    gap:0.4rem;
-    margin-top:0.5rem;
-  }
-  .logo-size-preset-btn{
-    background:var(--paper-dark);
-    border:1px solid var(--line);
-    color:var(--ink);
-    border-radius:7px;
-    padding:0.32rem 0.7rem;
-    font-family:'Inter', sans-serif;
-    font-size:0.76rem;
-    cursor:pointer;
-    transition:border-color 0.15s ease, background 0.15s ease;
-  }
-  .logo-size-preset-btn:hover{ border-color:var(--brass); }
-  .logo-size-preset-btn.active{ background:var(--green); border-color:var(--green); color:var(--cream); }
 
   .color-field-row{
     display:flex;
@@ -351,6 +303,7 @@
     margin:0.35rem 0.2rem;
   }
 
+  /* ---------- Sort dropdown (toolbar, next to Section/School year) ---------- */
   .sort-dropdown{ position:relative; flex-shrink:0; }
   .sort-btn{
     background:var(--surface);
@@ -409,6 +362,7 @@
   .sort-option .chk-ic{ width:1em; flex-shrink:0; opacity:0; }
   .sort-option.active .chk-ic{ opacity:1; }
 
+  /* ---------- Dark mode toggle (header nav bar) ---------- */
   .theme-toggle-btn{
     background:rgba(244,238,221,0.1);
     border:1.5px solid var(--brass);
@@ -426,6 +380,7 @@
   }
   .theme-toggle-btn:hover{ background:rgba(244,238,221,0.18); }
 
+  /* ---------- Account chip (top-corner Google account switcher) ---------- */
   .account-chip{ position:relative; flex-shrink:0; }
   .account-chip-btn{
     background:rgba(244,238,221,0.1);
@@ -494,6 +449,7 @@
     border:none; border-top:1px dashed var(--line); margin:0.3rem 0.2rem;
   }
 
+  /* ---------- Sign-in gate (shown on load until connected) ---------- */
   .signin-gate{
     display:none;
     position:fixed; inset:0;
@@ -1023,23 +979,6 @@
   .field{
     margin-bottom:0.9rem;
   }
-  .record-section{
-    border:1.5px dashed var(--line);
-    border-radius:9px;
-    padding:0.9rem 0.9rem 0.2rem;
-    margin:0.2rem 0 1.1rem;
-  }
-  .record-section-label{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.76rem;
-    letter-spacing:0.03em;
-    color:var(--ink);
-    padding:0 0 0.2rem;
-    margin:0 0 0.7rem;
-    border-bottom:1px solid var(--line);
-  }
-  .record-section .field-row,
-  .record-section .field:last-child{ margin-top:0.8rem; }
   .field label{
     display:block;
     font-family:'IBM Plex Mono', monospace;
@@ -1066,12 +1005,6 @@
   .field-row .field{ flex:1; }
   .field .optional-tag{ color:var(--ink-soft); text-transform:none; letter-spacing:0; font-family:'Inter',sans-serif; font-size:0.72rem; }
 
-  /* Birth Cert Image Custom Styles */
-  .bc-preview-wrap { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
-  .bc-img { max-width: 140px; max-height: 140px; object-fit: cover; border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
-  .bc-img:hover { transform: scale(1.02); border-color: var(--brass); }
-  .bc-display-row { display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap; }
-  
   .subject-rows{ margin-bottom:0.6rem; }
   .subject-row{
     display:flex;
@@ -1165,7 +1098,7 @@
     position:fixed;
     bottom:1.5rem; left:50%;
     transform:translateX(-50%) translateY(20px);
-    background:var(--green);
+    background:var(--ink);
     color:var(--cream);
     font-family:'IBM Plex Mono', monospace;
     font-size:0.82rem;
@@ -1409,14 +1342,12 @@
   }
   .icon-del:hover{ color:var(--stamp); background:rgba(162,62,48,0.08); }
   .icon-edit:hover{ color:var(--green); background:rgba(31,59,46,0.08); }
-  .icon-share:hover{ color:var(--brass); background:rgba(184,134,60,0.08); }
-  html[data-theme="dark"] .icon-share:hover{ color:var(--brass); background:rgba(237,232,216,0.08); }
 
   .selection-bar{
     display:none;
     align-items:center;
     justify-content:space-between;
-    background:var(--green);
+    background:var(--ink);
     color:var(--cream);
     border-radius:10px;
     padding:0.7rem 1rem;
@@ -1613,260 +1544,6 @@
   }
 
   .timeline{ list-style:none; margin:0; padding:0; }
-  .activity-log-list{
-    max-height:min(50vh, 420px);
-    overflow-y:auto;
-    margin:0.3rem 0 1rem;
-  }
-  .activity-log-empty{
-    color:var(--ink-soft);
-    font-size:0.85rem;
-    padding:1.2rem 0;
-    text-align:center;
-  }
-  .activity-log-entry{
-    padding:0.6rem 0;
-    border-top:1px dashed var(--line);
-  }
-  .activity-log-entry:first-child{ border-top:none; }
-  .activity-log-entry .al-top{
-    display:flex;
-    justify-content:space-between;
-    gap:0.6rem;
-    align-items:baseline;
-  }
-  .activity-log-entry .al-action{
-    font-weight:600;
-    font-size:0.88rem;
-    color:var(--ink);
-  }
-  .activity-log-entry .al-when{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.7rem;
-    color:var(--ink-soft);
-    white-space:nowrap;
-  }
-  .activity-log-entry .al-detail{
-    font-size:0.82rem;
-    color:var(--ink-soft);
-    margin-top:0.15rem;
-  }
-  .activity-log-entry .al-actor{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.68rem;
-    color:var(--brass);
-    margin-top:0.2rem;
-    display:inline-block;
-  }
-  .record-details-view{
-    list-style:none;
-    margin:0 0 0.2rem;
-    padding:0;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:0.3rem 1rem;
-  }
-  .record-details-view li{
-    font-size:0.84rem;
-    color:var(--ink);
-    display:flex;
-    justify-content:space-between;
-    gap:0.5rem;
-    border-bottom:1px dashed var(--line);
-    padding-bottom:0.25rem;
-  }
-  .record-details-view li span{ color:var(--ink-soft); }
-  @media (max-width:520px){ .record-details-view{ grid-template-columns:1fr; } }
-
-  /* ---------- Share sheet (SF10) & SF9 templates ---------- */
-  .share-sheet{
-    background:#fff;
-    color:#1a1a1a;
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:1.6rem 1.7rem;
-    font-family:'Inter', sans-serif;
-    font-size:0.82rem;
-    max-height:60vh;
-    overflow-y:auto;
-  }
-  .ss-topline{ display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
-  .ss-formcode{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:#333; white-space:nowrap; font-weight: bold; }
-  .ss-lrn-box{
-    border:1.5px solid #1a1a1a;
-    border-radius:4px;
-    padding:0.3rem 0.6rem;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.68rem;
-    white-space:nowrap;
-  }
-  .ss-lrn-box b{ display:block; font-size:0.86rem; margin-top:0.1rem; }
-  .ss-head-text{ text-align:center; border-bottom:2px solid #1a1a1a; padding-bottom:0.7rem; margin:0.1rem 0 1rem; }
-  .ss-head-text .ss-republic, .ss-head-text .ss-dept, .ss-head-text .ss-region{ font-size:0.78rem; margin:0; }
-  .ss-head-text .ss-title{ font-size:1rem; font-weight:700; letter-spacing:0.02em; margin:0.3rem 0 0; text-transform:uppercase; }
-
-  .ss-nameline{ display:flex; align-items:baseline; gap:0.4rem; border-bottom:1px solid #999; padding-bottom:0.15rem; margin-bottom:0.15rem; }
-  .ss-nameline-label{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.04em; color:#666; white-space:nowrap; }
-  .ss-nameline-value{ font-size:0.9rem; flex:1; }
-  .ss-name-captions{ display:flex; gap:2.2rem; margin-bottom:0.6rem; }
-  .ss-name-captions span{ font-size:0.58rem; text-transform:uppercase; letter-spacing:0.03em; color:#888; }
-
-  .ss-row{ display:flex; flex-wrap:wrap; gap:0 1.2rem; margin-bottom:0.55rem; font-size:0.84rem; }
-  .ss-field{ flex:1; min-width:140px; border-bottom:1px solid #999; padding-bottom:0.15rem; }
-  .ss-field .ss-label{ display:block; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.04em; color:#666; }
-  .ss-field .ss-value{ font-size:0.86rem; }
-
-  .ss-section-title{
-    font-weight:700;
-    font-size:0.82rem;
-    text-align:center;
-    text-transform:uppercase;
-    letter-spacing:0.03em;
-    margin:1.3rem 0 0.7rem;
-    padding:0.3rem 0;
-    border-top:1.5px solid #1a1a1a;
-    border-bottom:1.5px solid #1a1a1a;
-  }
-  
-  /* Shared Print Tables */
-  .ss-table{ width:100%; border-collapse:collapse; font-size:0.74rem; margin-bottom:0.6rem; }
-  .ss-table th, .ss-table td{ border:1px solid #999; padding:0.3rem 0.4rem; text-align:left; }
-  .ss-table th{ background:#f0f0f0; font-size:0.64rem; text-transform:uppercase; letter-spacing:0.02em; text-align:center; }
-  .ss-table td.ss-num, .ss-table th.ss-num{ text-align:center; width:2.1rem; }
-  
-  /* SF9 Specific Additions */
-  .sf9-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .sf9-section-header { font-weight: 700; font-size: 0.8rem; background: #e0e0e0; padding: 4px; text-align: center; border: 1px solid #1a1a1a; text-transform: uppercase; }
-  .sf9-school-info { text-align: center; font-size: 0.75rem; margin-bottom: 1rem; }
-  .sf9-student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.75rem; }
-  .sf9-student-info div { border-bottom: 1px solid #666; padding-bottom: 2px; }
-  .sf9-student-info span { font-weight: 700; }
-  .sf9-sign-area { display: flex; justify-content: space-around; margin-top: 1.5rem; }
-  .sf9-sign-box { text-align: center; font-size: 0.75rem; width: 40%; }
-  .sf9-sign-box div { border-top: 1px solid #1a1a1a; padding-top: 2px; }
-
-  .ss-progress-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 1.2rem; }
-  .ss-grade-cell{ margin-bottom:1rem; break-inside:avoid; page-break-inside:avoid; }
-  .ss-grade-cell .ss-grade-heading{ font-size:0.74rem; font-weight:700; margin:0 0 0.2rem; }
-  .ss-grade-cell .ss-grade-sub{ font-size:0.68rem; color:#666; margin:0 0 0.35rem; }
-  .ss-genavg-row td{ font-weight:700; }
-  .ss-genavg-row td.ss-genavg-label{ text-align:right; }
-  .ss-eligible-line{ font-size:0.72rem; color:#333; margin:-0.1rem 0 0; }
-
-  .ss-corevalues-wrap{ break-inside:avoid; page-break-inside:avoid; margin-bottom:0.6rem; }
-  .ss-corevalues-wrap + .ss-corevalues-wrap{ margin-top:0.9rem; }
-  .ss-corevalues-table th, .ss-corevalues-table td{ font-size:0.68rem; }
-  .ss-corevalues-table td:nth-child(2){ min-width:160px; }
-  .ss-legend{
-    display:flex;
-    flex-wrap:wrap;
-    gap:0.3rem 1.1rem;
-    font-size:0.68rem;
-    color:#444;
-    margin:0.4rem 0 1rem;
-  }
-  .ss-legend b{ font-family:'IBM Plex Mono', monospace; margin-right:0.2rem; }
-
-  .ss-certificate{
-    margin-top:0.4rem;
-    padding-top:0.9rem;
-    border-top:1.5px solid #1a1a1a;
-    font-size:0.82rem;
-    line-height:1.6;
-    break-inside:avoid;
-    page-break-inside:avoid;
-  }
-  .ss-certificate .ss-cert-title{
-    text-align:center;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:0.03em;
-    margin-bottom:0.6rem;
-  }
-  .ss-cert-sign{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    margin-top:2.2rem;
-  }
-  .ss-cert-sign .ss-cert-date-line{ font-size:0.78rem; }
-  .ss-cert-sign .ss-cert-date-line b{ display:inline-block; border-bottom:1px solid #1a1a1a; min-width:140px; padding-bottom:0.1rem; }
-  .ss-cert-sign .ss-cert-principal{ text-align:center; }
-  .ss-cert-sign .ss-cert-principal .ss-sig-line{ border-top:1px solid #1a1a1a; padding-top:0.2rem; min-width:190px; font-size:0.72rem; }
-
-  .ss-footer{
-    display:flex;
-    justify-content:space-between;
-    margin-top:1.1rem;
-    padding-top:0.6rem;
-    border-top:1px dashed #999;
-    font-size:0.64rem;
-    color:#666;
-  }
-  .ss-transferred-note{ font-size:0.76rem; color:#444; margin:-0.1rem 0 0.7rem; }
-
-  @media (max-width:520px){ 
-    .ss-progress-grid{ grid-template-columns:1fr; } 
-    .sf9-two-col { grid-template-columns: 1fr; }
-  }
-
-  /* ---------- Grades & permanent record editor modal ---------- */
-  .gr-tabs{
-    display:flex;
-    flex-wrap:wrap;
-    gap:0.4rem;
-    margin-bottom:1.1rem;
-  }
-  .gr-tab-btn{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.74rem;
-    letter-spacing:0.03em;
-    padding:0.4rem 0.85rem;
-    border-radius:999px;
-    border:1.5px solid var(--line);
-    background:var(--paper-dark);
-    color:var(--ink-soft);
-    cursor:pointer;
-  }
-  .gr-tab-btn.active{ background:var(--green); color:var(--cream); border-color:var(--green); }
-  .gr-table{ width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:1rem; }
-  .gr-table th, .gr-table td{ border:1px solid var(--line); padding:0.35rem 0.4rem; text-align:left; }
-  .gr-table th{ background:var(--paper-dark); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.03em; }
-  .gr-table input[type="number"]{ width:3.4rem; padding:0.2rem; font-size:0.8rem; }
-  .gr-table input, .gr-table select{
-    border:1px solid var(--line);
-    border-radius:5px;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:inherit;
-  }
-  .gr-table select{ padding:0.2rem 0.1rem; font-size:0.74rem; }
-  .gr-final{ font-weight:700; text-align:center; }
-  .gr-core-table td:nth-child(2){ min-width:180px; font-size:0.74rem; }
-  .gr-transfer{
-    border:1.5px dashed var(--line);
-    border-radius:9px;
-    padding:0.8rem 0.9rem 0.2rem;
-    margin-top:1rem;
-  }
-
-  @media print{
-    @page{ size:auto; margin:0; }
-    body > *{ display:none !important; }
-    
-    /* Reveal whichever modal has class .print-active */
-    body > .print-active { display:block !important; position:static !important; background:none !important; padding:0 !important; }
-    .print-active .modal { box-shadow:none !important; border:none !important; max-width:100% !important; padding:0 !important; }
-    .print-active .modal > * { display:none !important; }
-    .print-active .modal > .share-sheet {
-      display:block !important;
-      max-height:none !important; overflow:visible !important;
-      border:none !important;
-      padding:14mm 12mm !important;
-      font-size:0.78rem !important;
-    }
-  }
-
   .timeline li{
     display:flex;
     justify-content:space-between;
@@ -1923,13 +1600,8 @@
     header{ padding:1.9rem 1.1rem 1.7rem; }
     main{ padding:1.5rem 1rem 4.5rem; }
 
-    .header-top{ flex-direction:column; align-items:stretch; padding-left:0 !important; padding-right:0 !important; }
-    .school-logo{
-      position:static;
-      align-self:center;
-      margin-bottom:0.7rem;
-      width:min(var(--logo-size, 76px), 58px); height:min(var(--logo-size, 76px), 58px);
-    }
+    .header-top{ flex-direction:column; align-items:stretch; }
+    .school-logo{ width:58px; height:58px; }
     .header-actions{ width:100%; flex-direction:column; align-items:stretch; }
     .customize-btn{ width:100%; }
     .download-dropdown{ width:100%; }
@@ -1940,6 +1612,9 @@
     .sort-menu{ left:0; right:0; width:100%; min-width:0; }
     .theme-toggle-btn{ width:100%; }
 
+    /* Account chip was capping at 220px, leaving it narrow and
+       left-aligned next to the now full-width Customize/Download
+       buttons above and below it — match their width instead. */
     .account-chip{ width:100%; }
     .account-chip-btn{ width:100%; max-width:none; justify-content:center; }
     .account-menu{ left:0; right:0; width:100%; min-width:0; }
@@ -1965,6 +1640,8 @@
     .onboarding{ padding:2.2rem 0.9rem; }
     .onboarding ol{ padding:1.1rem 1rem 1.1rem 1.9rem; }
 
+    /* Review table becomes a horizontally-scrollable strip so every
+       field stays readable instead of being squeezed into slivers */
     .review-table-wrap{ overflow-x:auto; }
     .review-row{
       grid-template-columns:24px 110px 140px 110px 100px 28px;
@@ -1973,16 +1650,24 @@
     }
     .review-row.header{ position:sticky; top:0; left:0; }
 
+    /* ---------- Sign-in gate & guest mode ---------- */
     .signin-card{ padding:1.7rem 1.3rem 1.4rem; border-radius:14px; }
     .signin-card h2{ font-size:1.3rem; }
     .signin-card .signin-mark{ width:48px; height:48px; font-size:1.1rem; }
     .guest-banner{ font-size:0.72rem; padding:0.55rem 0.8rem; }
 
+    /* ---------- Backup/Drive modal ---------- */
     .gdrive-box{ flex-direction:column; align-items:stretch; }
     .gdrive-actions{ width:100%; }
     .gdrive-actions button{ flex:1; }
 
+    /* ---------- Scan choice buttons — full width, larger tap targets ---------- */
     .scan-choice button{ padding:1rem 1.1rem; }
+
+    /* Larger touch targets throughout — 44px is the accepted minimum
+       comfortable tap size, several buttons were sized for mouse use */
+    .tab-btn, .btn-secondary, .btn-primary, .customize-btn, .download-btn,
+    .account-chip-btn, .scan-btn, .add-btn, .sort-btn, .theme-toggle-btn{ min-height:44px; }
   }
 
   @media (max-width: 400px){
@@ -1991,27 +1676,19 @@
     .profile-card{ padding:1.4rem 1.3rem 1.2rem; }
     .signin-card{ padding:1.4rem 1.1rem 1.2rem; }
   }
-
-  @media (pointer: coarse){
-    .tab-btn, .btn-secondary, .btn-primary, .btn-danger, .btn-ghost,
-    .customize-btn, .download-btn, .account-chip-btn, .scan-btn, .add-btn,
-    .sort-btn, .theme-toggle-btn, .signin-google-btn, .signin-guest-btn,
-    .gr-tab-btn, .name-btn, .role-selector{ min-height:44px; }
-    .icon-del, .icon-edit, .icon-share, .modal-close,
-    .signin-theme-toggle-btn, .back-btn{
-      min-width:44px;
-      min-height:44px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .chk, .chk input{ width:24px; height:24px; }
-  }
 </style>
 </head>
-<body data-role="admin">
+<body>
 
-<!-- Sign-in Gate -->
+<!-- ============================================================
+     SIGN-IN GATE — shown on load until a Google account connects.
+     Hidden entirely if GOOGLE_CLIENT_ID isn't configured (see script
+     below), so the app still works normally during development or
+     if Drive sync is never set up. The "Continue as Guest" button
+     keeps the app usable even if Google sign-in is unavailable
+     (offline, verification pending, no Google account, etc.) — remove
+     it in the script below if you want sign-in to be a hard requirement.
+     ============================================================ -->
 <div class="signin-gate" id="signinGate">
   <div class="signin-card">
     <button class="signin-theme-toggle-btn" id="themeToggleBtnSignin" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
@@ -2032,26 +1709,40 @@
 
 <header>
   <div class="header-inner">
-    <div class="header-top" id="headerTop">
-      <img class="school-logo" id="schoolLogo" alt="School logo">
-
+    <div class="header-top">
       <div class="header-text">
-        <p class="eyebrow" id="brandTitle">School Records // Directory Search</p>
-        <h1 id="brandHeading">Roll &amp; Register</h1>
-        <p class="sub" id="brandDescription">Look up a student by name or LRN to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
+        <div class="header-brand-row" id="headerBrandRow">
+          <!-- School logo, shown only once one is uploaded via Customize -->
+          <img class="school-logo" id="schoolLogo" alt="School logo">
+          <div class="header-text-col">
+            <p class="eyebrow" id="brandTitle">School Records // Directory Search</p>
+            <h1 id="brandHeading">Roll &amp; Register</h1>
+            <p class="sub" id="brandDescription">Look up a student by name or LRN to see their section and adviser — or look up a teacher to see every subject and section they hold.</p>
+          </div>
+        </div>
       </div>
 
       <div class="header-actions">
-        <!-- Admin/Teacher Role Switcher -->
-        <select id="roleSelector" class="customize-btn role-selector">
-          <option value="admin">👑 Admin</option>
-          <option value="teacher">📝 Teacher</option>
-        </select>
+        <!-- ============================================================
+             CUSTOMIZE — lets a school upload their own logo, edit the
+             heading/title/description text, choose colors, and pick
+             which side the logo sits on.
+             ============================================================ -->
+        <button class="customize-btn" id="customizeBtn">🎨 Customize</button>
 
-        <button class="customize-btn" id="activityLogBtn">🕘 Activity</button>
-        <button class="customize-btn admin-only" id="customizeBtn">🎨 Customize</button>
+        <!-- ============================================================
+             DARK MODE — toggles the app's color theme. Remembered
+             per-browser (THEME_KEY in the script below).
+             ============================================================ -->
         <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
 
+        <!-- ============================================================
+             ACCOUNT CHIP — top-corner Google account status/switcher.
+             Hidden until GOOGLE_CLIENT_ID is configured (see script
+             below). Its label/menu are driven by updateAccountChip()
+             in the script, kept in sync with the sign-in gate and the
+             Backup & Import modal's Drive panel.
+             ============================================================ -->
         <div class="account-chip" id="accountChip" style="display:none;">
           <button type="button" class="account-chip-btn" id="accountChipBtn" aria-haspopup="true" aria-expanded="false">
             <span class="acc-dot" id="accountChipDot"></span>
@@ -2065,6 +1756,11 @@
           </div>
         </div>
 
+        <!-- ============================================================
+             DOWNLOAD DROPDOWN — the menu itself. Link targets live in
+             DOWNLOAD_LINKS near the top of the script block below — edit
+             the links there, not here, and they'll flow through automatically.
+             ============================================================ -->
         <div class="download-dropdown" id="downloadDropdown">
           <button class="download-btn" id="downloadBtn" aria-haspopup="true" aria-expanded="false">
             ⬇ Download <span class="caret">▾</span>
@@ -2090,6 +1786,14 @@
   </div>
 </header>
 
+<!-- ============================================================
+     GUEST MODE BANNER — shown whenever someone chose "Continue as
+     Guest" and hasn't signed in since. Not just a one-time gate
+     message: stays visible on every page load in guest mode as an
+     ongoing reminder, since forgetting to back up is exactly the
+     failure mode this is meant to prevent. Driven by updateAccountChip()
+     in the script below.
+     ============================================================ -->
 <div class="guest-banner" id="guestBanner" style="display:none;">
   <span>⚠ Guest mode — nothing is syncing to the cloud.</span>
   <span class="guest-banner-actions">
@@ -2120,6 +1824,11 @@
         </select>
       </div>
 
+      <!-- ============================================================
+           SORT — orders the currently visible Students/Teachers list.
+           Lives here in the toolbar, next to Section/School year, and
+           shares their height so the row stays level.
+           ============================================================ -->
       <div class="sort-dropdown" id="sortDropdown">
         <button class="sort-btn" id="sortBtn" aria-haspopup="true" aria-expanded="false">
           ⇅ <span id="sortBtnLabel">Sort: A–Z</span> <span class="caret">▾</span>
@@ -2131,8 +1840,8 @@
         </div>
       </div>
 
-      <button class="scan-btn admin-only" id="scanBtn">📷 Scan</button>
-      <button class="add-btn admin-only" id="addBtn">+ Add student</button>
+      <button class="scan-btn" id="scanBtn">📷 Scan</button>
+      <button class="add-btn" id="addBtn">+ Add student</button>
     </div>
   </div>
 
@@ -2148,11 +1857,11 @@
   </div>
   <p class="hint" id="hintText">0 students on file</p>
 
-  <div class="selection-bar admin-only" id="selectionBar">
+  <div class="selection-bar" id="selectionBar">
     <span id="selectionCount">0 selected</span>
     <div class="sel-actions">
       <button class="btn-ghost" id="selectionClearBtn">Clear</button>
-      <button class="btn-danger admin-only" id="selectionDeleteBtn">Delete selected</button>
+      <button class="btn-danger" id="selectionDeleteBtn">Delete selected</button>
     </div>
   </div>
 
@@ -2166,7 +1875,7 @@
       <h3 id="studentModalTitle">Add student</h3>
       <button class="modal-close" id="studentModalClose" aria-label="Close">✕</button>
     </div>
-    <p class="form-note">Saved automatically to this browser as soon as you hit save — no extra steps needed. Every field below is captured up front, in one pass, so the record is complete from the start.</p>
+    <p class="form-note">Saved automatically to this browser as soon as you hit save — no extra steps needed.</p>
     <form id="studentForm">
       <div class="field-row">
         <div class="field">
@@ -2174,114 +1883,28 @@
           <input type="text" id="stuId" placeholder="e.g. 136456789012" required>
         </div>
         <div class="field">
+          <label for="stuName">Full name</label>
+          <input type="text" id="stuName" placeholder="Jane Doe" required>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
           <label for="stuSection">Section</label>
           <input type="text" id="stuSection" placeholder="7-Rizal" required>
         </div>
-      </div>
-
-      <!-- Birth Certificate File Uploader -->
-      <div class="record-section">
-        <p class="record-section-label">Birth Certificate Images</p>
-        <div class="field-row">
-          <div class="field">
-            <label for="stuBcFrontFile">Front Picture</label>
-            <input type="file" id="stuBcFrontFile" accept="image/*">
-            <div class="bc-preview-wrap">
-              <img id="stuBcFrontPreview" class="bc-img" style="display:none;" alt="Front BC Preview">
-            </div>
-          </div>
-          <div class="field">
-            <label for="stuBcBackFile">Back Picture</label>
-            <input type="file" id="stuBcBackFile" accept="image/*">
-            <div class="bc-preview-wrap">
-              <img id="stuBcBackPreview" class="bc-img" style="display:none;" alt="Back BC Preview">
-            </div>
-          </div>
-        </div>
-        <button type="button" class="btn-secondary" style="font-size:0.7rem; padding:0.3rem 0.6rem; margin-top:0.4rem;" id="clearBcBtn">Clear Images</button>
-      </div>
-
-      <div class="record-section">
-        <p class="record-section-label">Permanent record details — matches the DepEd Form 137-E name line</p>
-        <div class="field-row">
-          <div class="field" style="flex:2;">
-            <label for="stuSurname">Surname</label>
-            <input type="text" id="stuSurname" placeholder="e.g. Dela Cruz" required>
-          </div>
-          <div class="field" style="flex:2;">
-            <label for="stuFirstName">First name</label>
-            <input type="text" id="stuFirstName" placeholder="e.g. Juan" required>
-          </div>
-          <div class="field" style="flex:0.6;">
-            <label for="stuMI">M.I.</label>
-            <input type="text" id="stuMI" maxlength="4" placeholder="D">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="stuSex">Sex</label>
-            <select id="stuSex" required>
-              <option value="" disabled selected>— select —</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="stuDob">Date of birth</label>
-            <input type="date" id="stuDob" required>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="stuPob">Place of birth</label>
-            <input type="text" id="stuPob" placeholder="e.g. Manila City" required>
-          </div>
-          <div class="field">
-            <label for="stuDoe">Date of entrance</label>
-            <input type="date" id="stuDoe" required>
-          </div>
-        </div>
-        <div class="field">
-          <label for="stuGuardian">Parent / Guardian</label>
-          <input type="text" id="stuGuardian" placeholder="Full name" required>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="stuGuardianAddress">Guardian address</label>
-            <input type="text" id="stuGuardianAddress" placeholder="Address" required>
-          </div>
-          <div class="field">
-            <label for="stuGuardianOccupation">Guardian occupation</label>
-            <input type="text" id="stuGuardianOccupation" placeholder="Occupation" required>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="stuDivision">Division</label>
-            <input type="text" id="stuDivision" placeholder="e.g. Batangas City" required>
-          </div>
-          <div class="field">
-            <label for="stuSchool">School</label>
-            <input type="text" id="stuSchool" placeholder="School name" required>
-          </div>
-        </div>
-      </div>
-
-      <div class="field-row">
         <div class="field">
           <label for="stuYear">School year</label>
           <input type="text" id="stuYear" placeholder="2024-2025" required>
         </div>
-        <div class="field">
-          <label for="stuTeacher">Adviser (teacher ID)</label>
-          <select id="stuTeacher"></select>
-        </div>
       </div>
       <div class="field">
-        <label for="stuOrigin">Transferred from <span class="optional-tag">— optional, leave blank if not a transferee</span></label>
+        <label for="stuTeacher">Adviser (teacher ID)</label>
+        <select id="stuTeacher"></select>
+      </div>
+      <div class="field">
+        <label for="stuOrigin">Transferred from <span class="optional-tag">— optional</span></label>
         <input type="text" id="stuOrigin" placeholder="Leave blank if not a transferee">
       </div>
-
       <div class="modal-actions">
         <button type="button" class="btn-secondary" id="studentCancelBtn">Cancel</button>
         <button type="submit" class="btn-primary" id="studentSubmitBtn">Save student</button>
@@ -2322,12 +1945,6 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- Image Viewer Modal (For Birth Cert Full Size) -->
-<div class="modal-overlay" id="imageViewerOverlay" style="z-index:999; padding: 2rem; align-items:center;">
-  <button class="modal-close" id="imageViewerClose" style="position:absolute; top:20px; right:20px;">✕</button>
-  <img id="imageViewerImg" style="max-width:100%; max-height:100%; border-radius:10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-</div>
-
 <!-- Scan chooser modal -->
 <div class="modal-overlay" id="scanChooserOverlay">
   <div class="modal">
@@ -2350,6 +1967,8 @@
     </div>
   </div>
 </div>
+
+<!-- Single-scan result note (feeds into the Add Student/Teacher modal) -->
 
 <!-- Bulk review modal (class list) -->
 <div class="modal-overlay" id="bulkReviewOverlay">
@@ -2389,93 +2008,8 @@
   </div>
 </div>
 
+<!-- Hidden file inputs used by the scan feature -->
 <input type="file" id="scanFileInput" accept="image/*" capture="environment" style="display:none">
-
-<!-- Share SF10 (Form 137) record modal (printable / "save as PDF") -->
-<div class="modal-overlay" id="shareModalOverlay">
-  <div class="modal" style="max-width:640px;">
-    <div class="modal-head">
-      <h3>Share SF10 (Form 137)</h3>
-      <button class="modal-close" id="shareModalClose" aria-label="Close">✕</button>
-    </div>
-    <p class="form-note">Opens this one student's permanent record, formatted for printing. Use "Print / Save as PDF".</p>
-    <div class="share-sheet" id="shareSheet"></div>
-    <div class="modal-actions" style="justify-content:space-between; margin-top:1rem;">
-      <button type="button" class="btn-secondary" id="shareEmailBtn">✉ Email</button>
-      <div style="display:flex; gap:0.6rem;">
-        <button type="button" class="btn-secondary" id="shareCloseBtn">Close</button>
-        <button type="button" class="btn-primary" id="sharePrintBtn">🖨 Print / Save as PDF</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Share SF9 (Report Card) modal -->
-<div class="modal-overlay" id="sf9ModalOverlay">
-  <div class="modal" style="max-width:760px;">
-    <div class="modal-head">
-      <h3>Share SF9 (Report Card)</h3>
-      <button class="modal-close" id="sf9ModalClose" aria-label="Close">✕</button>
-    </div>
-    <div class="field" style="max-width:200px;">
-      <label for="sf9GradeSelect">Select Grade to Print</label>
-      <select id="sf9GradeSelect"></select>
-    </div>
-    <div class="share-sheet" id="sf9Sheet"></div>
-    <div class="modal-actions" style="justify-content:flex-end; margin-top:1rem;">
-      <button type="button" class="btn-secondary" id="sf9CloseBtn">Close</button>
-      <button type="button" class="btn-primary" id="sf9PrintBtn">🖨 Print / Save as PDF</button>
-    </div>
-  </div>
-</div>
-
-<!-- Grades & permanent record modal -->
-<div class="modal-overlay" id="recordModalOverlay">
-  <div class="modal" style="max-width:820px;">
-    <div class="modal-head">
-      <h3>Grades &amp; permanent record</h3>
-      <button class="modal-close" id="recordModalClose" aria-label="Close">✕</button>
-    </div>
-    <p class="form-note">Elementary progress, core values, and attendance for Grades I–VI, DepEd Form 137-E style. Saved automatically as you type — this feeds the printed/shared record.</p>
-    <div class="gr-tabs" id="gradeTabs"></div>
-    <div id="gradeTabContent"></div>
-    <p class="ss-section-title">Certificate of transfer</p>
-    <div class="gr-transfer">
-      <div class="field">
-        <label for="grTransferEligible">Eligible for transfer and admission to Grade / Year</label>
-        <input type="text" id="grTransferEligible" placeholder="e.g. Grade VII">
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label for="grTransferPrincipal">Principal / School head name</label>
-          <input type="text" id="grTransferPrincipal" placeholder="Full name">
-        </div>
-        <div class="field">
-          <label for="grTransferDate">Date</label>
-          <input type="date" id="grTransferDate">
-        </div>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button type="button" class="btn-primary" id="recordCloseBtn">Done</button>
-    </div>
-  </div>
-</div>
-
-<!-- Activity log modal -->
-<div class="modal-overlay" id="activityLogModalOverlay">
-  <div class="modal" style="max-width:520px;">
-    <div class="modal-head">
-      <h3>Activity log</h3>
-      <button class="modal-close" id="activityLogModalClose" aria-label="Close">✕</button>
-    </div>
-    <p class="form-note">Who added, edited, deleted, or signed in — and when. Syncs with Google Drive backups, so on a shared account this shows what others did too.</p>
-    <div class="activity-log-list" id="activityLogList"></div>
-    <div class="modal-actions" style="justify-content:flex-end;">
-      <button type="button" class="btn-secondary" id="activityLogCloseBtn">Close</button>
-    </div>
-  </div>
-</div>
 
 <!-- Customize (school branding) modal -->
 <div class="modal-overlay" id="customizeModalOverlay">
@@ -2504,19 +2038,6 @@
         <option value="left">Left side</option>
         <option value="right">Right side</option>
       </select>
-    </div>
-
-    <div class="field">
-      <label for="brandLogoSizeInput">Logo size</label>
-      <div class="logo-size-row">
-        <input type="range" id="brandLogoSizeInput" min="40" max="140" step="2" value="76">
-        <span class="logo-size-value" id="brandLogoSizeValue">76px</span>
-      </div>
-      <div class="logo-size-presets" id="logoSizePresets">
-        <button type="button" class="logo-size-preset-btn" data-size="48">Small</button>
-        <button type="button" class="logo-size-preset-btn" data-size="76">Medium</button>
-        <button type="button" class="logo-size-preset-btn" data-size="110">Large</button>
-      </div>
     </div>
 
     <div class="field">
@@ -2603,35 +2124,15 @@
 <footer>Changes save automatically in this browser — no account or server needed. <button class="link-btn" id="exportOpenBtn" style="font-size:0.76rem;">Backup / Import data</button> to move it to another device.</footer>
 
 <script>
-  // ---------- Safe storage wrapper ----------
-  const memoryStorageFallback = {};
-  function safeGetItem(key){
-    try{ return localStorage.getItem(key); }
-    catch(err){ return Object.prototype.hasOwnProperty.call(memoryStorageFallback, key) ? memoryStorageFallback[key] : null; }
-  }
-  function safeSetItem(key, value){
-    try{ localStorage.setItem(key, value); }
-    catch(err){ memoryStorageFallback[key] = value; }
-  }
-  function safeRemoveItem(key){
-    try{ localStorage.removeItem(key); }
-    catch(err){ delete memoryStorageFallback[key]; }
-  }
-
-  // ---------- Admin / Teacher Role Sync ----------
-  const roleSelector = document.getElementById('roleSelector');
-  let currentRole = safeGetItem('rr_role') || 'admin';
-  roleSelector.value = currentRole;
-  document.body.setAttribute('data-role', currentRole);
-
-  roleSelector.addEventListener('change', (e) => {
-    currentRole = e.target.value;
-    safeSetItem('rr_role', currentRole);
-    document.body.setAttribute('data-role', currentRole);
-    render(); 
-  });
-
-  // ---------- DOWNLOAD LINKS ----------
+  // ================================================================
+  // DOWNLOAD LINKS — update these 3 lines whenever you publish a new
+  // build, then re-upload this file. Nothing else needs to change.
+  //
+  //   windows -> direct link to your latest .exe (e.g. a GitHub
+  //              Releases asset URL — see the repo's "Releases" tab)
+  //   android -> direct link to your latest .apk (same idea)
+  //   github  -> your repo's URL, for the "Source code" menu item
+  // ================================================================
   const DOWNLOAD_LINKS = {
     windows: "https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/latest/download/RollAndRegister-Setup.exe",
     android: "https://github.com/ivanclarklim2006-sudo/CC316-PROJECT/releases/latest/download/RollAndRegister.apk",
@@ -2642,10 +2143,17 @@
   document.getElementById('dlAndroid').href = DOWNLOAD_LINKS.android;
   document.getElementById('dlGithub').href = DOWNLOAD_LINKS.github;
 
-  // ---------- GOOGLE DRIVE SYNC CONFIG ----------
+  // ================================================================
+  // GOOGLE DRIVE SYNC CONFIG — replace with your own OAuth Client ID
+  // from Google Cloud Console (APIs & Services > Credentials > Create
+  // Credentials > OAuth client ID > Web application). Add this site's
+  // exact URL under "Authorized JavaScript origins" there.
+  // Leave the placeholder as-is to keep the "Connect Google account"
+  // button hidden until it's configured.
+  // ================================================================
   const GOOGLE_CLIENT_ID = "539917251167-crisqpt23rcb9q069ht82gesh92dmf0v.apps.googleusercontent.com";
   const GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
-  const GOOGLE_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email"; 
+  const GOOGLE_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email"; // lets the account chip show which Google account is signed in
   const GOOGLE_BACKUP_FILENAME = "roll-and-register-backup.json";
 
   const downloadDropdown = document.getElementById('downloadDropdown');
@@ -2668,13 +2176,16 @@
     }
   });
 
-  // ---------- Sort order ----------
+  // ---------- Sort order (Students & Teachers lists) ----------
+  // Declared here, before the dropdown below reads them, so the app
+  // doesn't crash on load with "Cannot access before initialization".
   const SORT_MODE_KEY = 'rollRegister_sortMode';
   const SORT_LABELS = { az: 'A–Z', latest: 'Latest', earliest: 'Earliest' };
-  let sortMode = ['az', 'latest', 'earliest'].includes(safeGetItem(SORT_MODE_KEY))
-    ? safeGetItem(SORT_MODE_KEY)
+  let sortMode = ['az', 'latest', 'earliest'].includes(localStorage.getItem(SORT_MODE_KEY))
+    ? localStorage.getItem(SORT_MODE_KEY)
     : 'az';
 
+  // ---------- Sort dropdown (toolbar, next to Section/School year) ----------
   const sortDropdown = document.getElementById('sortDropdown');
   const sortBtn = document.getElementById('sortBtn');
   const sortBtnLabel = document.getElementById('sortBtnLabel');
@@ -2694,7 +2205,7 @@
   sortMenu.querySelectorAll('.sort-option').forEach(btn => {
     btn.addEventListener('click', () => {
       sortMode = btn.dataset.sort;
-      safeSetItem(SORT_MODE_KEY, sortMode);
+      localStorage.setItem(SORT_MODE_KEY, sortMode);
       updateSortMenuUI();
       sortDropdown.classList.remove('open');
       sortBtn.setAttribute('aria-expanded', 'false');
@@ -2715,6 +2226,10 @@
   });
 
   // ---------- Dark mode toggle ----------
+  // Remembers an explicit choice per-browser; otherwise follows the
+  // system's light/dark preference on first visit. Two buttons share
+  // this logic: the header one (post sign-in) and the sign-in card's
+  // own toggle (so theme can be set before signing in/continuing as guest).
   const THEME_KEY = 'rollRegister_theme';
   const themeToggleBtn = document.getElementById('themeToggleBtn');
   const themeToggleBtnSignin = document.getElementById('themeToggleBtnSignin');
@@ -2724,22 +2239,26 @@
     themeToggleBtn.textContent = icon;
     themeToggleBtnSignin.textContent = icon;
   }
-  const storedTheme = safeGetItem(THEME_KEY);
+  const storedTheme = localStorage.getItem(THEME_KEY);
   const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   applyTheme(storedTheme || (systemPrefersDark ? 'dark' : 'light'));
   function toggleTheme(){
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     applyTheme(next);
-    safeSetItem(THEME_KEY, next);
+    localStorage.setItem(THEME_KEY, next);
   }
   themeToggleBtn.addEventListener('click', toggleTheme);
   themeToggleBtnSignin.addEventListener('click', toggleTheme);
 
-  // ---------- Account chip ----------
+  // ---------- Account chip (top-corner) dropdown toggle — mirrors the download dropdown above ----------
   const accountChip = document.getElementById('accountChip');
   const accountChipBtn = document.getElementById('accountChipBtn');
   accountChipBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+    // Signed out: clicking the chip is a faster path to sign in than
+    // opening a menu that would only offer switch/sign-out anyway.
+    // gapiToken is declared further down in this same script block but is
+    // always initialized by the time a click can happen.
     if(!gapiToken){ gdriveConnect(false); return; }
     const isOpen = accountChip.classList.toggle('open');
     accountChipBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
@@ -2757,22 +2276,29 @@
     }
   });
 
-  // ---------- SCHOOL BRANDING ----------
+  // ================================================================
+  // SCHOOL BRANDING — lets a school upload their own logo and set a
+  // title/description without touching any code. Saved in this
+  // browser only (same as the roster autosave), under its own key so
+  // it never mixes with student/teacher data. "Roll & Register" is
+  // intentionally NOT part of this — it's fixed in the HTML above.
+  // ================================================================
   const BRAND_KEY = 'rollRegister_branding_v1';
   const DEFAULT_TITLE = 'School Records // Directory Search';
   const DEFAULT_HEADING = 'Roll & Register';
   const DEFAULT_DESCRIPTION = 'Look up a student by name or LRN to see their section and adviser — or look up a teacher to see every subject and section they hold.';
-  const DEFAULT_PRIMARY_COLOR = '#1F3B2E'; 
-  const DEFAULT_ACCENT_COLOR = '#B8863C';  
+  const DEFAULT_PRIMARY_COLOR = '#1F3B2E'; // header background, buttons, tabs
+  const DEFAULT_ACCENT_COLOR = '#B8863C';  // brass highlights, stamps, borders
   const DEFAULT_LOGO_POSITION = 'left';
-  const DEFAULT_LOGO_SIZE = 76;
 
   const brandTitleEl = document.getElementById('brandTitle');
   const brandHeadingEl = document.getElementById('brandHeading');
   const brandDescriptionEl = document.getElementById('brandDescription');
   const schoolLogoEl = document.getElementById('schoolLogo');
-  const headerTopEl = document.getElementById('headerTop');
+  const headerBrandRowEl = document.getElementById('headerBrandRow');
 
+  // Lightens a #rrggbb color by a flat amount — used to derive the
+  // hover-state shade from whatever primary color the school picks.
   function lightenColor(hex, amount){
     const num = parseInt(hex.replace('#', ''), 16);
     const r = Math.min(255, (num >> 16) + amount);
@@ -2785,8 +2311,7 @@
     brandTitleEl.textContent = (brand && brand.title) ? brand.title : DEFAULT_TITLE;
     brandHeadingEl.textContent = (brand && brand.heading) ? brand.heading : DEFAULT_HEADING;
     brandDescriptionEl.textContent = (brand && brand.description) ? brand.description : DEFAULT_DESCRIPTION;
-    const hasLogo = !!(brand && brand.logo);
-    if(hasLogo){
+    if(brand && brand.logo){
       schoolLogoEl.src = brand.logo;
       schoolLogoEl.classList.add('show');
     } else {
@@ -2794,12 +2319,7 @@
       schoolLogoEl.classList.remove('show');
     }
     const logoPosition = (brand && brand.logoPosition) || DEFAULT_LOGO_POSITION;
-    const logoOnRight = logoPosition === 'right';
-    schoolLogoEl.classList.toggle('logo-right', logoOnRight);
-    headerTopEl.classList.toggle('has-logo-left', hasLogo && !logoOnRight);
-    headerTopEl.classList.toggle('has-logo-right', hasLogo && logoOnRight);
-    const logoSize = (brand && brand.logoSize) || DEFAULT_LOGO_SIZE;
-    document.documentElement.style.setProperty('--logo-size', logoSize + 'px');
+    headerBrandRowEl.classList.toggle('logo-right', logoPosition === 'right');
 
     const primary = (brand && brand.primaryColor) || DEFAULT_PRIMARY_COLOR;
     const accent = (brand && brand.accentColor) || DEFAULT_ACCENT_COLOR;
@@ -2810,17 +2330,19 @@
 
   function loadBranding(){
     try{
-      const raw = safeGetItem(BRAND_KEY);
+      const raw = localStorage.getItem(BRAND_KEY);
       if(raw) applyBranding(JSON.parse(raw));
-    }catch(err){ }
+    }catch(err){ /* fall back silently to defaults */ }
   }
   function saveBrandingToStorage(brand){
-    try{ safeSetItem(BRAND_KEY, JSON.stringify(brand)); }
+    try{ localStorage.setItem(BRAND_KEY, JSON.stringify(brand)); }
     catch(err){ showToast('Could not save — logo image may be too large'); }
   }
   loadBranding();
 
-  function resizeImageToDataURL(file, maxDim = 300, compression = 0.9){
+  // Shrinks an uploaded logo before storing it, so it doesn't eat into
+  // this browser's storage quota (same idea as the OCR photo downscale).
+  function resizeImageToDataURL(file, maxDim = 300){
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
@@ -2832,8 +2354,7 @@
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        // Uses jpeg and compresses well for offline storage if compression passed
-        resolve(canvas.toDataURL(compression < 1 ? 'image/jpeg' : 'image/png', compression));
+        resolve(canvas.toDataURL('image/png'));
       };
       img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read that image')); };
       img.src = url;
@@ -2845,9 +2366,6 @@
   const logoFileInput = document.getElementById('logoFileInput');
   const logoPreview = document.getElementById('logoPreview');
   const brandLogoPositionInput = document.getElementById('brandLogoPositionInput');
-  const brandLogoSizeInput = document.getElementById('brandLogoSizeInput');
-  const brandLogoSizeValue = document.getElementById('brandLogoSizeValue');
-  const logoSizePresets = document.getElementById('logoSizePresets');
   const brandTitleInput = document.getElementById('brandTitleInput');
   const brandHeadingInput = document.getElementById('brandHeadingInput');
   const brandDescriptionInput = document.getElementById('brandDescriptionInput');
@@ -2855,25 +2373,16 @@
   const brandAccentColorInput = document.getElementById('brandAccentColorInput');
   const brandPrimaryColorHex = document.getElementById('brandPrimaryColorHex');
   const brandAccentColorHex = document.getElementById('brandAccentColorHex');
-  let pendingLogoDataUrl = null; 
-
-  function setLogoSizeUI(size){
-    brandLogoSizeInput.value = size;
-    brandLogoSizeValue.textContent = size + 'px';
-    logoSizePresets.querySelectorAll('.logo-size-preset-btn').forEach(btn => {
-      btn.classList.toggle('active', Number(btn.dataset.size) === Number(size));
-    });
-  }
+  let pendingLogoDataUrl = null; // null = unchanged from current saved logo this session
 
   function openCustomizeModal(){
     const current = (() => {
-      try{ return JSON.parse(safeGetItem(BRAND_KEY) || '{}'); }
+      try{ return JSON.parse(localStorage.getItem(BRAND_KEY) || '{}'); }
       catch(err){ return {}; }
     })();
     pendingLogoDataUrl = current.logo || null;
     logoPreview.src = current.logo || '';
     brandLogoPositionInput.value = current.logoPosition || DEFAULT_LOGO_POSITION;
-    setLogoSizeUI(current.logoSize || DEFAULT_LOGO_SIZE);
     brandTitleInput.value = current.title || '';
     brandHeadingInput.value = current.heading || '';
     brandDescriptionInput.value = current.description || '';
@@ -2885,13 +2394,14 @@
   }
   function closeCustomizeModal(){
     customizeModalOverlay.classList.remove('show');
-    loadBranding(); 
+    loadBranding(); // discard any live color preview that wasn't saved
   }
 
   customizeBtn.addEventListener('click', openCustomizeModal);
   document.getElementById('customizeModalClose').addEventListener('click', closeCustomizeModal);
   customizeModalOverlay.addEventListener('click', e => { if(e.target === customizeModalOverlay) closeCustomizeModal(); });
 
+  // Live-preview colors as the school picks them, without saving yet
   brandPrimaryColorInput.addEventListener('input', () => {
     brandPrimaryColorHex.textContent = brandPrimaryColorInput.value;
     document.documentElement.style.setProperty('--green', brandPrimaryColorInput.value);
@@ -2902,22 +2412,11 @@
     document.documentElement.style.setProperty('--brass', brandAccentColorInput.value);
   });
 
-  brandLogoSizeInput.addEventListener('input', () => {
-    setLogoSizeUI(brandLogoSizeInput.value);
-    document.documentElement.style.setProperty('--logo-size', brandLogoSizeInput.value + 'px');
-  });
-  logoSizePresets.addEventListener('click', e => {
-    const btn = e.target.closest('.logo-size-preset-btn');
-    if(!btn) return;
-    setLogoSizeUI(btn.dataset.size);
-    document.documentElement.style.setProperty('--logo-size', btn.dataset.size + 'px');
-  });
-
   logoFileInput.addEventListener('change', async () => {
     const file = logoFileInput.files[0];
     if(!file) return;
     try{
-      pendingLogoDataUrl = await resizeImageToDataURL(file, 300, 1.0);
+      pendingLogoDataUrl = await resizeImageToDataURL(file);
       logoPreview.src = pendingLogoDataUrl;
     }catch(err){
       showToast('Could not read that image — try a different file');
@@ -2933,7 +2432,6 @@
     const brand = {
       logo: pendingLogoDataUrl || null,
       logoPosition: brandLogoPositionInput.value,
-      logoSize: Number(brandLogoSizeInput.value),
       title: brandTitleInput.value.trim(),
       heading: brandHeadingInput.value.trim(),
       description: brandDescriptionInput.value.trim(),
@@ -2947,11 +2445,10 @@
   });
 
   document.getElementById('resetBrandingBtn').addEventListener('click', () => {
-    try{ safeRemoveItem(BRAND_KEY); }catch(err){}
+    try{ localStorage.removeItem(BRAND_KEY); }catch(err){}
     pendingLogoDataUrl = null;
     logoPreview.src = '';
     brandLogoPositionInput.value = DEFAULT_LOGO_POSITION;
-    setLogoSizeUI(DEFAULT_LOGO_SIZE);
     brandTitleInput.value = '';
     brandHeadingInput.value = '';
     brandDescriptionInput.value = '';
@@ -2964,8 +2461,15 @@
     showToast('Reset to default');
   });
 
-  // ---------- Data arrays ----------
+  // ---- Data: starts empty. Use "+ Add student/teacher" in the app, or paste
+  // your own records here in the same shape as the commented example below.
+  // Note: the "id" field holds the student's LRN — the UI now labels it
+  // "Student LRN", the field name in the data just stayed "id" for simplicity. ----
+  // { id:"136456789012", name:"Maria Santos", section:"7-Rizal", year:"2024-2025", teacherId:"T-201",
+  //   history:[ {year:"2024-2025", section:"7-Rizal"} ], transferredFrom:"Optional Prior School" }
   const students = [];
+
+  // { id:"T-201", name:"Mr. Ramon Ibañez", subjects:[{subject:"Mathematics", section:"7-Rizal"}] }
   const teachers = [];
 
   let teacherById = {};
@@ -2973,90 +2477,14 @@
     teacherById = Object.fromEntries(teachers.map(t => [t.id, t]));
   }
 
-  // ---------- Activity log ----------
-  const ACTIVITY_LOG_KEY = 'rollRegister_activityLog_v1';
-  const ACTIVITY_LOG_MAX = 300;
-  let activityLog = [];
-  function currentActor(){
-    return (typeof gdriveEmail !== 'undefined' && gdriveEmail) ? gdriveEmail : 'Guest (this device)';
-  }
-  function saveActivityLog(){
-    try{ safeSetItem(ACTIVITY_LOG_KEY, JSON.stringify(activityLog)); }catch(err){}
-  }
-  function loadActivityLog(){
-    try{
-      const raw = safeGetItem(ACTIVITY_LOG_KEY);
-      if(raw) activityLog = JSON.parse(raw) || [];
-    }catch(err){ activityLog = []; }
-  }
-  function logActivity(action, detail){
-    activityLog.unshift({ action, detail, actor: currentActor(), at: Date.now() });
-    if(activityLog.length > ACTIVITY_LOG_MAX) activityLog.length = ACTIVITY_LOG_MAX;
-    saveActivityLog();
-    if(typeof renderActivityLog === 'function') renderActivityLog();
-  }
-  function mergeActivityLog(incoming){
-    if(!Array.isArray(incoming) || incoming.length === 0) return;
-    const seen = new Set(activityLog.map(e => `${e.at}|${e.action}|${e.detail}|${e.actor}`));
-    incoming.forEach(e => {
-      if(!e || !e.at || !e.action) return;
-      const key = `${e.at}|${e.action}|${e.detail}|${e.actor}`;
-      if(seen.has(key)) return;
-      seen.add(key);
-      activityLog.push(e);
-    });
-    activityLog.sort((a, b) => b.at - a.at);
-    if(activityLog.length > ACTIVITY_LOG_MAX) activityLog.length = ACTIVITY_LOG_MAX;
-    saveActivityLog();
-  }
-  loadActivityLog();
-
-  const activityLogBtn = document.getElementById('activityLogBtn');
-  const activityLogModalOverlay = document.getElementById('activityLogModalOverlay');
-  const activityLogList = document.getElementById('activityLogList');
-
-  function formatLogTime(ts){
-    const d = new Date(ts);
-    const now = new Date();
-    const sameDay = d.toDateString() === now.toDateString();
-    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    return sameDay ? time : d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' · ' + time;
-  }
-  function renderActivityLog(){
-    if(!activityLogList) return;
-    if(activityLog.length === 0){
-      activityLogList.innerHTML = `<div class="activity-log-empty">Nothing logged yet — actions like adding, editing, deleting, or signing in will show up here.</div>`;
-      return;
-    }
-    activityLogList.innerHTML = activityLog.map(e => `
-      <div class="activity-log-entry">
-        <div class="al-top">
-          <span class="al-action">${escapeHtml(e.action)}</span>
-          <span class="al-when">${escapeHtml(formatLogTime(e.at))}</span>
-        </div>
-        ${e.detail ? `<div class="al-detail">${escapeHtml(e.detail)}</div>` : ''}
-        <span class="al-actor">${escapeHtml(e.actor || 'Guest (this device)')}</span>
-      </div>
-    `).join('');
-  }
-  if(activityLogBtn){
-    activityLogBtn.addEventListener('click', () => {
-      renderActivityLog();
-      activityLogModalOverlay.classList.add('show');
-    });
-    document.getElementById('activityLogModalClose').addEventListener('click', () => activityLogModalOverlay.classList.remove('show'));
-    document.getElementById('activityLogCloseBtn').addEventListener('click', () => activityLogModalOverlay.classList.remove('show'));
-    activityLogModalOverlay.addEventListener('click', e => { if(e.target === activityLogModalOverlay) activityLogModalOverlay.classList.remove('show'); });
-  }
-
-  // ---------- Autosave ----------
+  // ---------- Autosave (this browser only, no server / no account) ----------
   const SAVE_KEY = 'rollRegister_v1';
   let storageAvailable = true;
 
   function saveData(){
     if(!storageAvailable) return;
     try{
-      safeSetItem(SAVE_KEY, JSON.stringify({ students, teachers }));
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ students, teachers }));
       scheduleDriveAutoSave();
     }catch(err){
       storageAvailable = false;
@@ -3066,13 +2494,13 @@
 
   function loadData(){
     try{
-      const raw = safeGetItem(SAVE_KEY);
+      const raw = localStorage.getItem(SAVE_KEY);
       if(!raw) return;
       const parsed = JSON.parse(raw);
       if(Array.isArray(parsed.students)) students.push(...parsed.students);
       if(Array.isArray(parsed.teachers)) teachers.push(...parsed.teachers);
     }catch(err){
-      storageAvailable = false; 
+      storageAvailable = false; // silent — toast UI isn't wired up yet this early
     }
   }
   loadData();
@@ -3112,7 +2540,7 @@
 
   let activeTab = 'students';
   let query = '';
-  let view = 'list'; 
+  let view = 'list'; // 'list' or 'profile'
   let profileStudentId = null;
   let sectionFilter = '';
   let yearFilter = '';
@@ -3242,654 +2670,6 @@
     render();
   }
 
-  // ---------- View BC Image ----------
-  function viewImage(src){
-    document.getElementById('imageViewerImg').src = src;
-    document.getElementById('imageViewerOverlay').classList.add('show');
-  }
-  document.getElementById('imageViewerClose').addEventListener('click', () => {
-    document.getElementById('imageViewerOverlay').classList.remove('show');
-  });
-
-  // ---------- Grades & permanent record (Form 137-E) ----------
-  const GRADE_LEVELS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
-  const SUBJECTS_COMMON = [
-    { key:'motherTongue', label:'Mother Tongue', levels:['I','II','III'] },
-    { key:'filipino', label:'Filipino', levels:['I','II','III','IV','V','VI'] },
-    { key:'english', label:'English', levels:['I','II','III','IV','V','VI'] },
-    { key:'math', label:'Mathematics', levels:['I','II','III','IV','V','VI'] },
-    { key:'science', label:'Science', levels:['I','II','III','IV','V','VI'] },
-    { key:'ap', label:'Araling Panlipunan (AP)', levels:['I','II','III','IV','V','VI'] },
-    { key:'esp', label:'Edukasyon sa Pagpapakatao', levels:['I','II','III','IV','V','VI'] },
-    { key:'epp', label:'EPP', levels:['IV','V','VI'] },
-    { key:'mapehMusic', label:'MAPEH — Music', levels:['I','II','III','IV','V','VI'] },
-    { key:'mapehArts', label:'MAPEH — Arts', levels:['I','II','III','IV','V','VI'] },
-    { key:'mapehPE', label:'MAPEH — Physical Education', levels:['I','II','III','IV','V','VI'] },
-    { key:'mapehHealth', label:'MAPEH — Health', levels:['I','II','III','IV','V','VI'] }
-  ];
-  function subjectsForLevel(level){ return SUBJECTS_COMMON.filter(su => su.levels.includes(level)); }
-
-  const CORE_VALUE_ROWS = [
-    { key:'diyos1', group:'Maka-Diyos', statement:"Expresses one's spiritual beliefs while respecting the spiritual beliefs of others." },
-    { key:'diyos2', group:'Maka-Diyos', statement:'Shows adherence to ethical principles by upholding truth.' },
-    { key:'tao1', group:'Makatao', statement:'Is sensitive to individual, social, and cultural differences.' },
-    { key:'tao2', group:'Makatao', statement:'Demonstrates contributions towards solidarity.' },
-    { key:'kalikasan1', group:'Makakalikasan', statement:'Cares for the environment and utilizes resources wisely, judiciously, and economically.' },
-    { key:'bansa1', group:'Makabansa', statement:'Demonstrates appropriate behavior in carrying out activities in the school, community, and country.' }
-  ];
-  const CORE_VALUE_MARKS = ['', 'AO', 'SO', 'RO', 'NO'];
-
-  function ensurePermanentRecord(s){
-    if(!s.permanentRecord) s.permanentRecord = {};
-    const pr = s.permanentRecord;
-    if(!pr.meta) pr.meta = {};
-    if(!pr.progress) pr.progress = {};
-    if(!pr.coreValues) pr.coreValues = {};
-    if(!pr.attendance) pr.attendance = {};
-    if(!pr.transfer) pr.transfer = { eligible:'', principal:'', date:'' };
-    GRADE_LEVELS.forEach(g => {
-      if(!pr.meta[g]) pr.meta[g] = { school:'', schoolYear:'', eligible:'' };
-      if(!pr.progress[g]) pr.progress[g] = { subjects:{} };
-      if(!pr.coreValues[g]) pr.coreValues[g] = { ratings:{} };
-      if(!pr.attendance[g]) pr.attendance[g] = { schoolDays:'', daysAbsent:'', causeAbsent:'', timesTardy:'', causeTardy:'', daysPresent:'' };
-    });
-    return pr;
-  }
-
-  function computeFinalRating(q){
-    const vals = ['q1','q2','q3','q4'].map(k => q && q[k] !== undefined && q[k] !== '' && q[k] !== null ? Number(q[k]) : null).filter(v => v !== null && !isNaN(v));
-    if(!vals.length) return null;
-    return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
-  }
-  function computeGeneralAverage(finals){
-    const nums = finals.filter(f => f !== null && f !== undefined);
-    if(!nums.length) return null;
-    return Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 100) / 100;
-  }
-
-  const recordModalOverlay = document.getElementById('recordModalOverlay');
-  const gradeTabsEl = document.getElementById('gradeTabs');
-  const gradeTabContentEl = document.getElementById('gradeTabContent');
-  let recordStudent = null;
-  let activeGradeTab = 'I';
-
-  function openRecordModal(s){
-    recordStudent = s;
-    const pr = ensurePermanentRecord(s);
-    gradeTabsEl.innerHTML = GRADE_LEVELS.map(g => `<button type="button" class="gr-tab-btn${g === activeGradeTab ? ' active' : ''}" data-level="${g}">Grade ${g}</button>`).join('');
-    gradeTabsEl.querySelectorAll('.gr-tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeGradeTab = btn.dataset.level;
-        gradeTabsEl.querySelectorAll('.gr-tab-btn').forEach(b => b.classList.toggle('active', b === btn));
-        renderGradeTabContent();
-      });
-    });
-    document.getElementById('grTransferEligible').value = pr.transfer.eligible || '';
-    document.getElementById('grTransferPrincipal').value = pr.transfer.principal || '';
-    document.getElementById('grTransferDate').value = pr.transfer.date || '';
-    renderGradeTabContent();
-    recordModalOverlay.classList.add('show');
-  }
-  function closeRecordModal(){
-    recordModalOverlay.classList.remove('show');
-    if(view === 'profile') renderProfile();
-  }
-
-  function renderGradeTabContent(){
-    const s = recordStudent;
-    if(!s) return;
-    const pr = s.permanentRecord;
-    const level = activeGradeTab;
-    const meta = pr.meta[level];
-    const progress = pr.progress[level];
-    const coreValues = pr.coreValues[level];
-    const att = pr.attendance[level];
-    const subjects = subjectsForLevel(level);
-    const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
-    const genAvg = computeGeneralAverage(finals);
-
-    gradeTabContentEl.innerHTML = `
-      <div class="field-row">
-        <div class="field"><label for="grMetaSchool">School</label><input type="text" id="grMetaSchool" placeholder="School name" value="${escapeHtml(meta.school)}"></div>
-        <div class="field"><label for="grMetaYear">School year</label><input type="text" id="grMetaYear" placeholder="e.g. 2019-2020" value="${escapeHtml(meta.schoolYear)}"></div>
-      </div>
-      <table class="gr-table">
-        <thead><tr><th>Learning area</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th><th class="ss-num">Final</th></tr></thead>
-        <tbody>
-          ${subjects.map((su, i) => {
-            const q = progress.subjects[su.key] || {};
-            return `<tr>
-              <td>${escapeHtml(su.label)}</td>
-              ${['q1','q2','q3','q4'].map(qk => `<td><input type="number" min="60" max="100" class="gr-cell" data-subject="${su.key}" data-field="${qk}" value="${q[qk] !== undefined && q[qk] !== null ? q[qk] : ''}"></td>`).join('')}
-              <td class="gr-final" data-final-for="${su.key}">${finals[i] === null ? '—' : finals[i]}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-        <tfoot><tr><td colspan="5" style="text-align:right; font-weight:700;">General average</td><td class="gr-final" id="grGeneralAverage">${genAvg === null ? '—' : genAvg}</td></tr></tfoot>
-      </table>
-      <div class="field">
-        <label for="grEligible">Eligible for admission to Grade</label>
-        <input type="text" id="grEligible" placeholder="e.g. ${level === 'VI' ? 'Grade VII' : 'II'}" value="${escapeHtml(meta.eligible)}">
-      </div>
-
-      <p class="ss-section-title" style="margin-top:1.3rem;">Core values — learners observed values</p>
-      <table class="gr-table gr-core-table">
-        <thead><tr><th>Core value</th><th>Behavior statement</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th></tr></thead>
-        <tbody>
-          ${CORE_VALUE_ROWS.map(row => {
-            const r = coreValues.ratings[row.key] || {};
-            return `<tr>
-              <td>${escapeHtml(row.group)}</td>
-              <td>${escapeHtml(row.statement)}</td>
-              ${['q1','q2','q3','q4'].map(qk => `<td><select class="gr-core-cell" data-row="${row.key}" data-field="${qk}">
-                ${CORE_VALUE_MARKS.map(opt => `<option value="${opt}" ${((r[qk] || '') === opt) ? 'selected' : ''}>${opt || '—'}</option>`).join('')}
-              </select></td>`).join('')}
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>
-
-      <p class="ss-section-title" style="margin-top:1.3rem;">Attendance record</p>
-      <div class="field-row">
-        <div class="field"><label for="attSchoolDays">No. of school days</label><input type="number" min="0" id="attSchoolDays" value="${escapeHtml(att.schoolDays)}"></div>
-        <div class="field"><label for="attDaysAbsent">Days absent</label><input type="number" min="0" id="attDaysAbsent" value="${escapeHtml(att.daysAbsent)}"></div>
-      </div>
-      <div class="field"><label for="attCauseAbsent">Cause (absence)</label><input type="text" id="attCauseAbsent" value="${escapeHtml(att.causeAbsent)}"></div>
-      <div class="field-row">
-        <div class="field"><label for="attTimesTardy">Times tardy</label><input type="number" min="0" id="attTimesTardy" value="${escapeHtml(att.timesTardy)}"></div>
-        <div class="field"><label for="attDaysPresent">Days present</label><input type="number" min="0" id="attDaysPresent" value="${escapeHtml(att.daysPresent)}"></div>
-      </div>
-      <div class="field"><label for="attCauseTardy">Cause (tardy)</label><input type="text" id="attCauseTardy" value="${escapeHtml(att.causeTardy)}"></div>
-    `;
-
-    gradeTabContentEl.querySelectorAll('.gr-cell').forEach(input => {
-      input.addEventListener('input', () => {
-        const subKey = input.dataset.subject, field = input.dataset.field;
-        if(!progress.subjects[subKey]) progress.subjects[subKey] = {};
-        progress.subjects[subKey][field] = input.value === '' ? '' : input.value;
-        const newFinal = computeFinalRating(progress.subjects[subKey]);
-        const finalCell = gradeTabContentEl.querySelector(`[data-final-for="${subKey}"]`);
-        if(finalCell) finalCell.textContent = newFinal === null ? '—' : newFinal;
-        const allFinals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
-        const newGenAvg = computeGeneralAverage(allFinals);
-        document.getElementById('grGeneralAverage').textContent = newGenAvg === null ? '—' : newGenAvg;
-        saveData();
-      });
-    });
-    gradeTabContentEl.querySelectorAll('.gr-core-cell').forEach(sel => {
-      sel.addEventListener('change', () => {
-        const rowKey = sel.dataset.row, field = sel.dataset.field;
-        if(!coreValues.ratings[rowKey]) coreValues.ratings[rowKey] = {};
-        coreValues.ratings[rowKey][field] = sel.value;
-        saveData();
-      });
-    });
-    document.getElementById('grMetaSchool').addEventListener('input', e => { meta.school = e.target.value; saveData(); });
-    document.getElementById('grMetaYear').addEventListener('input', e => { meta.schoolYear = e.target.value; saveData(); });
-    document.getElementById('grEligible').addEventListener('input', e => { meta.eligible = e.target.value; saveData(); });
-    document.getElementById('attSchoolDays').addEventListener('input', e => { att.schoolDays = e.target.value; saveData(); });
-    document.getElementById('attDaysAbsent').addEventListener('input', e => { att.daysAbsent = e.target.value; saveData(); });
-    document.getElementById('attCauseAbsent').addEventListener('input', e => { att.causeAbsent = e.target.value; saveData(); });
-    document.getElementById('attTimesTardy').addEventListener('input', e => { att.timesTardy = e.target.value; saveData(); });
-    document.getElementById('attDaysPresent').addEventListener('input', e => { att.daysPresent = e.target.value; saveData(); });
-    document.getElementById('attCauseTardy').addEventListener('input', e => { att.causeTardy = e.target.value; saveData(); });
-  }
-
-  document.getElementById('recordModalClose').addEventListener('click', closeRecordModal);
-  document.getElementById('recordCloseBtn').addEventListener('click', closeRecordModal);
-  recordModalOverlay.addEventListener('click', e => { if(e.target === recordModalOverlay) closeRecordModal(); });
-  document.getElementById('grTransferEligible').addEventListener('input', e => {
-    if(recordStudent) { ensurePermanentRecord(recordStudent).transfer.eligible = e.target.value; saveData(); }
-  });
-  document.getElementById('grTransferPrincipal').addEventListener('input', e => {
-    if(recordStudent) { ensurePermanentRecord(recordStudent).transfer.principal = e.target.value; saveData(); }
-  });
-  document.getElementById('grTransferDate').addEventListener('change', e => {
-    if(recordStudent) { ensurePermanentRecord(recordStudent).transfer.date = e.target.value; saveData(); }
-  });
-
-  // ---------- Share SF10 record (single student, printable / "save as PDF") ----------
-  const shareModalOverlay = document.getElementById('shareModalOverlay');
-  const shareSheet = document.getElementById('shareSheet');
-  let shareStudent = null;
-
-  function currentBrandingForShare(){
-    try{ return JSON.parse(safeGetItem(BRAND_KEY) || 'null') || {}; }
-    catch(err){ return {}; }
-  }
-
-  function buildGradeCellHtml(level, pr){
-    const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
-    const progress = pr.progress[level] || { subjects:{} };
-    const subjects = subjectsForLevel(level);
-    const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
-    const genAvg = computeGeneralAverage(finals);
-    return `
-    <div class="ss-grade-cell">
-      <p class="ss-grade-heading">Grade ${level} — School: ${escapeHtml(meta.school || '_______________')}</p>
-      <p class="ss-grade-sub">School Year: ${escapeHtml(meta.schoolYear || '_______________')}</p>
-      <table class="ss-table">
-        <thead>
-          <tr><th rowspan="2">Learning Areas</th><th colspan="4">Periodic Rating</th><th rowspan="2">Final<br>Rating</th><th rowspan="2">Remarks</th></tr>
-          <tr><th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th></tr>
-        </thead>
-        <tbody>
-          ${subjects.map((su, i) => {
-            const q = progress.subjects[su.key] || {};
-            return `<tr><td>${escapeHtml(su.label)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : ''}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '' : finals[i]}</td><td></td></tr>`;
-          }).join('')}
-        </tbody>
-        <tfoot><tr class="ss-genavg-row"><td colspan="5" class="ss-genavg-label">General Average</td><td class="ss-num">${genAvg === null ? '' : genAvg}</td><td></td></tr></tfoot>
-      </table>
-      <p class="ss-eligible-line">Eligible for Admission to Grade: ${escapeHtml(meta.eligible || '_______________')}</p>
-    </div>`;
-  }
-
-  function buildElementaryProgressHtml(s){
-    const pr = s.permanentRecord;
-    if(!pr) return '';
-    const pairs = [['I','II'], ['III','IV'], ['V','VI']];
-    return `<p class="ss-section-title">II. Elementary School Progress</p>` +
-      `<div class="ss-progress-grid">` +
-      pairs.map(([a, b]) => buildGradeCellHtml(a, pr) + buildGradeCellHtml(b, pr)).join('') +
-      `</div>`;
-  }
-
-  function buildCoreValuesGroupHtml(levels, pr){
-    const groupSpans = [];
-    CORE_VALUE_ROWS.forEach((row, i) => {
-      if(i > 0 && CORE_VALUE_ROWS[i - 1].group === row.group) groupSpans[groupSpans.length - 1].span++;
-      else groupSpans.push({ group:row.group, span:1, startIndex:i });
-    });
-    const groupStartIndex = {};
-    groupSpans.forEach(g => { groupStartIndex[g.startIndex] = g; });
-
-    return `
-    <div class="ss-corevalues-wrap">
-      <table class="ss-table ss-corevalues-table">
-        <thead>
-          <tr>
-            <th rowspan="2">Core Values</th>
-            <th rowspan="2">Behavior Statements</th>
-            ${levels.map(level => {
-              const meta = pr.meta[level] || {};
-              return `<th colspan="4">Grade ${level} SY: ${escapeHtml(meta.schoolYear || '____')}</th>`;
-            }).join('')}
-          </tr>
-          <tr>${levels.map(() => `<th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th>`).join('')}</tr>
-        </thead>
-        <tbody>
-          ${CORE_VALUE_ROWS.map((row, i) => {
-            const groupCell = groupStartIndex[i] ? `<td rowspan="${groupStartIndex[i].span}">${escapeHtml(row.group)}</td>` : '';
-            const quarterCells = levels.map(level => {
-              const cv = (pr.coreValues[level] || { ratings:{} }).ratings[row.key] || {};
-              return ['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${escapeHtml(cv[qk] || '')}</td>`).join('');
-            }).join('');
-            return `<tr>${groupCell}<td>${escapeHtml(row.statement)}</td>${quarterCells}</tr>`;
-          }).join('')}
-        </tbody>
-      </table>
-    </div>`;
-  }
-
-  function buildCoreValuesHtml(s){
-    const pr = s.permanentRecord;
-    if(!pr) return '';
-    return `<p class="ss-section-title">III. Learners Observed Values</p>` +
-      buildCoreValuesGroupHtml(['I', 'II', 'III'], pr) +
-      buildCoreValuesGroupHtml(['IV', 'V', 'VI'], pr) +
-      `<p class="ss-legend"><span><b>AO</b> Always Observed</span><span><b>SO</b> Sometimes Observed</span><span><b>RO</b> Rarely Observed</span><span><b>NO</b> Not Observed</span></p>`;
-  }
-
-  function buildAttendanceHtml(s){
-    const pr = s.permanentRecord;
-    if(!pr) return '';
-    return `
-      <p class="ss-section-title">IV. Attendance Record</p>
-      <table class="ss-table">
-        <thead><tr><th>Grade</th><th class="ss-num">No. of<br>School Days</th><th class="ss-num">No. of School<br>Days Absent</th><th>Cause</th><th class="ss-num">No. of Times<br>Tardy</th><th>Cause</th><th class="ss-num">No. of School<br>Days Present</th></tr></thead>
-        <tbody>
-          ${GRADE_LEVELS.map(level => {
-            const a = pr.attendance[level] || {};
-            return `<tr><td>${level}</td><td class="ss-num">${escapeHtml(a.schoolDays || '')}</td><td class="ss-num">${escapeHtml(a.daysAbsent || '')}</td><td>${escapeHtml(a.causeAbsent || '')}</td><td class="ss-num">${escapeHtml(a.timesTardy || '')}</td><td>${escapeHtml(a.causeTardy || '')}</td><td class="ss-num">${escapeHtml(a.daysPresent || '')}</td></tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
-  }
-
-  function buildCertificateHtml(s){
-    const pr = s.permanentRecord;
-    const transfer = (pr && pr.transfer) || {};
-    const hasNameParts = s.surname || s.firstName || s.mi;
-    const composedName = hasNameParts
-      ? [s.surname, s.firstName, s.mi ? (s.mi.replace(/\.$/, '') + '.') : ''].filter(Boolean).join(' ')
-      : s.name;
-    return `
-      <div class="ss-certificate">
-        <p class="ss-cert-title">Certificate of Transfer</p>
-        <p>To whom it may concern:</p>
-        <p>This is to certify that this is a true record of the Elementary School Permanent Record of <b>${escapeHtml(composedName)}</b>. He/She is eligible for transfer and admission to Grade / Year <b>${escapeHtml(transfer.eligible || '________________')}</b>.</p>
-        <div class="ss-cert-sign">
-          <p class="ss-cert-date-line">Date: <b>${escapeHtml(transfer.date || '')}</b></p>
-          <div class="ss-cert-principal">
-            <div class="ss-sig-line">${escapeHtml(transfer.principal || 'Principal / School Head')}</div>
-          </div>
-        </div>
-      </div>`;
-  }
-
-  function openShareModal(s){
-    shareStudent = s;
-    const teacher = teacherById[s.teacherId];
-    const brand = currentBrandingForShare();
-    const schoolName = s.school || brand.title || brand.heading || DEFAULT_HEADING;
-    const sortedHistory = [...(s.history || [])].sort((a, b) => b.year.localeCompare(a.year));
-    const hasNameParts = s.surname || s.firstName || s.mi;
-    const composedName = hasNameParts
-      ? [s.surname, s.firstName, s.mi ? (s.mi.replace(/\.$/, '') + '.') : ''].filter(Boolean).join(' ')
-      : s.name;
-
-    shareSheet.innerHTML = `
-      <div class="ss-topline">
-        <span class="ss-formcode">SF10-ES (Form 137-E)</span>
-        <div class="ss-lrn-box">LRN<b>${escapeHtml(s.id)}</b></div>
-      </div>
-      <div class="ss-head-text">
-        <p class="ss-republic">Republic of the Philippines</p>
-        <p class="ss-dept">Department of Education</p>
-        <p class="ss-region">${s.division ? escapeHtml(s.division) : 'Region ______________'}</p>
-        <p class="ss-title">Learner's Permanent Academic Record</p>
-      </div>
-
-      <div class="ss-nameline">
-        <span class="ss-nameline-label">Name:</span>
-        <span class="ss-nameline-value">${escapeHtml(composedName)}</span>
-      </div>
-      <div class="ss-name-captions"><span>Surname</span><span>Name</span><span>M.I.</span></div>
-      <div class="ss-row">
-        <div class="ss-field"><span class="ss-label">Division</span><span class="ss-value">${escapeHtml(s.division || '—')}</span></div>
-        <div class="ss-field"><span class="ss-label">School</span><span class="ss-value">${escapeHtml(schoolName)}</span></div>
-      </div>
-      <div class="ss-row">
-        <div class="ss-field"><span class="ss-label">Sex</span><span class="ss-value">${escapeHtml(s.sex || '—')}</span></div>
-        <div class="ss-field"><span class="ss-label">Date of birth</span><span class="ss-value">${escapeHtml(s.dob || '—')}</span></div>
-        <div class="ss-field"><span class="ss-label">Place of birth</span><span class="ss-value">${escapeHtml(s.pob || '—')}</span></div>
-        <div class="ss-field"><span class="ss-label">Date of entrance</span><span class="ss-value">${escapeHtml(s.doe || '—')}</span></div>
-      </div>
-      <div class="ss-row">
-        <div class="ss-field" style="flex:1.4;"><span class="ss-label">Parent / Guardian — Name</span><span class="ss-value">${escapeHtml(s.guardian || '—')}</span></div>
-        <div class="ss-field"><span class="ss-label">Address</span><span class="ss-value">${escapeHtml(s.guardianAddress || '—')}</span></div>
-        <div class="ss-field"><span class="ss-label">Occupation</span><span class="ss-value">${escapeHtml(s.guardianOccupation || '—')}</span></div>
-      </div>
-
-      <div class="ss-row">
-        <div class="ss-field"><span class="ss-label">Section</span><span class="ss-value">${escapeHtml(s.section)}</span></div>
-        <div class="ss-field"><span class="ss-label">School year</span><span class="ss-value">${escapeHtml(s.year || '—')}</span></div>
-        <div class="ss-field"><span class="ss-label">Adviser</span><span class="ss-value">${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || '—')}</span></div>
-      </div>
-      ${s.transferredFrom ? `<p class="ss-transferred-note">Transferred from: ${escapeHtml(s.transferredFrom)}</p>` : ''}
-
-      <p class="ss-section-title">I. Section History</p>
-      <table class="ss-table">
-        <thead><tr><th>School year</th><th>Section</th><th>Status</th></tr></thead>
-        <tbody>
-          ${sortedHistory.map((h, i) => `<tr><td>${escapeHtml(h.year)}</td><td>${escapeHtml(h.section)}</td><td>${i === 0 ? 'Current' : ''}</td></tr>`).join('') || '<tr><td colspan="3">No prior section records on file.</td></tr>'}
-        </tbody>
-      </table>
-
-      ${buildElementaryProgressHtml(s)}
-      ${buildCoreValuesHtml(s)}
-      ${buildAttendanceHtml(s)}
-      ${buildCertificateHtml(s)}
-
-      <div class="ss-footer">
-        <span>Generated ${escapeHtml(new Date().toLocaleDateString())} by ${escapeHtml(currentActor())}</span>
-      </div>
-    `;
-    
-    // Tag this overlay for printing
-    document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('print-active'));
-    shareModalOverlay.classList.add('print-active');
-    shareModalOverlay.classList.add('show');
-  }
-  function closeShareModal(){ 
-    shareModalOverlay.classList.remove('show');
-    shareModalOverlay.classList.remove('print-active');
-  }
-
-  document.getElementById('shareModalClose').addEventListener('click', closeShareModal);
-  document.getElementById('shareCloseBtn').addEventListener('click', closeShareModal);
-  shareModalOverlay.addEventListener('click', e => { if(e.target === shareModalOverlay) closeShareModal(); });
-
-  let savedDocTitle = null;
-  window.addEventListener('beforeprint', () => {
-    if((shareModalOverlay.classList.contains('show') || sf9ModalOverlay.classList.contains('show')) && shareStudent){
-      savedDocTitle = document.title;
-      let type = shareModalOverlay.classList.contains('show') ? 'SF10' : 'SF9';
-      document.title = `${type} - ${shareStudent.name} (${shareStudent.id})`;
-    }
-  });
-  window.addEventListener('afterprint', () => {
-    if(savedDocTitle !== null){ document.title = savedDocTitle; savedDocTitle = null; }
-  });
-
-  document.getElementById('sharePrintBtn').addEventListener('click', () => {
-    if(shareStudent) logActivity('Shared student record SF10 (print/PDF)', `${shareStudent.name} (${shareStudent.id})`);
-    window.print();
-  });
-  document.getElementById('shareEmailBtn').addEventListener('click', () => {
-    if(!shareStudent) return;
-    const s = shareStudent;
-    const teacher = teacherById[s.teacherId];
-    const subject = `Student record SF10 — ${s.name} (${s.id})`;
-    const bodyLines = [
-      `Student record for ${s.name} (LRN ${s.id})`,
-      `Section: ${s.section}   School year: ${s.year || '—'}`,
-      `Adviser: ${teacher ? teacher.name : (s.teacherId || '—')}`,
-      '',
-      'A full formatted copy of this record can be saved as a PDF from the "Print / Save as PDF" button and attached to this email.'
-    ];
-    logActivity('Shared student record SF10 (email)', `${s.name} (${s.id})`);
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
-  });
-
-  // ---------- Share SF9 record (Report Card) ----------
-  const sf9ModalOverlay = document.getElementById('sf9ModalOverlay');
-  const sf9Sheet = document.getElementById('sf9Sheet');
-  const sf9GradeSelect = document.getElementById('sf9GradeSelect');
-
-  function buildSF9Html(s, level) {
-    const pr = ensurePermanentRecord(s);
-    const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
-    const progress = pr.progress[level] || { subjects:{} };
-    const coreValues = pr.coreValues[level] || { ratings:{} };
-    const att = pr.attendance[level] || {};
-    
-    const subjects = subjectsForLevel(level);
-    const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
-    const genAvg = computeGeneralAverage(finals);
-
-    const teacher = teacherById[s.teacherId];
-    const brand = currentBrandingForShare();
-    const schoolName = meta.school || s.school || brand.title || brand.heading || DEFAULT_HEADING;
-
-    const hasNameParts = s.surname || s.firstName || s.mi;
-    const composedName = hasNameParts
-      ? [s.surname, s.firstName, s.mi ? (s.mi.replace(/\.$/, '') + '.') : ''].filter(Boolean).join(' ')
-      : s.name;
-    
-    // Core Values Table
-    const groupSpans = [];
-    CORE_VALUE_ROWS.forEach((row, i) => {
-      if(i > 0 && CORE_VALUE_ROWS[i - 1].group === row.group) groupSpans[groupSpans.length - 1].span++;
-      else groupSpans.push({ group:row.group, span:1, startIndex:i });
-    });
-    const groupStartIndex = {};
-    groupSpans.forEach(g => { groupStartIndex[g.startIndex] = g; });
-
-    let coreValuesHtml = `
-      <div class="sf9-section-header">Report on Learner's Observed Values</div>
-      <table class="ss-table ss-corevalues-table" style="margin-top:0.4rem;">
-        <thead>
-          <tr>
-            <th rowspan="2">Core Values</th>
-            <th rowspan="2">Behavior Statements</th>
-            <th colspan="4">Quarter</th>
-          </tr>
-          <tr><th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th></tr>
-        </thead>
-        <tbody>
-          ${CORE_VALUE_ROWS.map((row, i) => {
-            const groupCell = groupStartIndex[i] ? `<td rowspan="${groupStartIndex[i].span}">${escapeHtml(row.group)}</td>` : '';
-            const cv = coreValues.ratings[row.key] || {};
-            const quarterCells = ['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${escapeHtml(cv[qk] || '')}</td>`).join('');
-            return `<tr>${groupCell}<td>${escapeHtml(row.statement)}</td>${quarterCells}</tr>`;
-          }).join('')}
-        </tbody>
-      </table>
-      <p class="ss-legend" style="justify-content:center; margin-bottom: 0;"><span><b>AO</b> Always Observed</span><span><b>SO</b> Sometimes Observed</span><span><b>RO</b> Rarely Observed</span><span><b>NO</b> Not Observed</span></p>
-    `;
-
-    // Attendance Table
-    let attendanceHtml = `
-      <div class="sf9-section-header" style="margin-top:1.5rem;">Report on Attendance</div>
-      <table class="ss-table" style="margin-top:0.4rem;">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>No. of School Days</td>
-            <td colspan="4" class="ss-num" style="color:#666;">(Recorded Annually)</td>
-            <td class="ss-num">${escapeHtml(att.schoolDays || '')}</td>
-          </tr>
-          <tr>
-            <td>No. of Days Present</td>
-            <td colspan="4" class="ss-num" style="color:#666;"></td>
-            <td class="ss-num">${escapeHtml(att.daysPresent || '')}</td>
-          </tr>
-          <tr>
-            <td>No. of Days Absent</td>
-            <td colspan="4" class="ss-num" style="color:#666;"></td>
-            <td class="ss-num">${escapeHtml(att.daysAbsent || '')}</td>
-          </tr>
-        </tbody>
-      </table>
-    `;
-
-    return `
-      <div class="ss-topline">
-        <span class="ss-formcode">SF9 (Report Card)</span>
-        <div class="ss-lrn-box">LRN<b>${escapeHtml(s.id)}</b></div>
-      </div>
-      <div class="ss-head-text">
-        <p class="ss-republic">Republic of the Philippines</p>
-        <p class="ss-dept">Department of Education</p>
-        <p class="ss-region">${s.division ? escapeHtml(s.division) : 'Region ______________'}</p>
-        <p class="ss-title">Learner's Progress Report Card</p>
-      </div>
-
-      <div class="sf9-school-info">
-        <b>${escapeHtml(schoolName)}</b><br>
-        School Year: ${escapeHtml(meta.schoolYear || s.year || '____')}
-      </div>
-
-      <div class="sf9-student-info">
-        <div>Name: <span>${escapeHtml(composedName)}</span></div>
-        <div>Age/Sex: <span>${escapeHtml(s.sex || '—')}</span></div>
-        <div>Grade: <span>${escapeHtml(level)}</span></div>
-        <div>Section: <span>${escapeHtml(s.section || '—')}</span></div>
-      </div>
-
-      <div class="sf9-two-col">
-        <div>
-          <div class="sf9-section-header">Report on Learning Progress and Achievement</div>
-          <table class="ss-table" style="margin-top:0.4rem;">
-            <thead>
-              <tr><th rowspan="2">Learning Areas</th><th colspan="4">Quarter</th><th rowspan="2">Final<br>Grade</th><th rowspan="2">Remarks</th></tr>
-              <tr><th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th></tr>
-            </thead>
-            <tbody>
-              ${subjects.map((su, i) => {
-                const q = progress.subjects[su.key] || {};
-                let remarks = finals[i] !== null ? (finals[i] >= 75 ? 'Passed' : 'Failed') : '';
-                return `<tr><td>${escapeHtml(su.label)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : ''}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '' : finals[i]}</td><td style="font-size:0.65rem;">${remarks}</td></tr>`;
-              }).join('')}
-            </tbody>
-            <tfoot>
-              <tr class="ss-genavg-row"><td colspan="5" class="ss-genavg-label">General Average</td><td class="ss-num">${genAvg === null ? '' : genAvg}</td><td style="font-size:0.65rem;">${genAvg !== null ? (genAvg >= 75 ? 'Passed' : 'Failed') : ''}</td></tr>
-            </tfoot>
-          </table>
-          <p style="font-size:0.68rem; margin-top: -0.2rem;"><b>Descriptors:</b> Outstanding (90-100), Very Satisfactory (85-89), Satisfactory (80-84), Fairly Satisfactory (75-79), Did Not Meet Expectations (Below 75)</p>
-        </div>
-        <div>
-          ${coreValuesHtml}
-          ${attendanceHtml}
-        </div>
-      </div>
-
-      <div class="sf9-sign-area">
-        <div class="sf9-sign-box">
-           <br><br>
-           <div>${escapeHtml(pr.transfer.principal || 'Principal')}</div>
-           <span>Principal</span>
-        </div>
-        <div class="sf9-sign-box">
-           <br><br>
-           <div>${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || 'Teacher')}</div>
-           <span>Teacher</span>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderSF9ForGrade(level) {
-    if(shareStudent) {
-      sf9Sheet.innerHTML = buildSF9Html(shareStudent, level);
-    }
-  }
-
-  function openSF9Modal(s){
-    shareStudent = s;
-    sf9GradeSelect.innerHTML = GRADE_LEVELS.map(g => `<option value="${g}">Grade ${g}</option>`).join('');
-    // Pick the most likely grade based on section history, or default to I
-    let startGrade = 'I'; 
-    if(s.permanentRecord && s.permanentRecord.meta){
-      // simple heuristic: pick the highest grade that has a schoolYear filled
-      for(let i=GRADE_LEVELS.length-1; i>=0; i--) {
-        if(s.permanentRecord.meta[GRADE_LEVELS[i]] && s.permanentRecord.meta[GRADE_LEVELS[i]].schoolYear) {
-          startGrade = GRADE_LEVELS[i];
-          break;
-        }
-      }
-    }
-    sf9GradeSelect.value = startGrade;
-    renderSF9ForGrade(startGrade);
-    
-    // Tag this overlay for printing
-    document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('print-active'));
-    sf9ModalOverlay.classList.add('print-active');
-    sf9ModalOverlay.classList.add('show');
-  }
-  function closeSF9Modal(){ 
-    sf9ModalOverlay.classList.remove('show');
-    sf9ModalOverlay.classList.remove('print-active');
-  }
-
-  sf9GradeSelect.addEventListener('change', e => renderSF9ForGrade(e.target.value));
-  document.getElementById('sf9ModalClose').addEventListener('click', closeSF9Modal);
-  document.getElementById('sf9CloseBtn').addEventListener('click', closeSF9Modal);
-  sf9ModalOverlay.addEventListener('click', e => { if(e.target === sf9ModalOverlay) closeSF9Modal(); });
-
-  document.getElementById('sf9PrintBtn').addEventListener('click', () => {
-    if(shareStudent) logActivity('Shared student record SF9 (print/PDF)', `${shareStudent.name} (${shareStudent.id})`);
-    window.print();
-  });
-
-
   function renderProfile(){
     document.querySelector('.search-wrap').style.display = 'none';
     hintText.style.display = 'none';
@@ -3901,7 +2681,6 @@
     }
     const teacher = teacherById[s.teacherId];
     const sortedHistory = [...(s.history || [])].sort((a, b) => b.year.localeCompare(a.year));
-    const hasRecordDetails = s.surname || s.firstName || s.mi || s.sex || s.dob || s.pob || s.doe || s.guardian || s.guardianAddress || s.guardianOccupation || s.division || s.school;
 
     resultsEl.style.display = 'block';
     resultsEl.innerHTML = `
@@ -3916,28 +2695,6 @@
             <div><span class="tag">Transferred in</span>Came from ${escapeHtml(s.transferredFrom)}</div>
           </div>
         ` : ''}
-
-        ${(s.birthCertFront || s.birthCertBack) ? `
-          <p class="section-label">Birth Certificate</p>
-          <div class="bc-display-row" style="margin-bottom: 1.4rem;">
-             ${s.birthCertFront ? `<img src="${s.birthCertFront}" class="bc-img" onclick="viewImage(this.src)" title="Front Picture">` : ''}
-             ${s.birthCertBack ? `<img src="${s.birthCertBack}" class="bc-img" onclick="viewImage(this.src)" title="Back Picture">` : ''}
-          </div>
-        ` : ''}
-
-        ${hasRecordDetails ? `
-          <p class="section-label">Permanent record details</p>
-          <ul class="record-details-view">
-            ${(s.surname || s.firstName || s.mi) ? `<li><span>Surname / First name / M.I.</span><b>${escapeHtml(s.surname || '—')} / ${escapeHtml(s.firstName || '—')} / ${escapeHtml(s.mi || '—')}</b></li>` : ''}
-            ${s.sex ? `<li><span>Sex</span><b>${escapeHtml(s.sex)}</b></li>` : ''}
-            ${s.dob ? `<li><span>Date of birth</span><b>${escapeHtml(s.dob)}</b></li>` : ''}
-            ${s.pob ? `<li><span>Place of birth</span><b>${escapeHtml(s.pob)}</b></li>` : ''}
-            ${s.doe ? `<li><span>Date of entrance</span><b>${escapeHtml(s.doe)}</b></li>` : ''}
-            ${s.guardian ? `<li><span>Parent/Guardian</span><b>${escapeHtml(s.guardian)}</b></li>` : ''}
-            ${s.division ? `<li><span>Division</span><b>${escapeHtml(s.division)}</b></li>` : ''}
-            ${s.school ? `<li><span>School</span><b>${escapeHtml(s.school)}</b></li>` : ''}
-          </ul>
-        ` : ''}
         <p class="section-label">Section history</p>
         <ul class="timeline">
           ${sortedHistory.map((h, i) => `
@@ -3947,26 +2704,15 @@
             </li>
           `).join('') || '<li>No prior section records on file.</li>'}
         </ul>
-        <div class="modal-actions" style="justify-content:flex-start; margin-top:1.4rem; flex-wrap:wrap;">
-          <button type="button" class="btn-secondary admin-only" id="editFromProfileBtn">Edit student</button>
-          <button type="button" class="btn-secondary" id="recordFromProfileBtn">🎓 Grades (SF10)</button>
-          <button type="button" class="btn-secondary" id="shareFromProfileBtn">📄 View SF10 (Form 137)</button>
-          <button type="button" class="btn-secondary" id="sf9FromProfileBtn">📄 View SF9 (Report Card)</button>
-          <button type="button" class="btn-danger admin-only" id="deleteFromProfileBtn">Delete student</button>
+        <div class="modal-actions" style="justify-content:flex-start; margin-top:1.4rem;">
+          <button type="button" class="btn-secondary" id="editFromProfileBtn">Edit this student</button>
+          <button type="button" class="btn-danger" id="deleteFromProfileBtn">Delete this student</button>
         </div>
       </div>
     `;
     document.getElementById('backBtn').addEventListener('click', backToList);
-    
-    const editBtn = document.getElementById('editFromProfileBtn');
-    if(editBtn) editBtn.addEventListener('click', () => openStudentModal(s));
-    
-    document.getElementById('recordFromProfileBtn').addEventListener('click', () => openRecordModal(s));
-    document.getElementById('shareFromProfileBtn').addEventListener('click', () => openShareModal(s));
-    document.getElementById('sf9FromProfileBtn').addEventListener('click', () => openSF9Modal(s));
-    
-    const delBtn = document.getElementById('deleteFromProfileBtn');
-    if(delBtn) delBtn.addEventListener('click', () => confirmDeleteStudents([s.id]));
+    document.getElementById('editFromProfileBtn').addEventListener('click', () => openStudentModal(s));
+    document.getElementById('deleteFromProfileBtn').addEventListener('click', () => confirmDeleteStudents([s.id]));
   }
 
   function jumpToTeacher(teacherId){
@@ -4025,11 +2771,10 @@
               <li><b>Tap a student's name</b> to see their full section history, and check the boxes on any card to delete several at once.</li>
               <li>When you're ready to keep your data permanently, use <b>"export current data"</b> in the footer.</li>
             </ol>
-            <button class="add-btn admin-only" id="onboardingAddStudent">+ Add your first student</button>
+            <button class="add-btn" id="onboardingAddStudent">+ Add your first student</button>
           </div>
         `;
-        const obs = document.getElementById('onboardingAddStudent');
-        if(obs) obs.addEventListener('click', openStudentModal);
+        document.getElementById('onboardingAddStudent').addEventListener('click', openStudentModal);
         return;
       }
 
@@ -4061,21 +2806,16 @@
         const card = document.createElement('div');
         card.className = 'card' + (selectedStudentIds.has(s.id) ? ' selected' : '');
         card.style.animationDelay = (i * 0.03) + 's';
-        
-        const adminTools = `
-          <button class="icon-del icon-edit admin-only" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>
-          <button class="icon-del admin-only" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
-        `;
-
         card.innerHTML = `
           <div class="card-head">
-            <label class="chk admin-only">
+            <label class="chk">
               <input type="checkbox" class="select-chk" data-select-student="${escapeHtml(s.id)}" ${selectedStudentIds.has(s.id) ? 'checked' : ''}>
               <span class="chk-box"></span>
             </label>
             <div class="card-head-right">
               <div class="stamp">${escapeHtml(s.section)}</div>
-              ${adminTools}
+              <button class="icon-del icon-edit" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>
+              <button class="icon-del" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
             </div>
           </div>
           <p class="id">${escapeHtml(s.id)}</p>
@@ -4083,6 +2823,7 @@
           <div class="row"><span class="label">Section</span><span class="value">${escapeHtml(s.section)}</span></div>
           <div class="row"><span class="label">School Year</span><span class="value">${escapeHtml(s.year || '—')}</span></div>
           <div class="row"><span class="label">Adviser</span><span class="value"><button class="link-btn" data-teacher="${escapeHtml(s.teacherId)}">${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || '—')}</button></span></div>
+          <div class="row"><span class="label">Teacher ID</span><span class="value">${escapeHtml(s.teacherId || '—')}</span></div>
         `;
         resultsEl.appendChild(card);
       });
@@ -4134,11 +2875,10 @@
               <li>Once saved, they'll show up as an <b>adviser option</b> when you add students.</li>
               <li>Check the boxes on teacher cards to <b>select and delete several at once</b>.</li>
             </ol>
-            <button class="add-btn admin-only" id="onboardingAddTeacher">+ Add your first teacher</button>
+            <button class="add-btn" id="onboardingAddTeacher">+ Add your first teacher</button>
           </div>
         `;
-        const otb = document.getElementById('onboardingAddTeacher');
-        if(otb) otb.addEventListener('click', openTeacherModal);
+        document.getElementById('onboardingAddTeacher').addEventListener('click', openTeacherModal);
         return;
       }
 
@@ -4158,21 +2898,16 @@
         const card = document.createElement('div');
         card.className = 'card' + (selectedTeacherIds.has(t.id) ? ' selected' : '');
         card.style.animationDelay = (i * 0.03) + 's';
-        
-        const adminTools = `
-          <button class="icon-del icon-edit admin-only" data-edit-teacher="${escapeHtml(t.id)}" aria-label="Edit teacher" title="Edit teacher">✏️</button>
-          <button class="icon-del admin-only" data-delete-teacher="${escapeHtml(t.id)}" aria-label="Delete teacher" title="Delete teacher">🗑</button>
-        `;
-
         card.innerHTML = `
           <div class="card-head">
-            <label class="chk admin-only">
+            <label class="chk">
               <input type="checkbox" class="select-chk" data-select-teacher="${escapeHtml(t.id)}" ${selectedTeacherIds.has(t.id) ? 'checked' : ''}>
               <span class="chk-box"></span>
             </label>
             <div class="card-head-right">
               <div class="stamp">${t.subjects.length} held</div>
-              ${adminTools}
+              <button class="icon-del icon-edit" data-edit-teacher="${escapeHtml(t.id)}" aria-label="Edit teacher" title="Edit teacher">✏️</button>
+              <button class="icon-del" data-delete-teacher="${escapeHtml(t.id)}" aria-label="Delete teacher" title="Delete teacher">🗑</button>
             </div>
           </div>
           <p class="id">${escapeHtml(t.id)}</p>
@@ -4229,7 +2964,7 @@
   const confirmText = document.getElementById('confirmText');
   const confirmSubText = document.getElementById('confirmSubText');
   const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  let pendingDelete = null; 
+  let pendingDelete = null; // { type: 'student' | 'teacher', ids: [...] }
 
   function openConfirmModal({ title, text, sub }){
     confirmTitle.textContent = title;
@@ -4278,7 +3013,6 @@
     const { type, ids } = pendingDelete;
 
     if(type === 'student'){
-      const deletedNames = students.filter(s => ids.includes(s.id)).map(s => `${s.name} (${s.id})`);
       for(let i = students.length - 1; i >= 0; i--){
         if(ids.includes(students[i].id)) students.splice(i, 1);
       }
@@ -4286,20 +3020,17 @@
       refreshDropdowns();
       if(sectionFilter && !students.some(s => s.section === sectionFilter)){ sectionFilter = ''; sectionSelect.value = ''; }
       if(yearFilter && !students.some(s => s.year === yearFilter)){ yearFilter = ''; yearSelect.value = ''; }
-      logActivity(ids.length === 1 ? 'Deleted student' : `Deleted ${ids.length} students`, deletedNames.join(', '));
       showToast(ids.length === 1 ? 'Student deleted' : `${ids.length} students deleted`);
       if(view === 'profile' && ids.includes(profileStudentId)){
         view = 'list';
         profileStudentId = null;
       }
     } else {
-      const deletedNames = teachers.filter(t => ids.includes(t.id)).map(t => `${t.name} (${t.id})`);
       for(let i = teachers.length - 1; i >= 0; i--){
         if(ids.includes(teachers[i].id)) teachers.splice(i, 1);
       }
       ids.forEach(id => selectedTeacherIds.delete(id));
       rebuildTeacherById();
-      logActivity(ids.length === 1 ? 'Deleted teacher' : `Deleted ${ids.length} teachers`, deletedNames.join(', '));
       showToast(ids.length === 1 ? 'Teacher deleted' : `${ids.length} teachers deleted`);
     }
 
@@ -4314,90 +3045,29 @@
   const stuTeacherSelect = document.getElementById('stuTeacher');
   const studentModalTitle = document.getElementById('studentModalTitle');
   const studentSubmitBtn = document.getElementById('studentSubmitBtn');
-  let editingStudentId = null; 
-  let pendingBcFront = null;
-  let pendingBcBack = null;
-
-  function updateBcPreviewUI() {
-    const frontPreview = document.getElementById('stuBcFrontPreview');
-    if(pendingBcFront) {
-      frontPreview.src = pendingBcFront;
-      frontPreview.style.display = 'block';
-    } else {
-      frontPreview.src = '';
-      frontPreview.style.display = 'none';
-      document.getElementById('stuBcFrontFile').value = '';
-    }
-
-    const backPreview = document.getElementById('stuBcBackPreview');
-    if(pendingBcBack) {
-      backPreview.src = pendingBcBack;
-      backPreview.style.display = 'block';
-    } else {
-      backPreview.src = '';
-      backPreview.style.display = 'none';
-      document.getElementById('stuBcBackFile').value = '';
-    }
-  }
-
-  document.getElementById('stuBcFrontFile').addEventListener('change', async (e) => {
-    if(e.target.files[0]) {
-       pendingBcFront = await resizeImageToDataURL(e.target.files[0], 800, 0.7);
-       updateBcPreviewUI();
-    }
-  });
-
-  document.getElementById('stuBcBackFile').addEventListener('change', async (e) => {
-    if(e.target.files[0]) {
-       pendingBcBack = await resizeImageToDataURL(e.target.files[0], 800, 0.7);
-       updateBcPreviewUI();
-    }
-  });
-
-  document.getElementById('clearBcBtn').addEventListener('click', () => {
-    pendingBcFront = null;
-    pendingBcBack = null;
-    updateBcPreviewUI();
-  });
+  let editingStudentId = null; // null = adding new; otherwise the original LRN being edited
 
   function openStudentModal(existing){
     stuTeacherSelect.innerHTML = '<option value="">— none yet —</option>' +
       teachers.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.id)} — ${escapeHtml(t.name)}</option>`).join('');
     studentForm.reset();
-    pendingBcFront = null;
-    pendingBcBack = null;
-    
+
     if(existing){
       editingStudentId = existing.id;
       studentModalTitle.textContent = 'Edit student';
       studentSubmitBtn.textContent = 'Save changes';
       document.getElementById('stuId').value = existing.id;
+      document.getElementById('stuName').value = existing.name;
       document.getElementById('stuSection').value = existing.section;
       document.getElementById('stuYear').value = existing.year || '';
       stuTeacherSelect.value = existing.teacherId || '';
       document.getElementById('stuOrigin').value = existing.transferredFrom || '';
-      document.getElementById('stuSurname').value = existing.surname || '';
-      document.getElementById('stuFirstName').value = existing.firstName || '';
-      document.getElementById('stuMI').value = existing.mi || '';
-      document.getElementById('stuSex').value = existing.sex || '';
-      document.getElementById('stuDob').value = existing.dob || '';
-      document.getElementById('stuPob').value = existing.pob || '';
-      document.getElementById('stuDoe').value = existing.doe || '';
-      document.getElementById('stuGuardian').value = existing.guardian || '';
-      document.getElementById('stuGuardianAddress').value = existing.guardianAddress || '';
-      document.getElementById('stuGuardianOccupation').value = existing.guardianOccupation || '';
-      document.getElementById('stuDivision').value = existing.division || '';
-      document.getElementById('stuSchool').value = existing.school || '';
-
-      if(existing.birthCertFront) pendingBcFront = existing.birthCertFront;
-      if(existing.birthCertBack) pendingBcBack = existing.birthCertBack;
     } else {
       editingStudentId = null;
       studentModalTitle.textContent = 'Add student';
       studentSubmitBtn.textContent = 'Save student';
     }
 
-    updateBcPreviewUI();
     studentModalOverlay.classList.add('show');
     document.getElementById('stuId').focus();
   }
@@ -4410,35 +3080,13 @@
   studentForm.addEventListener('submit', e => {
     e.preventDefault();
     const id = document.getElementById('stuId').value.trim();
+    const name = document.getElementById('stuName').value.trim();
     const section = document.getElementById('stuSection').value.trim();
     const year = document.getElementById('stuYear').value.trim();
     const teacherId = stuTeacherSelect.value;
     const origin = document.getElementById('stuOrigin').value.trim();
-    const surname = document.getElementById('stuSurname').value.trim();
-    const firstName = document.getElementById('stuFirstName').value.trim();
-    const mi = document.getElementById('stuMI').value.trim();
-    const name = [firstName, mi ? (mi.replace(/\.$/, '') + '.') : '', surname].filter(Boolean).join(' ');
-    const sex = document.getElementById('stuSex').value;
-    const dob = document.getElementById('stuDob').value;
-    const pob = document.getElementById('stuPob').value.trim();
-    const doe = document.getElementById('stuDoe').value;
-    const guardian = document.getElementById('stuGuardian').value.trim();
-    const guardianAddress = document.getElementById('stuGuardianAddress').value.trim();
-    const guardianOccupation = document.getElementById('stuGuardianOccupation').value.trim();
-    const division = document.getElementById('stuDivision').value.trim();
-    const school = document.getElementById('stuSchool').value.trim();
-    
-    const recordDetails = { surname, firstName, mi, sex, dob, pob, doe, guardian, guardianAddress, guardianOccupation, division, school };
-    function applyRecordDetails(target){
-      Object.keys(recordDetails).forEach(key => {
-        if(recordDetails[key]) target[key] = recordDetails[key];
-        else delete target[key];
-      });
-      // Attach birth certs
-      if(pendingBcFront) target.birthCertFront = pendingBcFront; else delete target.birthCertFront;
-      if(pendingBcBack) target.birthCertBack = pendingBcBack; else delete target.birthCertBack;
-    }
 
+    // Duplicate LRN check — ignore the record we're currently editing
     const dupe = students.some(s => s.id.toLowerCase() === id.toLowerCase() && s.id !== editingStudentId);
     if(dupe){
       showToast(`Student LRN "${id}" already exists`);
@@ -4453,14 +3101,13 @@
       s.year = year;
       s.teacherId = teacherId;
       if(origin) s.transferredFrom = origin; else delete s.transferredFrom;
-      applyRecordDetails(s);
 
+      // Keep the section-history timeline in sync with the current year/section
       s.history = s.history || [];
       const histEntry = s.history.find(h => h.year === year);
       if(histEntry) histEntry.section = section;
       else s.history.unshift({ year, section });
 
-      logActivity('Edited student', `${name} (${id})`);
       saveData();
       refreshDropdowns();
       closeStudentModal();
@@ -4483,9 +3130,7 @@
       dateAdded: Date.now()
     };
     if(origin) newStudent.transferredFrom = origin;
-    applyRecordDetails(newStudent);
     students.push(newStudent);
-    logActivity('Added student', `${name} (${id})`);
     saveData();
 
     refreshDropdowns();
@@ -4511,7 +3156,7 @@
   const teacherModalTitle = document.getElementById('teacherModalTitle');
   const teacherSubmitBtn = document.getElementById('teacherSubmitBtn');
   let subjectRowCount = 0;
-  let editingTeacherId = null; 
+  let editingTeacherId = null; // null = adding new; otherwise the original ID being edited
 
   function addSubjectRow(subject = '', section = ''){
     subjectRowCount++;
@@ -4589,12 +3234,14 @@
       t.name = name;
       t.subjects = subjects;
 
+      // If the teacher's ID changed, update any students that list them as adviser
       if(oldId !== id){
         students.forEach(s => { if(s.teacherId === oldId) s.teacherId = id; });
       }
       rebuildTeacherById();
-      logActivity('Edited teacher', `${name} (${id})`);
       saveData();
+
+      closeTeacherModal();
       view = 'list';
       activeTab = 'teachers';
       tabsEl.dataset.active = 'teachers';
@@ -4608,7 +3255,6 @@
     const newTeacher = { id, name, subjects, dateAdded: Date.now() };
     teachers.push(newTeacher);
     rebuildTeacherById();
-    logActivity('Added teacher', `${name} (${id})`);
     saveData();
 
     closeTeacherModal();
@@ -4656,7 +3302,7 @@
     return tesseractLoadPromise;
   }
 
-  let pendingScanMode = null; 
+  let pendingScanMode = null; // 'student-single' | 'student-bulk' | 'teacher-single'
 
   function openScanChooser(){
     scanChooserTitle.textContent = activeTab === 'students' ? 'Scan students' : 'Scan a teacher';
@@ -4686,12 +3332,11 @@
     scanChooserOverlay.classList.add('show');
   }
 
-  const scanBtnEl = document.getElementById('scanBtn');
-  if(scanBtnEl) scanBtnEl.addEventListener('click', openScanChooser);
-
+  scanBtn.addEventListener('click', openScanChooser);
   document.getElementById('scanChooserClose').addEventListener('click', () => scanChooserOverlay.classList.remove('show'));
   scanChooserOverlay.addEventListener('click', e => { if(e.target === scanChooserOverlay) scanChooserOverlay.classList.remove('show'); });
 
+  // ---- parsing heuristics (best-effort guesses — user reviews everything after) ----
   function guessIdFromText(text){
     const m = text.match(/\b([A-Z]{1,6}-\d{3,7})\b/) || text.match(/\b(\d{4,10})\b/);
     return m ? m[1] : '';
@@ -4715,12 +3360,6 @@
       }
     }
     return '';
-  }
-  function splitGuessedName(fullName){
-    const parts = (fullName || '').trim().split(/\s+/).filter(Boolean);
-    if(!parts.length) return { surname:'', firstName:'' };
-    if(parts.length === 1) return { surname:parts[0], firstName:'' };
-    return { surname:parts[parts.length - 1], firstName:parts.slice(0, -1).join(' ') };
   }
   function parseSingleStudent(text){
     const id = guessIdFromText(text);
@@ -4751,6 +3390,21 @@
     return rows;
   }
 
+  // Phone camera photos are often huge (12MP+) and low-contrast under
+  // ordinary indoor lighting — both hurt OCR accuracy. This pass:
+  //   1) upscales small/low-res crops so character strokes are thick
+  //      enough for Tesseract to resolve, and caps huge photos so OCR
+  //      doesn't stall lower-end phones,
+  //   2) converts to grayscale,
+  //   3) stretches contrast against the image's own darkest/lightest
+  //      pixels (so a dim or glare-y photo doesn't get lost in the
+  //      midtones), then
+  //   4) applies local adaptive thresholding (a blurred-mean comparison,
+  //      not one fixed cutoff) so text stays legible across uneven
+  //      lighting/shadows on the page — a fixed global threshold washes
+  //      out one side of an unevenly-lit photo.
+  // Net effect: crisp black text on a flat white background, which is
+  // exactly what Tesseract is tuned for, instead of a noisy color photo.
   function preprocessForOCR(file, { maxDim = 2200, minDim = 1000 } = {}){
     return new Promise((resolve) => {
       const img = new Image();
@@ -4776,6 +3430,7 @@
           const n = w * h;
           const gray = new Uint8ClampedArray(n);
 
+          // Grayscale (luminosity-weighted) + track min/max for contrast stretch.
           let lo = 255, hi = 0;
           for(let i = 0, p = 0; i < n; i++, p += 4){
             const g = 0.299 * px[p] + 0.587 * px[p+1] + 0.114 * px[p+2];
@@ -4789,16 +3444,23 @@
             stretched[i] = ((gray[i] - lo) / range) * 255;
           }
 
+          // Fast box-blur (two-pass) to approximate a local mean per
+          // pixel — this is the "adaptive" part of the threshold.
           const radius = Math.max(8, Math.round(Math.min(w, h) * 0.02));
           const blurred = boxBlur(stretched, w, h, radius);
 
-          const bias = 12; 
+          // A pixel is text (black) if it's noticeably darker than its
+          // local neighborhood average; otherwise it's background (white).
+          const bias = 12; // small tolerance so flat regions stay white
           for(let i = 0, p = 0; i < n; i++, p += 4){
             const v = stretched[i] < (blurred[i] - bias) ? 0 : 255;
             px[p] = px[p+1] = px[p+2] = v;
           }
           ctx.putImageData(imgData, 0, 0);
         }catch(e){
+          // getImageData can fail on some browsers for cross-origin/edge
+          // cases — fall back to the plain resized (color) image rather
+          // than blocking the scan entirely.
         }
 
         canvas.toBlob(blob => resolve(blob || file), 'image/png');
@@ -4808,6 +3470,7 @@
     });
   }
 
+  // Simple separable box blur used for local-mean thresholding above.
   function boxBlur(src, w, h, radius){
     const tmp = new Float32Array(w * h);
     const out = new Float32Array(w * h);
@@ -4851,6 +3514,12 @@
       const scannable = await preprocessForOCR(file);
       ocrStatusText.textContent = 'Loading scanner…';
       await loadTesseract();
+      // PSM 4 = "single column of text of variable sizes" — fits a
+      // printed class list (one entry per line, ragged widths) better
+      // than the default "fully automatic" mode, which sometimes
+      // fragments a list into separate blocks and drops lines. PSM 6 =
+      // "uniform block of text" — fits a single ID card/record, which is
+      // usually a tight, uniform cluster of lines.
       const psm = mode === 'student-bulk' ? '4' : '6';
       const result = await window.Tesseract.recognize(scannable, 'eng', {
         tessedit_pageseg_mode: psm,
@@ -4862,6 +3531,9 @@
       });
       let text = result.data.text || '';
 
+      // If the tuned PSM came back empty (can happen on layouts it
+      // doesn't expect), fall back to Tesseract's automatic mode once
+      // before giving up, using the same cleaned-up image.
       if(!text.trim()){
         ocrStatusText.textContent = 'Retrying with a different mode…';
         const retry = await window.Tesseract.recognize(scannable, 'eng', {
@@ -4882,9 +3554,7 @@
         const guess = parseSingleStudent(text);
         openStudentModal();
         document.getElementById('stuId').value = guess.id;
-        const guessNameParts = splitGuessedName(guess.name);
-        document.getElementById('stuSurname').value = guessNameParts.surname;
-        document.getElementById('stuFirstName').value = guessNameParts.firstName;
+        document.getElementById('stuName').value = guess.name;
         document.getElementById('stuSection').value = guess.section;
         document.getElementById('stuYear').value = guess.year;
         showToast('Scanned — please review before saving');
@@ -4903,6 +3573,7 @@
     }
   });
 
+  // ---- bulk review table (class list) ----
   let bulkRowCount = 0;
   function openBulkReview(rows){
     bulkReviewRows.innerHTML = '';
@@ -4946,7 +3617,6 @@
     });
 
     if(added > 0){
-      logActivity(`Scanned & added ${added} student${added === 1 ? '' : 's'}`, '');
       saveData();
       refreshDropdowns();
     }
@@ -4964,6 +3634,7 @@
     showToast(msg);
   });
 
+  // ---------- Export data ----------
   const exportModalOverlay = document.getElementById('exportModalOverlay');
   const exportText = document.getElementById('exportText');
 
@@ -4999,19 +3670,20 @@
     }
   });
 
+  // ---------- Shared backup payload builder (used by manual download AND Drive sync) ----------
   function buildBackupPayload(){
     let branding = null;
-    try{ branding = JSON.parse(safeGetItem(BRAND_KEY) || 'null'); }catch(err){}
+    try{ branding = JSON.parse(localStorage.getItem(BRAND_KEY) || 'null'); }catch(err){}
     return {
       type: 'roll-and-register-backup',
       exportedAt: new Date().toISOString(),
       students,
       teachers,
-      branding,
-      activityLog
+      branding
     };
   }
 
+  // ---------- Backup download (.json) ----------
   document.getElementById('downloadBackupBtn').addEventListener('click', () => {
     const payload = buildBackupPayload();
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -5026,8 +3698,489 @@
     showToast('Backup downloaded');
   });
 
+  // ---------- Shared import-merge logic (used by manual file import AND Drive sync) ----------
+  // Adds students/teachers from a parsed backup object, skipping duplicates
+  // by ID. Returns a summary object; does NOT close the modal or re-render
+  // by itself so callers (file import vs Drive load) can decide when to.
   function mergeImportedBackup(data){
     const importedStudents = Array.isArray(data.students) ? data.students : [];
     const importedTeachers = Array.isArray(data.teachers) ? data.teachers : [];
 
-    let addedStudents = 0, skippedStudents = I seem to be encountering an error. Can I try something else for you?
+    let addedStudents = 0, skippedStudents = 0;
+    importedStudents.forEach(s => {
+      if(!s || !s.id || !s.name) return;
+      if(students.some(existing => existing.id.toLowerCase() === String(s.id).toLowerCase())){ skippedStudents++; return; }
+      students.push(s);
+      addedStudents++;
+    });
+
+    let addedTeachers = 0, skippedTeachers = 0;
+    importedTeachers.forEach(t => {
+      if(!t || !t.id || !t.name) return;
+      if(teachers.some(existing => existing.id.toLowerCase() === String(t.id).toLowerCase())){ skippedTeachers++; return; }
+      teachers.push(t);
+      addedTeachers++;
+    });
+
+    let brandingImported = false;
+    if(data.branding && (data.branding.logo || data.branding.title || data.branding.description)){
+      saveBrandingToStorage(data.branding);
+      applyBranding(data.branding);
+      brandingImported = true;
+    }
+
+    if(addedStudents > 0 || addedTeachers > 0){
+      rebuildTeacherById();
+      saveData();
+      refreshDropdowns();
+    }
+
+    const parts = [];
+    if(addedStudents > 0) parts.push(`${addedStudents} student${addedStudents === 1 ? '' : 's'}`);
+    if(addedTeachers > 0) parts.push(`${addedTeachers} teacher${addedTeachers === 1 ? '' : 's'}`);
+    let message = parts.length ? `Imported ${parts.join(' & ')}` : 'Nothing new to import';
+    const skippedTotal = skippedStudents + skippedTeachers;
+    if(skippedTotal > 0) message += ` — skipped ${skippedTotal} duplicate${skippedTotal === 1 ? '' : 's'}`;
+    if(brandingImported) message += ' · logo/title restored';
+
+    return { addedStudents, addedTeachers, skippedStudents, skippedTeachers, brandingImported, message };
+  }
+
+  // ---------- Backup import (.json) ----------
+  const importFileInput = document.getElementById('importFileInput');
+  document.getElementById('importBackupBtn').addEventListener('click', () => {
+    importFileInput.value = '';
+    importFileInput.click();
+  });
+
+  importFileInput.addEventListener('change', () => {
+    const file = importFileInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try{ data = JSON.parse(reader.result); }
+      catch(err){ showToast('That file is not a valid backup (bad JSON)'); return; }
+
+      const result = mergeImportedBackup(data);
+
+      exportModalOverlay.classList.remove('show');
+      view = 'list';
+      render();
+      showToast(result.message);
+    };
+    reader.onerror = () => showToast('Could not read that file');
+    reader.readAsText(file);
+  });
+
+  // ---------- Google Drive sync ----------
+  // Uses Google Identity Services for sign-in and the Drive API's hidden
+  // "appDataFolder" space to store one backup file per Google account —
+  // that folder isn't visible in the account's regular Drive, it's just
+  // storage for this app. Reuses buildBackupPayload() / mergeImportedBackup()
+  // above so Drive sync behaves exactly like the manual download/import.
+  const gdriveBox = document.getElementById('gdriveBox');
+  const gdriveStatus = document.getElementById('gdriveStatus');
+  const gdriveActions = document.getElementById('gdriveActions');
+
+  const signinGate = document.getElementById('signinGate');
+  const signinGoogleBtn = document.getElementById('signinGoogleBtn');
+  const signinGuestBtn = document.getElementById('signinGuestBtn');
+  const signinStatus = document.getElementById('signinStatus');
+  const guestBanner = document.getElementById('guestBanner');
+  const guestBannerBackupBtn = document.getElementById('guestBannerBackupBtn');
+  const guestBannerSigninBtn = document.getElementById('guestBannerSigninBtn');
+  const accountChipDot = document.getElementById('accountChipDot');
+  const accountChipLabel = document.getElementById('accountChipLabel');
+  const accountMenu = document.getElementById('accountMenu');
+  const accountMenuNote = document.getElementById('accountMenuNote');
+  const accountSwitchBtn = document.getElementById('accountSwitchBtn');
+  const accountSignOutBtn = document.getElementById('accountSignOutBtn');
+
+  const SKIP_SIGNIN_KEY = 'rollRegister_skipSignIn';
+  const HAD_SIGNED_IN_KEY = 'rollRegister_hadSignedIn'; // just a flag: "this browser has granted Google access before" — never holds the token itself
+  const isGuestMode = () => isGoogleConfigured && !gapiToken && localStorage.getItem(SKIP_SIGNIN_KEY) === '1';
+
+  let gapiToken = null;       // current OAuth access token (memory only)
+  let gdriveEmail = null;
+  let gdriveFileId = null;    // cached Drive file ID for the backup file
+  let gisLoadPromise = null;
+  let lastDriveSyncAt = null;
+
+  const isGoogleConfigured = GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('YOUR_CLIENT_ID');
+  if(!isGoogleConfigured){
+    // Hide the whole box until a real Client ID is set, rather than show
+    // a button that can only fail — see the GOOGLE_CLIENT_ID comment above.
+    gdriveBox.style.display = 'none';
+  } else {
+    accountChip.style.display = '';
+    // Show the sign-in gate on load unless this browser previously chose
+    // "Continue as Guest" — re-shown every session isn't the goal, just
+    // enough to offer sign-in without nagging someone who's opted out.
+    if(localStorage.getItem(HAD_SIGNED_IN_KEY) === '1'){
+      // This browser has signed in before — try to reconnect quietly in
+      // the background instead of making them click through Google's
+      // login screen again. Falls back to the normal gate/banner below
+      // if the browser's Google session has expired or needs interaction.
+      attemptSilentSignIn();
+    } else if(localStorage.getItem(SKIP_SIGNIN_KEY) !== '1'){
+      signinGate.classList.add('show');
+    } else {
+      guestBanner.style.display = 'flex';
+    }
+  }
+
+  function loadGis(){
+    if(window.google && window.google.accounts && window.google.accounts.oauth2) return Promise.resolve();
+    if(gisLoadPromise) return gisLoadPromise;
+    gisLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Could not load Google Sign-In — check your internet connection.'));
+      document.head.appendChild(script);
+    });
+    return gisLoadPromise;
+  }
+
+  async function fetchGoogleEmail(token){
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if(!res.ok) return null;
+    const data = await res.json();
+    return data.email || null;
+  }
+
+  function formatSyncTime(date){
+    if(!date) return '';
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Keeps the top-corner account chip in sync with whatever setGdriveUI
+  // just did to the Backup & Import modal — one state, two surfaces.
+  function updateAccountChip(){
+    if(!isGoogleConfigured) return;
+    if(gapiToken){
+      accountChipDot.style.background = '#8fae86';
+      accountChipLabel.textContent = gdriveEmail || 'Connected';
+      accountMenuNote.textContent = lastDriveSyncAt
+        ? `${gdriveEmail || 'Signed in'} · synced ${formatSyncTime(lastDriveSyncAt)}`
+        : (gdriveEmail || 'Signed in');
+      signinGate.classList.remove('show');
+      guestBanner.style.display = 'none';
+    } else if(isGuestMode()){
+      accountChipDot.style.background = '#d8a84e';
+      accountChipLabel.textContent = 'Guest mode';
+      accountMenuNote.textContent = 'Guest mode — not syncing';
+      guestBanner.style.display = 'flex';
+    } else {
+      accountChipDot.style.background = '#b08a8a';
+      accountChipLabel.textContent = 'Sign in';
+      accountMenuNote.textContent = 'Not connected';
+      guestBanner.style.display = 'none';
+    }
+  }
+
+  function setGdriveUI(state){
+    if(state === 'connected'){
+      const base = gdriveEmail ? `Connected as ${gdriveEmail}` : 'Connected';
+      gdriveStatus.textContent = lastDriveSyncAt ? `${base} · synced ${formatSyncTime(lastDriveSyncAt)}` : base;
+      gdriveActions.innerHTML = `
+        <button type="button" class="btn-secondary" id="gdriveSaveBtn">⬆ Save to Drive</button>
+        <button type="button" class="btn-secondary" id="gdriveLoadBtn">⬇ Load from Drive</button>
+        <button type="button" class="btn-secondary" id="gdriveDisconnectBtn">Disconnect</button>
+      `;
+      // Wrapped in arrow functions (not passed directly) so the click
+      // event object doesn't get forwarded as gdriveSave's `silent` arg.
+      document.getElementById('gdriveSaveBtn').addEventListener('click', () => gdriveSave(false));
+      document.getElementById('gdriveLoadBtn').addEventListener('click', () => gdriveLoad());
+      document.getElementById('gdriveDisconnectBtn').addEventListener('click', () => gdriveDisconnect());
+    } else {
+      gdriveStatus.textContent = state === 'connecting' ? 'Connecting…' : 'Not connected';
+      gdriveActions.innerHTML = `<button type="button" class="btn-secondary" id="gdriveConnectBtn">Connect Google account</button>`;
+      document.getElementById('gdriveConnectBtn').addEventListener('click', () => gdriveConnect());
+    }
+    updateAccountChip();
+  }
+
+  async function driveFetch(url, options = {}){
+    const res = await fetch(url, {
+      ...options,
+      headers: { ...(options.headers || {}), Authorization: `Bearer ${gapiToken}` }
+    });
+    if(res.status === 401){ gdriveDisconnect(); throw new Error('Google session expired — please reconnect.'); }
+    return res;
+  }
+
+  async function findBackupFile(){
+    const q = encodeURIComponent(`name='${GOOGLE_BACKUP_FILENAME}' and trashed=false`);
+    const res = await driveFetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,modifiedTime)`);
+    const data = await res.json();
+    return (data.files && data.files[0]) || null;
+  }
+
+  async function gdriveSave(silent){
+    try{
+      gdriveStatus.textContent = silent ? 'Syncing…' : 'Saving…';
+      const payload = buildBackupPayload();
+      const body = JSON.stringify(payload, null, 2);
+
+      if(!gdriveFileId){
+        const existing = await findBackupFile();
+        if(existing) gdriveFileId = existing.id;
+      }
+
+      let res;
+      if(gdriveFileId){
+        res = await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${gdriveFileId}?uploadType=media`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body
+        });
+      } else {
+        const metadata = { name: GOOGLE_BACKUP_FILENAME, parents: ['appDataFolder'] };
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', new Blob([body], { type: 'application/json' }));
+        res = await driveFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+          method: 'POST',
+          body: form
+        });
+        const created = await res.json();
+        gdriveFileId = created.id;
+      }
+      if(!res.ok) throw new Error('Drive save failed');
+      lastDriveSyncAt = new Date();
+      setGdriveUI('connected');
+      if(!silent) showToast('Saved to Google Drive');
+    }catch(err){
+      setGdriveUI('connected');
+      // Auto-saves fail quietly in the status line rather than popping a
+      // toast on every keystroke-adjacent change — manual saves still get
+      // an explicit toast since the user is waiting on that click.
+      if(silent){ gdriveStatus.textContent = 'Auto-sync failed — click Save to Drive to retry'; }
+      else showToast(err.message || 'Could not save to Drive');
+    }
+  }
+
+  // ---------- Drive auto-save ----------
+  // Debounced so rapid edits (e.g. typing in a field, adding several rows)
+  // collapse into one Drive write a couple seconds after things go quiet,
+  // instead of firing a request per keystroke.
+  let driveAutoSaveTimer = null;
+  function scheduleDriveAutoSave(){
+    if(!isGoogleConfigured || !gapiToken) return;
+    if(driveAutoSaveTimer) clearTimeout(driveAutoSaveTimer);
+    driveAutoSaveTimer = setTimeout(() => { gdriveSave(true); }, 2000);
+  }
+
+  async function gdriveLoad(){
+    try{
+      gdriveStatus.textContent = 'Loading…';
+      const existing = await findBackupFile();
+      if(!existing){ setGdriveUI('connected'); showToast('No backup found in this Google account yet'); return; }
+      gdriveFileId = existing.id;
+      const res = await driveFetch(`https://www.googleapis.com/drive/v3/files/${gdriveFileId}?alt=media`);
+      if(!res.ok) throw new Error('Drive load failed');
+      const data = await res.json();
+      const result = mergeImportedBackup(data);
+      setGdriveUI('connected');
+      exportModalOverlay.classList.remove('show');
+      view = 'list';
+      render();
+      showToast(result.message);
+    }catch(err){
+      setGdriveUI('connected');
+      showToast(err.message || 'Could not load from Drive');
+    }
+  }
+
+  function gdriveDisconnect(){
+    if(driveAutoSaveTimer){ clearTimeout(driveAutoSaveTimer); driveAutoSaveTimer = null; }
+    if(gapiToken && window.google) window.google.accounts.oauth2.revoke(gapiToken, () => {});
+    gapiToken = null;
+    gdriveEmail = null;
+    gdriveFileId = null;
+    lastDriveSyncAt = null;
+    setGdriveUI('disconnected');
+    showToast('Disconnected from Google');
+  }
+
+  async function gdriveConnect(selectAccount, silent){
+    try{
+      if(!silent){
+        setGdriveUI('connecting');
+        if(signinStatus) signinStatus.textContent = 'Connecting…';
+      }
+      await loadGis();
+      const tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: `${GOOGLE_DRIVE_SCOPE} ${GOOGLE_EMAIL_SCOPE}`,
+        callback: async (resp) => {
+          if(resp.error){
+            if(silent){
+              // The quiet background reconnect didn't work (session expired,
+              // third-party cookies blocked, etc.) — just fall back to the
+              // normal gate/banner instead of bothering anyone with an error.
+              if(localStorage.getItem(SKIP_SIGNIN_KEY) === '1'){
+                guestBanner.style.display = 'flex';
+              } else {
+                signinGate.classList.add('show');
+              }
+              updateAccountChip();
+              return;
+            }
+            setGdriveUI('disconnected');
+            if(signinStatus) signinStatus.textContent = '';
+            showToast('Google sign-in was cancelled or failed');
+            return;
+          }
+          gapiToken = resp.access_token;
+          try{ gdriveEmail = await fetchGoogleEmail(gapiToken); }catch(err){ gdriveEmail = null; }
+          localStorage.setItem(HAD_SIGNED_IN_KEY, '1');
+          setGdriveUI('connected');
+          if(signinStatus) signinStatus.textContent = '';
+          await initialDriveSync();
+        }
+      });
+      // select_account forces Google's account chooser even if this browser
+      // already has a granted session — used when switching accounts so the
+      // same account doesn't just get silently reselected. Silent reconnect
+      // uses prompt: '' — Google issues a fresh token with no UI at all if
+      // this browser already granted access and still has a live session.
+      tokenClient.requestAccessToken(selectAccount ? { prompt: 'select_account' } : (silent ? { prompt: '' } : {}));
+    }catch(err){
+      if(silent) return; // stay quiet on background failures — leave the normal gate/banner as-is
+      setGdriveUI('disconnected');
+      if(signinStatus) signinStatus.textContent = '';
+      showToast(err.message || 'Could not start Google sign-in');
+    }
+  }
+
+  // Tried automatically on page load when this browser has signed in
+  // before, so opening the site doesn't require clicking through Google's
+  // login screen every single time.
+  function attemptSilentSignIn(){
+    gdriveConnect(false, true);
+  }
+
+  // Switches to a different Google account on this device. Local
+  // students/teachers are cleared first (branding is left alone — that's
+  // treated as this device/school's look, not per-account data) so the
+  // account we switch TO can't get contaminated by whatever the previous
+  // account's data was; initialDriveSync() then either pulls that account's
+  // existing backup in, or starts a fresh one if it has none yet.
+  async function switchAccount(){
+    const proceed = confirm('Switch Google account? This device will show the selected account\'s own data. Anything not yet synced from the current account will be saved first.');
+    if(!proceed) return;
+
+    if(gapiToken){
+      await gdriveSave(true).catch(() => {}); // best-effort flush before leaving this account
+      if(window.google) window.google.accounts.oauth2.revoke(gapiToken, () => {});
+    }
+    if(driveAutoSaveTimer){ clearTimeout(driveAutoSaveTimer); driveAutoSaveTimer = null; }
+    gapiToken = null;
+    gdriveEmail = null;
+    gdriveFileId = null;
+    lastDriveSyncAt = null;
+
+    students.length = 0;
+    teachers.length = 0;
+    rebuildTeacherById();
+    saveData();
+    refreshDropdowns();
+    view = 'list';
+    render();
+
+    setGdriveUI('disconnected');
+    await gdriveConnect(true);
+  }
+
+  signinGoogleBtn.addEventListener('click', () => gdriveConnect(false));
+  signinGuestBtn.addEventListener('click', () => {
+    localStorage.setItem(SKIP_SIGNIN_KEY, '1');
+    signinGate.classList.remove('show');
+    guestBanner.style.display = 'flex';
+    updateAccountChip();
+  });
+  guestBannerBackupBtn.addEventListener('click', () => {
+    exportText.value = buildExportCode();
+    exportModalOverlay.classList.add('show');
+  });
+  guestBannerSigninBtn.addEventListener('click', () => gdriveConnect(false));
+  accountSwitchBtn.addEventListener('click', () => {
+    accountChip.classList.remove('open');
+    switchAccount();
+  });
+  accountSignOutBtn.addEventListener('click', () => {
+    accountChip.classList.remove('open');
+    gdriveDisconnect();
+    // An explicit sign-out is a deliberate choice, unlike a fresh page load —
+    // so re-offer the gate immediately regardless of any earlier guest choice,
+    // and stop trying to silently reconnect on future loads.
+    localStorage.removeItem(SKIP_SIGNIN_KEY);
+    localStorage.removeItem(HAD_SIGNED_IN_KEY);
+    signinGate.classList.add('show');
+    guestBanner.style.display = 'none';
+  });
+
+  // Runs once right after connecting, before auto-save takes over. If a
+  // backup already exists on Drive (e.g. this is a second device), pull it
+  // in first — merging is additive/skip-duplicate, so it can't erase
+  // anything local. Only pushes local data as a fresh backup if Drive has
+  // none yet, so a first-time connect from an empty browser can't stomp on
+  // an existing roster.
+  async function initialDriveSync(){
+    try{
+      const existing = await findBackupFile();
+      if(existing){
+        gdriveFileId = existing.id;
+        const res = await driveFetch(`https://www.googleapis.com/drive/v3/files/${gdriveFileId}?alt=media`);
+        if(res.ok){
+          const data = await res.json();
+          const result = mergeImportedBackup(data);
+          lastDriveSyncAt = new Date();
+          setGdriveUI('connected');
+          showToast(`Connected to Google Drive — ${result.message.toLowerCase()}`);
+          return;
+        }
+      }
+      await gdriveSave(true);
+      showToast('Connected to Google Drive — this device\'s data is now the starting backup');
+    }catch(err){
+      showToast('Connected, but the initial sync failed — try Save/Load from Drive manually');
+    }
+  }
+
+  if(isGoogleConfigured) setGdriveUI('disconnected');
+
+  render();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').then(reg => {
+        // If a new service worker takes over control (i.e. a new version was
+        // just deployed and activated), the old cached JS for this page is
+        // stale — reload once to pick up the new index.html cleanly. The
+        // guard avoids reloading on the very first-ever install.
+        let refreshed = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if(refreshed) return;
+          refreshed = true;
+          window.location.reload();
+        });
+
+        // Ask the browser to check for a newer service-worker.js whenever
+        // this tab regains focus — covers the "left a tab open for days"
+        // case, since otherwise updates are only checked on navigation.
+        document.addEventListener('visibilitychange', () => {
+          if(document.visibilityState === 'visible') reg.update().catch(() => {});
+        });
+      }).catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>
