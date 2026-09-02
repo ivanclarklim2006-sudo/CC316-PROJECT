@@ -5122,12 +5122,73 @@
      location.reload();
   });
 
-  // Placeholder for Google Drive Sync stub so UI doesn't crash if called
+  // ---------- Google Login & Account UI Logic ----------
   let gapiToken = null;
   let gdriveEmail = null;
-  function gdriveConnect(interactive){}
-  function scheduleDriveAutoSave(){}
+  
+  const signinGoogleBtn = document.getElementById('signinGoogleBtn');
+  const accountChip = document.getElementById('accountChip');
+  const accountChipLabel = document.getElementById('accountChipLabel');
+  const accountMenuNote = document.getElementById('accountMenuNote');
+  const accountSignOutBtn = document.getElementById('accountSignOutBtn');
 
+  // Function to handle successful sign in
+  function handleSignInSuccess(email) {
+    gapiToken = "active_session"; // Replace with actual token if using Drive API
+    gdriveEmail = email || "user@school.edu";
+    
+    // Hide the login gate
+    signinGate.classList.remove('show');
+    
+    // Update the Account Chip UI
+    accountChip.style.display = 'inline-flex';
+    accountChipLabel.textContent = gdriveEmail;
+    accountMenuNote.textContent = "Connected to account";
+    
+    // Ensure guest mode is disabled
+    isGuestMode = false;
+    safeSetItem('rr_guest_mode', 'false');
+    if(guestBanner) guestBanner.style.display = 'none';
+    
+    logActivity('Signed in', gdriveEmail);
+    showToast("Signed in successfully");
+  }
+
+  // Click listener for the Google Login button
+  if (signinGoogleBtn) {
+    signinGoogleBtn.addEventListener('click', () => {
+      // NOTE: If you have your original Google GIS script, trigger it here.
+      // Otherwise, this safely unlocks the UI so you can use the app:
+      handleSignInSuccess("admin@school.edu"); 
+    });
+  }
+
+  // Sign out logic
+  if (accountSignOutBtn) {
+    accountSignOutBtn.addEventListener('click', () => {
+      gapiToken = null;
+      gdriveEmail = null;
+      safeRemoveItem('rr_guest_mode');
+      
+      // Hide chip and show gate again
+      accountChip.style.display = 'none';
+      signinGate.classList.add('show');
+      showToast("Signed out");
+    });
+  }
+
+  // Check if user was already in guest mode on page load
+  if (!isGuestMode && !gapiToken) {
+    signinGate.classList.add('show'); // Show gate by default if not guest and not logged in
+  }
+
+  // Drive API stubs to prevent crashes if called elsewhere
+  function gdriveConnect(interactive) {
+      if (interactive) handleSignInSuccess("admin@school.edu");
+  }
+  function scheduleDriveAutoSave() {
+      // Add your Google Drive upload logic here if needed
+  }
   // Start the application
   render();
 
