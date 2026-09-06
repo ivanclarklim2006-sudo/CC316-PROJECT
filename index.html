@@ -212,78 +212,6 @@
   .file-btn:hover{ border-color:var(--brass); }
   .logo-hint{ font-size:0.74rem; color:var(--ink-soft); }
 
-  /* ---------- Role switcher (Admin / Teacher) ----------
-     Reuses the existing .customize-btn look so it doesn't introduce a
-     new visual language. Anything marked .admin-only is simply hidden
-     with a body-level class toggle — no separate theme, no new colors. */
-  .role-chip{ position:relative; }
-  .role-chip .role-caret{ opacity:0.75; font-size:0.7em; margin-left:0.15rem; }
-  .role-menu{
-    position:absolute; top:calc(100% + 6px); right:0; min-width:190px;
-    background:var(--surface); border:1px solid var(--line); border-radius:10px;
-    box-shadow:0 10px 28px var(--shadow); padding:0.4rem; z-index:40;
-    display:none; flex-direction:column; gap:0.15rem;
-  }
-  .role-menu.show{ display:flex; }
-  .role-menu button{
-    display:flex; align-items:center; justify-content:space-between; gap:0.5rem;
-    background:transparent; border:none; text-align:left; cursor:pointer;
-    padding:0.5rem 0.6rem; border-radius:7px; font-family:'Inter',sans-serif;
-    font-size:0.84rem; color:var(--ink);
-  }
-  .role-menu button:hover{ background:var(--paper-dark); }
-  .role-menu button.active{ font-weight:600; }
-  .role-menu .role-check{ opacity:0; }
-  .role-menu button.active .role-check{ opacity:1; }
-  .role-menu .role-menu-note{ font-size:0.7rem; color:var(--ink-soft); padding:0.3rem 0.6rem 0.4rem; border-top:1px solid var(--line); margin-top:0.2rem; }
-  html[data-theme="dark"] .role-menu button{ color:var(--ink); }
-  body.role-teacher .admin-only{ display:none !important; }
-  .role-badge-inline{
-    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:0.68rem;
-    letter-spacing:0.04em; text-transform:uppercase; color:var(--brass);
-    border:1px solid var(--brass); border-radius:5px; padding:0.1rem 0.4rem; margin-left:0.5rem;
-    vertical-align:middle;
-  }
-
-  /* ---------- Birth certificate photo upload (front/back only) ---------- */
-  .bc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; margin-top:0.6rem; }
-  @media (max-width:560px){ .bc-grid{ grid-template-columns:1fr; } }
-  .bc-card{
-    border:1.5px dashed var(--line); border-radius:12px; padding:0.8rem;
-    background:var(--paper-dark); display:flex; flex-direction:column; gap:0.6rem;
-  }
-  .bc-card-label{ font-family:'IBM Plex Mono', monospace; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-soft); }
-  .bc-preview{
-    width:100%; aspect-ratio:1.586/1; border-radius:9px; overflow:hidden;
-    background:var(--surface); border:1px solid var(--line);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .bc-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .bc-preview .bc-empty{ color:var(--ink-soft); font-size:0.78rem; text-align:center; padding:0.5rem; }
-  .bc-card-actions{ display:flex; gap:0.5rem; flex-wrap:wrap; }
-  .bc-card-actions .file-btn{ font-size:0.76rem; padding:0.35rem 0.65rem; }
-  .bc-card-actions .file-btn.bc-remove{ color:var(--stamp); border-color:var(--stamp); }
-
-  /* ---------- SF9 / SF10 doc picker on the profile card ---------- */
-  .doc-picker-row{ display:flex; gap:0.6rem; flex-wrap:wrap; }
-  .sf-formcode{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; letter-spacing:0.03em; }
-
-  /* ---------- SF9 report card layout ---------- */
-  .sf9-cols{ display:grid; grid-template-columns:1fr 1.3fr; gap:1.6rem; align-items:start; }
-  @media print{ .sf9-cols{ grid-template-columns:1fr 1.3fr; } }
-  .sf9-att-table th, .sf9-att-table td{ padding:0.25rem 0.3rem; font-size:0.72rem; }
-  .sf9-sig-block{ margin-top:1rem; }
-  .sf9-sig-row{ display:flex; justify-content:space-between; gap:0.6rem; margin:0.9rem 0 0.15rem; border-bottom:1px solid var(--ink); padding-bottom:0.15rem; min-height:1.1rem; }
-  .sf9-sig-cap{ font-size:0.68rem; color:var(--ink-soft); text-align:center; }
-  .sf9-quarter-sig{ display:flex; justify-content:space-between; align-items:center; margin:0.55rem 0; gap:0.6rem; }
-  .sf9-quarter-sig .q-label{ font-size:0.76rem; white-space:nowrap; }
-  .sf9-quarter-sig .q-line{ flex:1; border-bottom:1px solid var(--ink); height:1px; }
-  .sf9-cert{ margin-top:1.2rem; padding-top:0.8rem; border-top:1px dashed var(--line); }
-  .sf9-cert h4{ margin:0 0 0.4rem; font-size:0.86rem; }
-  .sf9-legend-table td, .sf9-legend-table th{ font-size:0.72rem; padding:0.25rem 0.4rem; }
-  .sf9-dear-parent{ font-size:0.82rem; line-height:1.5; margin:0.9rem 0; }
-  .sf9-dear-parent p{ margin:0 0 0.5rem; text-indent:1.4em; }
-
   .logo-size-row{
     display:flex;
     align-items:center;
@@ -1651,6 +1579,26 @@
   }
   .profile-card .current-line b{ color:var(--ink); font-weight:600; }
 
+  /* Action buttons under a student's profile — as many as it needs
+     (edit / grades / SF9 / SF10 / birth cert / delete), so unlike the
+     single-row .modal-actions these must be free to wrap onto as many
+     lines as the card's width requires. Without wrap they'd overflow
+     the card's right edge since .profile-card never clips its content. */
+  .profile-actions{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    gap:0.6rem;
+    margin-top:1.4rem;
+    padding-top:1rem;
+    border-top:1px dashed var(--line);
+  }
+  .profile-actions button{ flex:0 0 auto; }
+  @media (max-width:560px){
+    .profile-actions{ flex-direction:column; }
+    .profile-actions button{ width:100%; }
+  }
+
   .origin-note{
     display:flex;
     gap:0.6rem;
@@ -1749,7 +1697,7 @@
   @media (max-width:520px){ .record-details-view{ grid-template-columns:1fr; } }
 
   /* ---------- Share sheet — laid out to match the printed DepEd
-     Form 137-E "Elementary School Permanent Record": form-code +
+     SF10-ES "Learner's Permanent Academic Record": form-code +
      LRN box top corners, centered republic/agency header, the
      Surname/Name/M.I. identity block, a two-column Grade I–VI
      progress grid, grouped Grade I–III / IV–VI core-values tables,
@@ -1764,6 +1712,13 @@
     font-size:0.82rem;
     max-height:60vh;
     overflow-y:auto;
+  }
+  /* On-screen preview for SF9 — widened so the two side-by-side pages
+     underneath read comfortably; each page card is its own landscape-
+     shaped sheet (see .sf9-page), not a single forced aspect-ratio box,
+     so real content never gets clipped or squeezed to fit a shape. */
+  .share-sheet.ss-landscape{
+    max-height:74vh;
   }
   .ss-topline{ display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
   .ss-formcode{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:#333; white-space:nowrap; }
@@ -1828,6 +1783,110 @@
     margin:0.4rem 0 1rem;
   }
   .ss-legend b{ font-family:'IBM Plex Mono', monospace; margin-right:0.2rem; }
+  .ss-parent-msg{ font-size:0.82rem; font-style:italic; color:var(--ink-soft); margin:0.6rem 0; line-height:1.5; }
+  .share-doc-controls{ margin-bottom:1rem; }
+  .sf9-page{
+    background:#fff; border:1px solid #ccc; border-radius:8px;
+    padding:1.3rem 1.5rem; margin-bottom:1.3rem;
+  }
+  .sf9-page:last-child{ margin-bottom:0; }
+  @media print{
+    .sf9-page{ border:none; border-radius:0; padding:0.4in 0.5in; margin-bottom:0; }
+    .sf9-page + .sf9-page{ page-break-before:always; }
+  }
+  .sf9-page-grid{ display:grid; grid-template-columns:0.85fr 1.15fr; gap:1.7rem; align-items:start; }
+  @media (max-width:760px){ .sf9-page-grid{ grid-template-columns:1fr; } }
+  .sf9-page-num{ text-align:center; font-size:0.66rem; color:#888; margin-top:0.6rem; font-family:'IBM Plex Mono', monospace; }
+  .sf9-att-table th, .sf9-att-table td{ padding:0.25rem 0.3rem; font-size:0.72rem; }
+  .sf9-quarter-sig{ display:flex; justify-content:space-between; align-items:center; margin:0.55rem 0; gap:0.6rem; }
+  .sf9-quarter-sig .q-label{ font-size:0.76rem; white-space:nowrap; }
+  .sf9-quarter-sig .q-line{ flex:1; border-bottom:1px solid var(--ink); height:1px; }
+  .sf9-legend-table td, .sf9-legend-table th{ font-size:0.72rem; padding:0.25rem 0.4rem; }
+  .sf9-dear-parent{ font-size:0.82rem; line-height:1.5; margin:0.9rem 0; }
+  .sf9-dear-parent p{ margin:0 0 0.5rem; text-indent:1.4em; }
+  .bc-upload-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.2rem; }
+  .bc-upload-cell{ display:flex; flex-direction:column; gap:0.5rem; }
+  .bc-preview-wrap{ position:relative; }
+  .bc-preview{
+    width:100%; aspect-ratio:16/10; object-fit:contain;
+    border:1.5px dashed var(--line); border-radius:10px;
+    background:var(--paper-dark);
+    display:block;
+  }
+  .bc-preview:not([src]), .bc-preview[src=""]{ visibility:hidden; }
+  .bc-preview[src]:not([src=""]){ cursor:zoom-in; }
+  .bc-zoom-hint{
+    position:absolute; right:0.5rem; bottom:0.5rem;
+    display:none;
+    align-items:center; justify-content:center;
+    width:28px; height:28px;
+    border-radius:50%;
+    background:rgba(31,42,34,0.72);
+    color:#F4EEDD;
+    font-size:0.85rem;
+    pointer-events:none;
+  }
+  .bc-preview[src]:not([src=""]) ~ .bc-zoom-hint{ display:flex; }
+  @media (max-width:560px){ .bc-upload-grid{ grid-template-columns:1fr; } }
+
+  /* Full-size lightbox for tapping/clicking a birth-cert photo */
+  .lightbox-overlay{
+    display:none;
+    position:fixed; inset:0; z-index:300;
+    background:rgba(10,14,11,0.92);
+    align-items:center; justify-content:center;
+    padding:2rem;
+    overflow:hidden;
+  }
+  .lightbox-overlay.show{ display:flex; }
+  .lightbox-overlay img{
+    max-width:100%; max-height:100%;
+    object-fit:contain;
+    border-radius:6px;
+    box-shadow:0 8px 40px rgba(0,0,0,0.5);
+    /* pinch-zoom (not none) — lets the OS/browser's own pinch gesture
+       zoom this element even inside an installed/standalone PWA, where
+       page-level pinch is normally suppressed. Desktop mouse users get
+       wheel/drag/double-click zoom from the JS below instead. */
+    touch-action:pinch-zoom;
+    cursor:zoom-in;
+    transform-origin:center center;
+    will-change:transform;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .lightbox-overlay img.zoomed{ cursor:grab; }
+  .lightbox-close{
+    position:absolute; top:1.1rem; right:1.3rem;
+    width:40px; height:40px;
+    border-radius:50%;
+    border:1.5px solid rgba(244,238,221,0.4);
+    background:rgba(244,238,221,0.08);
+    color:#F4EEDD;
+    font-size:1.1rem;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    z-index:2;
+  }
+  .lightbox-close:hover{ background:rgba(244,238,221,0.18); }
+  .lightbox-zoom-controls{
+    position:absolute; bottom:1.2rem; left:50%; transform:translateX(-50%);
+    display:flex; gap:0.5rem; z-index:2;
+  }
+  .lightbox-zoom-controls button{
+    width:38px; height:38px; border-radius:50%;
+    border:1.5px solid rgba(244,238,221,0.4);
+    background:rgba(244,238,221,0.1);
+    color:#F4EEDD; font-size:1.15rem; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .lightbox-zoom-controls button:hover{ background:rgba(244,238,221,0.2); }
+  .lightbox-hint{
+    position:absolute; top:1.2rem; left:1.3rem;
+    color:rgba(244,238,221,0.75); font-size:0.72rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  @media (max-width:560px){ .lightbox-hint{ display:none; } }
 
   .ss-certificate{
     margin-top:0.4rem;
@@ -1912,7 +1971,10 @@
   @media print{
     /* Zero page margin removes room for the browser's own header/footer
        (page title, URL, date/time) in Chromium-based browsers — the
-       whitespace is added back below, on the printed content itself. */
+       whitespace is added back below, on the printed content itself.
+       Orientation itself is set at print time by #dynamicPageOrientation
+       below — SF9 prints landscape, SF10 stays portrait — since @page
+       can't be scoped by a class on the content being printed. */
     @page{ size:auto; margin:0; }
     body > *{ display:none !important; }
     body > #shareModalOverlay{ display:block !important; position:static !important; background:none !important; padding:0 !important; }
@@ -2088,6 +2150,12 @@
     .chk, .chk input{ width:24px; height:24px; }
   }
 </style>
+<!-- Populated by JS right before the print styles are used, so the SF9
+     report card prints landscape (this app's own choice — the actual
+     DepEd SF9 form is portrait) while SF10 keeps the default portrait
+     orientation. @page can't be scoped to a class on the printed
+     content, so this swaps the whole rule instead. -->
+<style id="dynamicPageOrientation">@media print{ @page{ size:auto; margin:0; } }</style>
 </head>
 <body>
 
@@ -2148,25 +2216,7 @@
              heading/title/description text, choose colors, and pick
              which side the logo sits on.
              ============================================================ -->
-        <button class="customize-btn admin-only" id="customizeBtn">🎨 Customize</button>
-
-        <!-- ============================================================
-             ROLE SWITCHER — Admin / Teacher. Admin has full access;
-             Teacher mode hides destructive/administrative controls
-             (anything tagged .admin-only) via a single body class.
-             Switching TO Admin asks for the device passcode (set on
-             first use); switching to Teacher never needs one.
-             ============================================================ -->
-        <div class="role-chip" id="roleChip">
-          <button type="button" class="customize-btn" id="roleChipBtn" aria-haspopup="true" aria-expanded="false">
-            <span id="roleChipIcon">🛡️</span> <span id="roleChipLabel">Admin</span> <span class="role-caret">▾</span>
-          </button>
-          <div class="role-menu" id="roleMenu">
-            <button type="button" data-role="admin" id="roleOptionAdmin"><span>🛡️ Admin</span><span class="role-check">✓</span></button>
-            <button type="button" data-role="teacher" id="roleOptionTeacher"><span>🍎 Teacher</span><span class="role-check">✓</span></button>
-            <div class="role-menu-note">Teacher mode hides delete, backup, and customization controls.</div>
-          </div>
-        </div>
+        <button class="customize-btn" id="customizeBtn">🎨 Customize</button>
 
         <!-- ============================================================
              DARK MODE — toggles the app's color theme. Remembered
@@ -2181,7 +2231,7 @@
              in the script, kept in sync with the sign-in gate and the
              Backup & Import modal's Drive panel.
              ============================================================ -->
-        <div class="account-chip admin-only" id="accountChip" style="display:none;">
+        <div class="account-chip" id="accountChip" style="display:none;">
           <button type="button" class="account-chip-btn" id="accountChipBtn" aria-haspopup="true" aria-expanded="false">
             <span class="acc-dot" id="accountChipDot"></span>
             <span class="acc-label" id="accountChipLabel">Not signed in</span>
@@ -2299,7 +2349,7 @@
     <span id="selectionCount">0 selected</span>
     <div class="sel-actions">
       <button class="btn-ghost" id="selectionClearBtn">Clear</button>
-      <button class="btn-danger admin-only" id="selectionDeleteBtn">Delete selected</button>
+      <button class="btn-danger" id="selectionDeleteBtn">Delete selected</button>
     </div>
   </div>
 
@@ -2327,7 +2377,7 @@
       </div>
 
       <div class="record-section">
-        <p class="record-section-label">Permanent record details — matches the DepEd Form 137-E name line</p>
+        <p class="record-section-label">Permanent record details — matches the DepEd SF10-ES name line</p>
         <div class="field-row">
           <div class="field" style="flex:2;">
             <label for="stuSurname">Surname</label>
@@ -2515,12 +2565,26 @@
 
 <!-- Share student record modal (printable / "save as PDF" via browser print) -->
 <div class="modal-overlay" id="shareModalOverlay">
-  <div class="modal" style="max-width:640px;">
+  <div class="modal" id="shareModalBox" style="max-width:640px;">
     <div class="modal-head">
-      <h3 id="shareModalTitle">Share record</h3>
+      <h3>Share record</h3>
       <button class="modal-close" id="shareModalClose" aria-label="Close">✕</button>
     </div>
     <p class="form-note">Opens this one student's record, formatted for printing. Use "Print / Save as PDF" — every browser's print dialog can save straight to a PDF file, which you can then attach to an email. This app already suppresses the browser's page header/footer (site name, URL, date/time); if your browser still adds one, look for a "Headers and footers" toggle under "More settings" in the print dialog and switch it off.</p>
+
+    <div class="field-row share-doc-controls" id="shareDocControls">
+      <div class="field">
+        <label for="shareDocType">Document</label>
+        <select id="shareDocType">
+          <option value="sf9">SF9 — Report Card (one grade level)</option>
+          <option value="sf10">SF10-ES — Permanent Record (all grades)</option>
+        </select>
+      </div>
+      <div class="field" id="shareLevelField">
+        <label for="shareLevelSelect">Grade level</label>
+        <select id="shareLevelSelect"></select>
+      </div>
+    </div>
 
     <div class="share-sheet" id="shareSheet"></div>
 
@@ -2534,7 +2598,60 @@
   </div>
 </div>
 
-<!-- Grades & permanent record modal (Form 137-E style: per-grade subject ratings,
+<!-- Birth certificate photos (front & back) — image-only, no data entry -->
+<div class="modal-overlay" id="birthCertModalOverlay">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-head">
+      <h3>Birth certificate</h3>
+      <button class="modal-close" id="birthCertModalClose" aria-label="Close">✕</button>
+    </div>
+    <p class="form-note">Keep a photo of the learner's birth certificate on file — front and back. Saved with this student's record in this browser (and to Google Drive, if connected). No transcription needed.</p>
+    <div class="bc-upload-grid">
+      <div class="bc-upload-cell">
+        <p class="section-label">Front</p>
+        <div class="bc-preview-wrap">
+          <img class="bc-preview" id="bcFrontPreview" alt="Birth certificate — front">
+          <span class="bc-zoom-hint">🔍</span>
+        </div>
+        <div class="file-btn-row">
+          <label class="file-btn" for="bcFrontInput">Choose image</label>
+          <button type="button" class="file-btn" id="bcFrontRemoveBtn">Remove</button>
+        </div>
+        <input type="file" id="bcFrontInput" accept="image/*" style="display:none">
+      </div>
+      <div class="bc-upload-cell">
+        <p class="section-label">Back</p>
+        <div class="bc-preview-wrap">
+          <img class="bc-preview" id="bcBackPreview" alt="Birth certificate — back">
+          <span class="bc-zoom-hint">🔍</span>
+        </div>
+        <div class="file-btn-row">
+          <label class="file-btn" for="bcBackInput">Choose image</label>
+          <button type="button" class="file-btn" id="bcBackRemoveBtn">Remove</button>
+        </div>
+        <input type="file" id="bcBackInput" accept="image/*" style="display:none">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-primary" id="birthCertDoneBtn">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Full-size viewer for a tapped/clicked birth-cert photo -->
+<div class="lightbox-overlay" id="imageLightboxOverlay">
+  <button type="button" class="lightbox-close" id="imageLightboxClose" aria-label="Close">✕</button>
+  <span class="lightbox-hint">Scroll / pinch / double-click to zoom, drag to pan</span>
+  <img id="imageLightboxImg" alt="Full-size photo">
+  <div class="lightbox-zoom-controls">
+    <button type="button" id="lightboxZoomOutBtn" aria-label="Zoom out">−</button>
+    <button type="button" id="lightboxZoomResetBtn" aria-label="Reset zoom">⟲</button>
+    <button type="button" id="lightboxZoomInBtn" aria-label="Zoom in">+</button>
+    <button type="button" id="lightboxOpenTabBtn" aria-label="Open full-size in a new tab">⤢</button>
+  </div>
+</div>
+
+<!-- Grades & permanent record modal (SF10-ES style: per-grade subject ratings,
      core values / learners observed values, attendance, certificate of transfer) -->
 <div class="modal-overlay" id="recordModalOverlay">
   <div class="modal" style="max-width:820px;">
@@ -2542,7 +2659,7 @@
       <h3>Grades &amp; permanent record</h3>
       <button class="modal-close" id="recordModalClose" aria-label="Close">✕</button>
     </div>
-    <p class="form-note">Elementary progress, core values, and attendance for Grades I–VI, DepEd Form 137-E style. Saved automatically as you type — this feeds the printed/shared record.</p>
+    <p class="form-note">Elementary progress, core values, and attendance for Grades I–VI, DepEd SF10-ES (formerly Form 137) style. Saved automatically as you type — this feeds the printed/shared record.</p>
     <div class="gr-tabs" id="gradeTabs"></div>
     <div id="gradeTabContent"></div>
     <p class="ss-section-title">Certificate of transfer</p>
@@ -2687,9 +2804,10 @@
     <div class="modal-actions" style="justify-content:flex-start; margin:0 0 1.3rem; padding:0; border:none;">
       <button type="button" class="btn-primary" id="downloadBackupBtn">⬇ Download backup (.json)</button>
       <button type="button" class="btn-secondary" id="importBackupBtn">⬆ Import backup</button>
+      <button type="button" class="btn-secondary" id="loadDemoDataBtn">🎬 Load demo data</button>
       <input type="file" id="importFileInput" accept="application/json,.json" style="display:none">
     </div>
-    <p class="logo-hint" style="margin:-0.8rem 0 1.3rem;">Importing adds students/teachers from the file and skips any whose LRN or Teacher ID already exists here — it won't erase what you already have.</p>
+    <p class="logo-hint" style="margin:-0.8rem 0 1.3rem;">Importing adds students/teachers from the file and skips any whose LRN or Teacher ID already exists here — it won't erase what you already have. "Load demo data" adds a small sample roster (with grades already filled in) the same way, for presentations and walkthroughs.</p>
 
     <details style="margin-bottom:0.4rem;">
       <summary style="cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:0.76rem; color:var(--ink-soft); letter-spacing:0.03em;">Advanced: bake this data in as the file's default</summary>
@@ -2706,7 +2824,7 @@
   </div>
 </div>
 
-<footer>Changes save automatically in this browser — no account or server needed. <button class="link-btn admin-only" id="exportOpenBtn" style="font-size:0.76rem;">Backup / Import data</button> to move it to another device. <span class="role-badge-inline" id="footerRoleBadge">Admin</span></footer>
+<footer>Changes save automatically in this browser — no account or server needed. <button class="link-btn" id="exportOpenBtn" style="font-size:0.76rem;">Backup / Import data</button> to move it to another device.</footer>
 
 <script>
   // ---------- Safe storage wrapper ----------
@@ -2962,7 +3080,7 @@
 
   // Shrinks an uploaded logo before storing it, so it doesn't eat into
   // this browser's storage quota (same idea as the OCR photo downscale).
-  function resizeImageToDataURL(file, maxDim = 300){
+  function resizeImageToDataURL(file, maxDim = 300, mimeType = 'image/png', quality){
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
@@ -2974,7 +3092,7 @@
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/png'));
+        resolve(canvas.toDataURL(mimeType, quality));
       };
       img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read that image')); };
       img.src = url;
@@ -3237,85 +3355,6 @@
   loadData();
   rebuildTeacherById();
 
-  // ---------- Role switcher (Admin / Teacher) ----------
-  // Per-device setting, independent of the Google account/branding. Admin
-  // has full access; Teacher hides anything tagged .admin-only in the
-  // markup above via a single body class. Switching TO Admin requires a
-  // passcode (created the first time it's used); switching to Teacher
-  // never does, since it only removes capabilities.
-  const ROLE_KEY = 'rollRegister_role';
-  const ADMIN_PIN_KEY = 'rollRegister_adminPin';
-  let currentRole = safeGetItem(ROLE_KEY) === 'teacher' ? 'teacher' : 'admin';
-
-  const roleChipBtn = document.getElementById('roleChipBtn');
-  const roleMenu = document.getElementById('roleMenu');
-  const roleChipIcon = document.getElementById('roleChipIcon');
-  const roleChipLabel = document.getElementById('roleChipLabel');
-  const roleOptionAdmin = document.getElementById('roleOptionAdmin');
-  const roleOptionTeacher = document.getElementById('roleOptionTeacher');
-  const footerRoleBadge = document.getElementById('footerRoleBadge');
-
-  function applyRole(role){
-    currentRole = role;
-    safeSetItem(ROLE_KEY, role);
-    document.body.classList.toggle('role-teacher', role === 'teacher');
-    if(roleChipIcon) roleChipIcon.textContent = role === 'admin' ? '🛡️' : '🍎';
-    if(roleChipLabel) roleChipLabel.textContent = role === 'admin' ? 'Admin' : 'Teacher';
-    if(footerRoleBadge) footerRoleBadge.textContent = role === 'admin' ? 'Admin' : 'Teacher';
-    if(roleOptionAdmin) roleOptionAdmin.classList.toggle('active', role === 'admin');
-    if(roleOptionTeacher) roleOptionTeacher.classList.toggle('active', role === 'teacher');
-    // Note: controls tagged .admin-only are hidden purely via the CSS rule
-    // `body.role-teacher .admin-only{display:none}` — no re-render needed,
-    // since it's a live CSS match against the body class, not a JS check
-    // baked into the rendered HTML.
-  }
-
-  function switchToAdmin(){
-    const savedPin = safeGetItem(ADMIN_PIN_KEY);
-    if(!savedPin){
-      const chosen = prompt('Create an Admin passcode for this device (used whenever switching back to Admin mode):');
-      if(chosen === null) return;
-      if(!chosen.trim()){ showToast('Passcode cannot be blank'); return; }
-      safeSetItem(ADMIN_PIN_KEY, chosen.trim());
-      applyRole('admin');
-      logActivity('Switched role', 'Admin (passcode created)');
-      showToast('Admin passcode set — switched to Admin mode');
-      return;
-    }
-    const entered = prompt('Enter the Admin passcode to switch to Admin mode:');
-    if(entered === null) return;
-    if(entered === savedPin){
-      applyRole('admin');
-      logActivity('Switched role', 'Admin');
-      showToast('Switched to Admin mode');
-    } else {
-      showToast('Incorrect passcode');
-    }
-  }
-
-  if(roleChipBtn){
-    roleChipBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      roleMenu.classList.toggle('show');
-      roleChipBtn.setAttribute('aria-expanded', roleMenu.classList.contains('show') ? 'true' : 'false');
-    });
-    document.addEventListener('click', () => roleMenu.classList.remove('show'));
-    roleMenu.addEventListener('click', e => e.stopPropagation());
-    roleOptionAdmin.addEventListener('click', () => {
-      roleMenu.classList.remove('show');
-      if(currentRole === 'admin') return;
-      switchToAdmin();
-    });
-    roleOptionTeacher.addEventListener('click', () => {
-      roleMenu.classList.remove('show');
-      if(currentRole === 'teacher') return;
-      applyRole('teacher');
-      logActivity('Switched role', 'Teacher');
-      showToast('Switched to Teacher mode');
-    });
-  }
-  applyRole(currentRole);
-
   const tabsEl = document.getElementById('tabs');
   const searchInput = document.getElementById('searchInput');
   const clearBtn = document.getElementById('clearBtn');
@@ -3442,7 +3481,6 @@
         ? "Search by student name or LRN…"
         : "Search by teacher name or ID…";
       addBtn.textContent = activeTab === 'students' ? '+ Add student' : '+ Add teacher';
-      addBtn.classList.toggle('admin-only', activeTab === 'teachers');
       sectionJumpWrap.style.display = activeTab === 'students' ? '' : 'none';
       yearJumpWrap.style.display = activeTab === 'students' ? '' : 'none';
       sectionFilter = '';
@@ -3481,35 +3519,45 @@
     render();
   }
 
-  // ---------- Grades & permanent record (Form 137-E: per-grade subject ratings,
+  // ---------- Grades & permanent record (SF10-ES: per-grade subject ratings,
   // core values / learners observed values, attendance record, certificate of transfer) ----------
   const GRADE_LEVELS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+  // Matches the learning areas actually printed on SF9/SF10 (MATATAG
+  // curriculum): Grades I-III use a simplified 5-area set, Grades IV-VI
+  // use the 8-area set with MAPEH broken into its four components.
+  const SUBJECTS_LOWER = [
+    { key:'language', label:'Language' },
+    { key:'reading', label:'Reading and Literacy' },
+    { key:'math', label:'Mathematics' },
+    { key:'gmrc', label:'GMRC (Good Manners and Right Conduct)' },
+    { key:'makabansa', label:'Makabansa' }
+  ];
+  const SUBJECTS_UPPER = [
+    { key:'filipino', label:'Filipino' },
+    { key:'english', label:'English' },
+    { key:'math', label:'Mathematics' },
+    { key:'science', label:'Science' },
+    { key:'esp', label:'EsP (Edukasyon sa Pagpapakatao)' },
+    { key:'ap', label:'Araling Panlipunan (AP)' },
+    { key:'epp', label:'EPP / TLE' },
+    { key:'mapehMusic', label:'MAPEH — Music & Arts' },
+    { key:'mapehPE', label:'MAPEH — P.E. & Health' }
+  ];
+  function subjectsForLevel(level){ return ['I','II','III'].includes(level) ? SUBJECTS_LOWER : SUBJECTS_UPPER; }
   const GRADE_LEVEL_WORDS = { I:'One', II:'Two', III:'Three', IV:'Four', V:'Five', VI:'Six' };
-  // SF9's "Report on Attendance" runs June through March (PH school-year
-  // calendar, April/May are summer break) — one row of school days and one
-  // of days present per month; days absent is derived, not stored.
-  const SF9_MONTHS = [
-    { key:'jun', label:'June' }, { key:'jul', label:'July' }, { key:'aug', label:'August' },
-    { key:'sep', label:'September' }, { key:'oct', label:'October' }, { key:'nov', label:'November' },
-    { key:'dec', label:'December' }, { key:'jan', label:'January' }, { key:'feb', label:'February' },
-    { key:'mar', label:'March' }
-  ];
-  const MODALITY_OPTIONS = ['', 'F2F', 'Modular', 'Online', 'Blended'];
-  const SUBJECTS_COMMON = [
-    { key:'motherTongue', label:'Mother Tongue', levels:['I','II','III'] },
-    { key:'filipino', label:'Filipino', levels:['I','II','III','IV','V','VI'] },
-    { key:'english', label:'English', levels:['I','II','III','IV','V','VI'] },
-    { key:'math', label:'Mathematics', levels:['I','II','III','IV','V','VI'] },
-    { key:'science', label:'Science', levels:['I','II','III','IV','V','VI'] },
-    { key:'ap', label:'Araling Panlipunan (AP)', levels:['I','II','III','IV','V','VI'] },
-    { key:'esp', label:'Edukasyon sa Pagpapakatao', levels:['I','II','III','IV','V','VI'] },
-    { key:'epp', label:'EPP', levels:['IV','V','VI'] },
-    { key:'mapehMusic', label:'MAPEH — Music', levels:['I','II','III','IV','V','VI'] },
-    { key:'mapehArts', label:'MAPEH — Arts', levels:['I','II','III','IV','V','VI'] },
-    { key:'mapehPE', label:'MAPEH — Physical Education', levels:['I','II','III','IV','V','VI'] },
-    { key:'mapehHealth', label:'MAPEH — Health', levels:['I','II','III','IV','V','VI'] }
-  ];
-  function subjectsForLevel(level){ return SUBJECTS_COMMON.filter(su => su.levels.includes(level)); }
+  function computeRemark(final){ return final === null ? '' : (final >= 75 ? 'Passed' : 'Failed'); }
+  function computeAgeForSchoolYear(dob, schoolYear){
+    if(!dob) return '';
+    const yearMatch = schoolYear && schoolYear.match(/^(\d{4})/);
+    const startYear = yearMatch ? Number(yearMatch[1]) : new Date().getFullYear();
+    const asOf = new Date(startYear, 5, 1); // June 1 of the school-year start
+    const birth = new Date(dob);
+    if(isNaN(birth.getTime())) return '';
+    let age = asOf.getFullYear() - birth.getFullYear();
+    const hadBirthday = (asOf.getMonth() > birth.getMonth()) || (asOf.getMonth() === birth.getMonth() && asOf.getDate() >= birth.getDate());
+    if(!hadBirthday) age--;
+    return age >= 0 ? age : '';
+  }
 
   const CORE_VALUE_ROWS = [
     { key:'diyos1', group:'Maka-Diyos', statement:"Expresses one's spiritual beliefs while respecting the spiritual beliefs of others." },
@@ -3520,6 +3568,15 @@
     { key:'bansa1', group:'Makabansa', statement:'Demonstrates appropriate behavior in carrying out activities in the school, community, and country.' }
   ];
   const CORE_VALUE_MARKS = ['', 'AO', 'SO', 'RO', 'NO'];
+  // SF9's "Report on Attendance" runs June through March (PH school-year
+  // calendar; April/May are summer break).
+  const SF9_MONTHS = [
+    { key:'jun', label:'June' }, { key:'jul', label:'July' }, { key:'aug', label:'August' },
+    { key:'sep', label:'September' }, { key:'oct', label:'October' }, { key:'nov', label:'November' },
+    { key:'dec', label:'December' }, { key:'jan', label:'January' }, { key:'feb', label:'February' },
+    { key:'mar', label:'March' }
+  ];
+  const MODALITY_OPTIONS = ['', 'F2F', 'Modular', 'Online', 'Blended'];
 
   function ensurePermanentRecord(s){
     if(!s.permanentRecord) s.permanentRecord = {};
@@ -3530,7 +3587,8 @@
     if(!pr.attendance) pr.attendance = {};
     if(!pr.transfer) pr.transfer = { eligible:'', principal:'', date:'' };
     GRADE_LEVELS.forEach(g => {
-      if(!pr.meta[g]) pr.meta[g] = { school:'', schoolYear:'', eligible:'' };
+      if(!pr.meta[g]) pr.meta[g] = { school:'', schoolYear:'', eligible:'', schoolId:'' };
+      if(pr.meta[g].schoolId === undefined) pr.meta[g].schoolId = '';
       if(!pr.progress[g]) pr.progress[g] = { subjects:{} };
       if(!pr.progress[g].modality) pr.progress[g].modality = { q1:'', q2:'', q3:'', q4:'' };
       if(!pr.coreValues[g]) pr.coreValues[g] = { ratings:{} };
@@ -3598,10 +3656,11 @@
     gradeTabContentEl.innerHTML = `
       <div class="field-row">
         <div class="field"><label for="grMetaSchool">School</label><input type="text" id="grMetaSchool" placeholder="School name" value="${escapeHtml(meta.school)}"></div>
+        <div class="field"><label for="grMetaSchoolId">School ID</label><input type="text" id="grMetaSchoolId" placeholder="e.g. 123456" value="${escapeHtml(meta.schoolId || '')}"></div>
         <div class="field"><label for="grMetaYear">School year</label><input type="text" id="grMetaYear" placeholder="e.g. 2019-2020" value="${escapeHtml(meta.schoolYear)}"></div>
       </div>
       <table class="gr-table">
-        <thead><tr><th>Learning area</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th><th class="ss-num">Final</th></tr></thead>
+        <thead><tr><th>Learning area</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th><th class="ss-num">Final</th><th>Remarks</th></tr></thead>
         <tbody>
           ${subjects.map((su, i) => {
             const q = progress.subjects[su.key] || {};
@@ -3609,10 +3668,11 @@
               <td>${escapeHtml(su.label)}</td>
               ${['q1','q2','q3','q4'].map(qk => `<td><input type="number" min="60" max="100" class="gr-cell" data-subject="${su.key}" data-field="${qk}" value="${q[qk] !== undefined && q[qk] !== null ? q[qk] : ''}"></td>`).join('')}
               <td class="gr-final" data-final-for="${su.key}">${finals[i] === null ? '—' : finals[i]}</td>
+              <td class="gr-remark" data-remark-for="${su.key}">${computeRemark(finals[i])}</td>
             </tr>`;
           }).join('')}
         </tbody>
-        <tfoot><tr><td colspan="5" style="text-align:right; font-weight:700;">General average</td><td class="gr-final" id="grGeneralAverage">${genAvg === null ? '—' : genAvg}</td></tr></tfoot>
+        <tfoot><tr><td colspan="5" style="text-align:right; font-weight:700;">General average</td><td class="gr-final" id="grGeneralAverage">${genAvg === null ? '—' : genAvg}</td><td></td></tr></tfoot>
       </table>
       <div class="field">
         <label for="grEligible">Eligible for admission to Grade</label>
@@ -3650,7 +3710,7 @@
 
       <p class="ss-section-title" style="margin-top:1.3rem;">Monthly attendance <span class="optional-tag">— feeds the SF9 report card's attendance table</span></p>
       <table class="gr-table sf9-att-table">
-        <thead><tr><th>Month</th>${SF9_MONTHS.map(m => `<th class="ss-num">${m.label.slice(0,3)}</th>`).join('')}</tr></thead>
+        <thead><tr><th>Month</th>${SF9_MONTHS.map(m => `<th class="ss-num">${m.label.slice(0, 3)}</th>`).join('')}</tr></thead>
         <tbody>
           <tr><td>School days</td>${SF9_MONTHS.map(m => `<td><input type="number" min="0" class="gr-att-cell" data-month="${m.key}" data-field="days" value="${escapeHtml(att.monthly[m.key].days)}"></td>`).join('')}</tr>
           <tr><td>Days present</td>${SF9_MONTHS.map(m => `<td><input type="number" min="0" class="gr-att-cell" data-month="${m.key}" data-field="present" value="${escapeHtml(att.monthly[m.key].present)}"></td>`).join('')}</tr>
@@ -3659,7 +3719,7 @@
 
       <p class="ss-section-title" style="margin-top:1.3rem;">Learning modality per quarter <span class="optional-tag">— shown on the SF9 report card</span></p>
       <div class="field-row">
-        ${['q1','q2','q3','q4'].map((qk, i) => `
+        ${['q1', 'q2', 'q3', 'q4'].map((qk, i) => `
           <div class="field">
             <label for="grModality${qk}">Q${i + 1}</label>
             <select id="grModality${qk}" class="gr-modality-cell" data-field="${qk}">
@@ -3679,6 +3739,8 @@
         const newFinal = computeFinalRating(progress.subjects[subKey]);
         const finalCell = gradeTabContentEl.querySelector(`[data-final-for="${subKey}"]`);
         if(finalCell) finalCell.textContent = newFinal === null ? '—' : newFinal;
+        const remarkCell = gradeTabContentEl.querySelector(`[data-remark-for="${subKey}"]`);
+        if(remarkCell) remarkCell.textContent = computeRemark(newFinal);
         const allFinals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
         const newGenAvg = computeGeneralAverage(allFinals);
         document.getElementById('grGeneralAverage').textContent = newGenAvg === null ? '—' : newGenAvg;
@@ -3694,6 +3756,7 @@
       });
     });
     document.getElementById('grMetaSchool').addEventListener('input', e => { meta.school = e.target.value; saveData(); });
+    document.getElementById('grMetaSchoolId').addEventListener('input', e => { meta.schoolId = e.target.value; saveData(); });
     document.getElementById('grMetaYear').addEventListener('input', e => { meta.schoolYear = e.target.value; saveData(); });
     document.getElementById('grEligible').addEventListener('input', e => { meta.eligible = e.target.value; saveData(); });
     document.getElementById('attSchoolDays').addEventListener('input', e => { att.schoolDays = e.target.value; saveData(); });
@@ -3735,7 +3798,6 @@
   const shareModalOverlay = document.getElementById('shareModalOverlay');
   const shareSheet = document.getElementById('shareSheet');
   let shareStudent = null;
-  let shareDocType = 'sf10'; // 'sf9' or 'sf10' — which DepEd form the share modal is currently showing
 
   function currentBrandingForShare(){
     try{ return JSON.parse(safeGetItem(BRAND_KEY) || 'null') || {}; }
@@ -3744,7 +3806,7 @@
 
   // Builds one Grade-level cell for the progress grid — a school/school-year
   // heading, the subject rating table, and the eligibility line — matching
-  // one half of a Form 137-E "Grade N – School ___" block.
+  // one half of a SF10-ES "Grade N – School ___" block.
   function buildGradeCellHtml(level, pr){
     const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
     const progress = pr.progress[level] || { subjects:{} };
@@ -3763,7 +3825,7 @@
         <tbody>
           ${subjects.map((su, i) => {
             const q = progress.subjects[su.key] || {};
-            return `<tr><td>${escapeHtml(su.label)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : ''}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '' : finals[i]}</td><td></td></tr>`;
+            return `<tr><td>${escapeHtml(su.label)}</td>${['q1','q2','q3','q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : ''}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '' : finals[i]}</td><td>${computeRemark(finals[i])}</td></tr>`;
           }).join('')}
         </tbody>
         <tfoot><tr class="ss-genavg-row"><td colspan="5" class="ss-genavg-label">General Average</td><td class="ss-num">${genAvg === null ? '' : genAvg}</td><td></td></tr></tfoot>
@@ -3774,7 +3836,7 @@
 
   // Elementary school progress, laid out as three left/right Grade pairs
   // (I & II, III & IV, V & VI) — the same two-column arrangement as the
-  // printed Form 137-E page.
+  // printed SF10-ES page.
   function buildElementaryProgressHtml(s){
     const pr = s.permanentRecord;
     if(!pr) return '';
@@ -3873,55 +3935,13 @@
       </div>`;
   }
 
-  // ---------- SF9 — Learner's Progress Report Card ----------
-  // Picks whichever grade level's permanent-record data best matches this
-  // student's current enrollment: an exact school-year match first, then
-  // the highest grade level that has any data entered, then Grade I.
-  function pickSf9Level(s){
+  function buildSF9Sheet(s, level){
     const pr = ensurePermanentRecord(s);
-    let level = GRADE_LEVELS.find(g => pr.meta[g].schoolYear && s.year && pr.meta[g].schoolYear === s.year);
-    if(!level){
-      level = [...GRADE_LEVELS].reverse().find(g => {
-        const hasSubjects = Object.keys(pr.progress[g].subjects || {}).length > 0;
-        const hasAtt = Object.values(pr.attendance[g].monthly || {}).some(m => m.days || m.present);
-        return hasSubjects || hasAtt || pr.meta[g].schoolYear;
-      });
-    }
-    return level || 'I';
-  }
-  function ratingRemark(v){
-    if(v === null || v === undefined || v === '') return '';
-    return Number(v) >= 75 ? 'Passed' : 'Failed';
-  }
-  function gradeDescriptor(v){
-    if(v === null || v === undefined || v === '') return '';
-    const n = Number(v);
-    if(n >= 90) return 'Outstanding';
-    if(n >= 85) return 'Very Satisfactory';
-    if(n >= 80) return 'Satisfactory';
-    if(n >= 75) return 'Fairly Satisfactory';
-    return 'Did Not Meet Expectations';
-  }
-  function computeAgeForSchoolYear(dob, schoolYear){
-    if(!dob) return '';
-    const yearMatch = schoolYear && schoolYear.match(/^(\d{4})/);
-    const startYear = yearMatch ? Number(yearMatch[1]) : new Date().getFullYear();
-    const asOf = new Date(startYear, 5, 1); // June 1 of the school-year start
-    const birth = new Date(dob);
-    if(isNaN(birth.getTime())) return '';
-    let age = asOf.getFullYear() - birth.getFullYear();
-    const hadBirthday = (asOf.getMonth() > birth.getMonth()) || (asOf.getMonth() === birth.getMonth() && asOf.getDate() >= birth.getDate());
-    if(!hadBirthday) age--;
-    return age >= 0 ? age : '';
-  }
-
-  function buildSF9Html(s){
-    const pr = ensurePermanentRecord(s);
-    const level = pickSf9Level(s);
-    const meta = pr.meta[level];
-    const progress = pr.progress[level];
-    const coreValues = pr.coreValues[level];
-    const att = pr.attendance[level];
+    const meta = pr.meta[level] || { school:'', schoolYear:'', eligible:'' };
+    const progress = pr.progress[level] || { subjects:{}, modality:{ q1:'', q2:'', q3:'', q4:'' } };
+    const att = pr.attendance[level] || {};
+    const monthly = att.monthly || {};
+    const transfer = pr.transfer || {};
     const subjects = subjectsForLevel(level);
     const finals = subjects.map(su => computeFinalRating(progress.subjects[su.key]));
     const genAvg = computeGeneralAverage(finals);
@@ -3934,12 +3954,8 @@
       : s.name;
     const schoolYear = meta.schoolYear || s.year || '';
     const age = computeAgeForSchoolYear(s.dob, schoolYear);
-    const monthTotals = SF9_MONTHS.reduce((acc, m) => {
-      acc.days += Number(att.monthly[m.key].days) || 0;
-      acc.present += Number(att.monthly[m.key].present) || 0;
-      return acc;
-    }, { days:0, present:0 });
-    const avgPerQuarter = ['q1','q2','q3','q4'].map(qk => {
+
+    const avgPerQuarter = ['q1', 'q2', 'q3', 'q4'].map(qk => {
       const vals = subjects.map(su => {
         const q = progress.subjects[su.key] || {};
         return q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? Number(q[qk]) : null;
@@ -3947,149 +3963,153 @@
       if(!vals.length) return null;
       return Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) / 100;
     });
+
+    const monthTotals = SF9_MONTHS.reduce((acc, m) => {
+      const rec = monthly[m.key] || { days:'', present:'' };
+      acc.days += Number(rec.days) || 0;
+      acc.present += Number(rec.present) || 0;
+      return acc;
+    }, { days:0, present:0 });
     const ordinal = n => n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : '4th';
+
+    // ---- PAGE 1: attendance + signatures (left) / identity + certificate of transfer (right) ----
+    const page1 = `
+      <div class="sf9-page">
+        <div class="sf9-page-grid">
+          <div class="sf9-col-left">
+            <p class="ss-section-title" style="margin-top:0;">Report on Attendance</p>
+            <table class="ss-table sf9-att-table">
+              <thead><tr><th></th>${SF9_MONTHS.map(m => `<th class="ss-num">${m.label.slice(0, 3)}</th>`).join('')}<th class="ss-num">Total</th></tr></thead>
+              <tbody>
+                <tr><td>No. of school days</td>${SF9_MONTHS.map(m => `<td class="ss-num">${escapeHtml((monthly[m.key] || {}).days || '')}</td>`).join('')}<td class="ss-num">${monthTotals.days || ''}</td></tr>
+                <tr><td>No. of days present</td>${SF9_MONTHS.map(m => `<td class="ss-num">${escapeHtml((monthly[m.key] || {}).present || '')}</td>`).join('')}<td class="ss-num">${monthTotals.present || ''}</td></tr>
+                <tr><td>No. of days absent</td>${SF9_MONTHS.map(m => {
+                  const rec = monthly[m.key] || {};
+                  const a = (rec.days === '' && rec.present === '') || (rec.days === undefined) ? '' : Math.max(0, (Number(rec.days) || 0) - (Number(rec.present) || 0));
+                  return `<td class="ss-num">${a}</td>`;
+                }).join('')}<td class="ss-num">${(monthTotals.days || monthTotals.present) ? Math.max(0, monthTotals.days - monthTotals.present) : ''}</td></tr>
+              </tbody>
+            </table>
+
+            <p class="ss-section-title" style="margin-top:1.6rem;">Parent's / Guardian's Signature</p>
+            ${[1, 2, 3, 4].map(q => `<div class="sf9-quarter-sig"><span class="q-label">${ordinal(q)} Quarter</span><span class="q-line"></span></div>`).join('')}
+          </div>
+
+          <div class="sf9-col-right">
+            <div class="ss-head-text">
+              <p class="ss-republic">Republic of the Philippines</p>
+              <p class="ss-dept">DEPARTMENT OF EDUCATION</p>
+              <p class="ss-region">Region ______________</p>
+              <p class="ss-region">Division of ${escapeHtml(s.division || '______________')}</p>
+              <p class="ss-region">______________ District</p>
+              <p class="ss-title" style="margin-top:0.35rem;">${escapeHtml(schoolName).toUpperCase()}</p>
+              <p class="ss-region">School ID: ${escapeHtml(meta.schoolId || '______')}</p>
+            </div>
+            <p class="ss-title" style="text-align:center; font-size:1em; margin:0.9rem 0 1rem;">LEARNER'S PROGRESS REPORT CARD</p>
+
+            <div class="ss-row">
+              <div class="ss-field" style="flex:2;"><span class="ss-label">Name</span><span class="ss-value">${escapeHtml(composedName)}</span></div>
+              <div class="ss-field"><span class="ss-label">Age</span><span class="ss-value">${age === '' ? '—' : age}</span></div>
+              <div class="ss-field"><span class="ss-label">Sex</span><span class="ss-value">${escapeHtml((s.sex || '—').toUpperCase())}</span></div>
+            </div>
+            <div class="ss-row">
+              <div class="ss-field"><span class="ss-label">LRN</span><span class="ss-value">${escapeHtml(s.id)}</span></div>
+              <div class="ss-field"><span class="ss-label">Grade</span><span class="ss-value">${escapeHtml((GRADE_LEVEL_WORDS[level] || level).toUpperCase())}</span></div>
+              <div class="ss-field"><span class="ss-label">Section</span><span class="ss-value">${escapeHtml((s.section || '—').toUpperCase())}</span></div>
+            </div>
+            <div class="ss-row">
+              <div class="ss-field"><span class="ss-label">School Year</span><span class="ss-value">${escapeHtml(schoolYear || '—')}</span></div>
+            </div>
+
+            <p class="sf9-dear-parent"><b>Dear Parent:</b><br>This report card shows the ability and progress your child has made in the different learning areas as well as his/her core values.<br>The school welcomes you if you desire to know more about your child's progress.</p>
+
+            <div class="sf9-sig-row"></div>
+            <p class="sf9-sig-cap">${escapeHtml(teacher ? teacher.name.toUpperCase() : (s.teacherId || 'TEACHER'))}<br><span>Teacher</span></p>
+            <div class="sf9-sig-row" style="margin-top:1rem;"></div>
+            <p class="sf9-sig-cap">${escapeHtml((transfer.principal || 'PRINCIPAL / SCHOOL HEAD').toUpperCase())}<br><span>Principal</span></p>
+
+            <p class="ss-section-title" style="margin-top:1.3rem;">Certificate of Transfer</p>
+            <p style="margin:0.3rem 0;">Admitted to Grade: <b>${escapeHtml((GRADE_LEVEL_WORDS[level] || level).toUpperCase())}</b> &nbsp;&nbsp; Section: <b>${escapeHtml(s.section || '________')}</b></p>
+            <p style="margin:0.3rem 0;">Eligibility for Admission to Grade: <b>${escapeHtml(transfer.eligible || meta.eligible || '________________')}</b></p>
+            <p style="margin:0.6rem 0 0.2rem;">Approved:</p>
+            <div class="sf9-sig-row"></div>
+            <p class="sf9-sig-cap">${escapeHtml((transfer.principal || 'PRINCIPAL / SCHOOL HEAD').toUpperCase())}<br><span>Principal</span></p>
+
+            <p style="margin-top:1.1rem; font-weight:700;">Cancellation of Eligibility to Transfer</p>
+            <p style="margin:0.3rem 0;">Admitted in: ________________________ &nbsp;&nbsp; Date: <b>${escapeHtml(transfer.date || '________________')}</b></p>
+          </div>
+        </div>
+        <p class="sf9-page-num">Page 1 of 2</p>
+      </div>`;
+
+    // ---- PAGE 2: learning progress + grading scale (left) / core values + marking legend (right) ----
+    const page2 = `
+      <div class="sf9-page">
+        <div class="sf9-page-grid">
+          <div class="sf9-col-left">
+            <p class="ss-section-title" style="margin-top:0;">Report on Learning Progress and Achievement</p>
+            <table class="ss-table">
+              <thead>
+                <tr><th rowspan="2">Learning Areas</th><th colspan="4">Quarter</th><th rowspan="2">Final<br>Grade</th><th rowspan="2">Remarks</th></tr>
+                <tr><th class="ss-num">1</th><th class="ss-num">2</th><th class="ss-num">3</th><th class="ss-num">4</th></tr>
+              </thead>
+              <tbody>
+                ${subjects.map((su, i) => {
+                  const q = progress.subjects[su.key] || {};
+                  return `<tr><td>${escapeHtml(su.label)}</td>${['q1', 'q2', 'q3', 'q4'].map(qk => `<td class="ss-num">${q[qk] !== undefined && q[qk] !== '' && q[qk] !== null ? escapeHtml(String(q[qk])) : ''}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '' : finals[i]}</td><td>${computeRemark(finals[i])}</td></tr>`;
+                }).join('')}
+                <tr><td><i>Average</i></td>${avgPerQuarter.map(v => `<td class="ss-num"><i>${v === null ? '' : v}</i></td>`).join('')}<td></td><td></td></tr>
+              </tbody>
+              <tfoot><tr class="ss-genavg-row"><td colspan="5" class="ss-genavg-label">General Average</td><td class="ss-num">${genAvg === null ? '' : genAvg}</td><td></td></tr></tfoot>
+            </table>
+            <div class="ss-row" style="margin-top:0.5rem;">
+              <div class="ss-field"><span class="ss-label">Learning Modality</span><span class="ss-value">Q1 ${escapeHtml(progress.modality.q1 || '—')} &nbsp; Q2 ${escapeHtml(progress.modality.q2 || '—')} &nbsp; Q3 ${escapeHtml(progress.modality.q3 || '—')} &nbsp; Q4 ${escapeHtml(progress.modality.q4 || '—')}</span></div>
+            </div>
+
+            <table class="ss-table sf9-legend-table" style="margin-top:0.9rem;">
+              <thead><tr><th>Description</th><th class="ss-num">Grading Scale</th><th>Remarks</th></tr></thead>
+              <tbody>
+                <tr><td>Outstanding</td><td class="ss-num">90-100</td><td>Passed</td></tr>
+                <tr><td>Very Satisfactory</td><td class="ss-num">85-89</td><td>Passed</td></tr>
+                <tr><td>Satisfactory</td><td class="ss-num">80-84</td><td>Passed</td></tr>
+                <tr><td>Fairly Satisfactory</td><td class="ss-num">75-79</td><td>Passed</td></tr>
+                <tr><td>Did Not Meet Expectations</td><td class="ss-num">Below 75</td><td>Failed</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="sf9-col-right">
+            <p class="ss-section-title" style="margin-top:0;">Report on Learner's Observed Values</p>
+            ${buildCoreValuesGroupHtml([level], pr)}
+
+            <table class="ss-table sf9-legend-table" style="margin-top:0.9rem; max-width:360px;">
+              <thead><tr><th colspan="2">Marking</th><th colspan="2">Non-numerical Rating</th></tr></thead>
+              <tbody>
+                <tr><td>AO</td><td>Always Observed</td></tr>
+                <tr><td>SO</td><td>Sometimes Observed</td></tr>
+                <tr><td>RO</td><td>Rarely Observed</td></tr>
+                <tr><td>NO</td><td>Not Observed</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="sf9-page-num">Page 2 of 2</p>
+        <div class="ss-footer">
+          <span>Generated ${escapeHtml(new Date().toLocaleDateString())} by ${escapeHtml(currentActor())}</span>
+        </div>
+      </div>`;
 
     return `
       <div class="ss-topline">
-        <span class="ss-formcode">DepEd SF9</span>
+        <span class="ss-formcode">SF9 — Learner's Progress Report Card</span>
         <div class="ss-lrn-box">LRN<b>${escapeHtml(s.id)}</b></div>
       </div>
-      <div class="ss-head-text">
-        <p class="ss-republic">Republic of the Philippines</p>
-        <p class="ss-dept">Department of Education</p>
-        <p class="ss-region">Division of ${escapeHtml(s.division || '______________')}</p>
-        <p class="ss-title" style="margin-top:0.3rem;">${escapeHtml(schoolName)}</p>
-        <p class="ss-title" style="font-size:0.95em;">LEARNER'S PROGRESS REPORT CARD</p>
-      </div>
-
-      <div class="ss-row">
-        <div class="ss-field" style="flex:2;"><span class="ss-label">Name</span><span class="ss-value">${escapeHtml(composedName)}</span></div>
-        <div class="ss-field"><span class="ss-label">Age</span><span class="ss-value">${age === '' ? '—' : age}</span></div>
-        <div class="ss-field"><span class="ss-label">Sex</span><span class="ss-value">${escapeHtml(s.sex || '—')}</span></div>
-      </div>
-      <div class="ss-row">
-        <div class="ss-field"><span class="ss-label">Grade</span><span class="ss-value">${escapeHtml(GRADE_LEVEL_WORDS[level] || level)}</span></div>
-        <div class="ss-field"><span class="ss-label">Section</span><span class="ss-value">${escapeHtml(s.section || '—')}</span></div>
-        <div class="ss-field"><span class="ss-label">School year</span><span class="ss-value">${escapeHtml(schoolYear || '—')}</span></div>
-      </div>
-
-      <div class="sf9-dear-parent">
-        <p><b>Dear Parent:</b></p>
-        <p>This report card shows the ability and progress your child has made in the different learning areas as well as his/her core values.</p>
-        <p>The school welcomes you if you desire to know more about your child's progress.</p>
-      </div>
-
-      <div class="sf9-cols">
-        <div>
-          <p class="ss-section-title">Report on Attendance</p>
-          <table class="ss-table sf9-att-table">
-            <thead><tr><th></th>${SF9_MONTHS.map(m => `<th class="ss-num">${m.label.slice(0, 3)}</th>`).join('')}<th class="ss-num">Total</th></tr></thead>
-            <tbody>
-              <tr><td>School days</td>${SF9_MONTHS.map(m => `<td class="ss-num">${escapeHtml(att.monthly[m.key].days)}</td>`).join('')}<td class="ss-num">${monthTotals.days || ''}</td></tr>
-              <tr><td>Days present</td>${SF9_MONTHS.map(m => `<td class="ss-num">${escapeHtml(att.monthly[m.key].present)}</td>`).join('')}<td class="ss-num">${monthTotals.present || ''}</td></tr>
-              <tr><td>Days absent</td>${SF9_MONTHS.map(m => {
-                const d = att.monthly[m.key].days, p = att.monthly[m.key].present;
-                const a = (d === '' && p === '') ? '' : Math.max(0, (Number(d) || 0) - (Number(p) || 0));
-                return `<td class="ss-num">${a}</td>`;
-              }).join('')}<td class="ss-num">${(monthTotals.days || monthTotals.present) ? Math.max(0, monthTotals.days - monthTotals.present) : ''}</td></tr>
-            </tbody>
-          </table>
-
-          <p class="ss-section-title" style="margin-top:1rem;">Parent's / Guardian's Signature</p>
-          ${[1, 2, 3, 4].map(q => `<div class="sf9-quarter-sig"><span class="q-label">${ordinal(q)} Quarter</span><span class="q-line"></span></div>`).join('')}
-        </div>
-
-        <div>
-          <p class="ss-section-title">Certificate of Transfer</p>
-          <div class="sf9-cert">
-            <p>Admitted to Grade: <b>${escapeHtml(GRADE_LEVEL_WORDS[level] || level)}</b> &nbsp; Section: <b>${escapeHtml(s.section || '________')}</b></p>
-            <p>Eligibility for Admission to Grade: <b>${escapeHtml(meta.eligible || '________________')}</b></p>
-            <div class="sf9-sig-row"></div>
-            <p class="sf9-sig-cap">${escapeHtml(teacher ? teacher.name : (s.teacherId || 'Teacher'))} — Teacher</p>
-            <p style="margin-top:0.8rem;">Approved:</p>
-            <div class="sf9-sig-row"></div>
-            <p class="sf9-sig-cap">${escapeHtml((pr.transfer && pr.transfer.principal) || 'Principal / School Head')} — Principal</p>
-
-            <p style="margin-top:1rem;"><b>Cancellation of Eligibility to Transfer</b></p>
-            <p>Admitted in: ________________________ &nbsp; Date: ________________</p>
-          </div>
-        </div>
-      </div>
-
-      <p class="ss-section-title" style="margin-top:1.4rem;">Report on Learning Progress and Achievement</p>
-      <table class="ss-table">
-        <thead><tr><th>Learning Areas</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th><th class="ss-num">Final Grade</th><th>Remarks</th></tr></thead>
-        <tbody>
-          ${subjects.map((su, i) => {
-            const q = progress.subjects[su.key] || {};
-            return `<tr><td>${escapeHtml(su.label)}</td>${['q1', 'q2', 'q3', 'q4'].map(qk => `<td class="ss-num">${escapeHtml(q[qk] || '')}</td>`).join('')}<td class="ss-num">${finals[i] === null ? '' : finals[i]}</td><td>${ratingRemark(finals[i])}</td></tr>`;
-          }).join('')}
-          <tr><td><i>Average</i></td>${avgPerQuarter.map(v => `<td class="ss-num"><i>${v === null ? '' : v}</i></td>`).join('')}<td></td><td></td></tr>
-        </tbody>
-        <tfoot><tr><td colspan="5" style="text-align:right; font-weight:700;">General Average</td><td class="ss-num" style="font-weight:700;">${genAvg === null ? '—' : genAvg}</td><td>${gradeDescriptor(genAvg)}</td></tr></tfoot>
-      </table>
-      <div class="ss-row" style="margin-top:0.5rem;">
-        <div class="ss-field"><span class="ss-label">Learning Modality (Q1–Q4)</span><span class="ss-value">${['q1', 'q2', 'q3', 'q4'].map(qk => escapeHtml(progress.modality[qk] || '—')).join(' / ')}</span></div>
-      </div>
-      <table class="ss-table sf9-legend-table" style="margin-top:0.6rem;">
-        <thead><tr><th>Description</th><th>Grading Scale</th><th>Remarks</th></tr></thead>
-        <tbody>
-          <tr><td>Outstanding</td><td>90–100</td><td>Passed</td></tr>
-          <tr><td>Very Satisfactory</td><td>85–89</td><td>Passed</td></tr>
-          <tr><td>Satisfactory</td><td>80–84</td><td>Passed</td></tr>
-          <tr><td>Fairly Satisfactory</td><td>75–79</td><td>Passed</td></tr>
-          <tr><td>Did Not Meet Expectations</td><td>Below 75</td><td>Failed</td></tr>
-        </tbody>
-      </table>
-
-      <p class="ss-section-title" style="margin-top:1.4rem;">Report on Learner's Observed Values</p>
-      <table class="ss-table">
-        <thead><tr><th>Core Values</th><th>Behavior Statements</th><th class="ss-num">Q1</th><th class="ss-num">Q2</th><th class="ss-num">Q3</th><th class="ss-num">Q4</th></tr></thead>
-        <tbody>
-          ${(() => {
-            const groupSpans = [];
-            CORE_VALUE_ROWS.forEach((row, i) => {
-              if(i > 0 && CORE_VALUE_ROWS[i - 1].group === row.group) groupSpans[groupSpans.length - 1].span++;
-              else groupSpans.push({ group: row.group, span: 1, startIndex: i });
-            });
-            const groupStartIndex = {};
-            groupSpans.forEach(g => { groupStartIndex[g.startIndex] = g; });
-            return CORE_VALUE_ROWS.map((row, i) => {
-              const groupCell = groupStartIndex[i] ? `<td rowspan="${groupStartIndex[i].span}">${escapeHtml(row.group)}</td>` : '';
-              const r = coreValues.ratings[row.key] || {};
-              return `<tr>${groupCell}<td>${escapeHtml(row.statement)}</td>${['q1', 'q2', 'q3', 'q4'].map(qk => `<td class="ss-num">${escapeHtml(r[qk] || '')}</td>`).join('')}</tr>`;
-            }).join('');
-          })()}
-        </tbody>
-      </table>
-      <table class="ss-table sf9-legend-table" style="margin-top:0.6rem;">
-        <thead><tr><th colspan="2">Marking</th></tr></thead>
-        <tbody>
-          <tr><td>AO</td><td>Always Observed</td></tr>
-          <tr><td>SO</td><td>Sometimes Observed</td></tr>
-          <tr><td>RO</td><td>Rarely Observed</td></tr>
-          <tr><td>NO</td><td>Not Observed</td></tr>
-        </tbody>
-      </table>
-
-      <div class="ss-footer">
-        <span>Generated ${escapeHtml(new Date().toLocaleDateString())} by ${escapeHtml(currentActor())}</span>
-      </div>
+      ${page1}
+      ${page2}
     `;
   }
 
-  function openShareModal(s, docType){
-    shareStudent = s;
-    shareDocType = docType === 'sf9' ? 'sf9' : 'sf10';
-    const titleEl = document.getElementById('shareModalTitle');
-    if(titleEl) titleEl.textContent = shareDocType === 'sf9' ? 'SF9 — Learner\'s Progress Report Card' : 'SF10 — Learner\'s Permanent Academic Record';
-
-    if(shareDocType === 'sf9'){
-      shareSheet.innerHTML = buildSF9Html(s);
-      shareModalOverlay.classList.add('show');
-      return;
-    }
-
+  function buildSF10Sheet(s){
     const teacher = teacherById[s.teacherId];
     const brand = currentBrandingForShare();
     const schoolName = s.school || brand.title || brand.heading || DEFAULT_HEADING;
@@ -4099,16 +4119,16 @@
       ? [s.surname, s.firstName, s.mi ? (s.mi.replace(/\.$/, '') + '.') : ''].filter(Boolean).join(' ')
       : s.name;
 
-    shareSheet.innerHTML = `
+    return `
       <div class="ss-topline">
-        <span class="ss-formcode">DepEd SF10 (Form 137-E)</span>
+        <span class="ss-formcode">SF10-ES (formerly Form 137)</span>
         <div class="ss-lrn-box">LRN<b>${escapeHtml(s.id)}</b></div>
       </div>
       <div class="ss-head-text">
         <p class="ss-republic">Republic of the Philippines</p>
         <p class="ss-dept">Department of Education</p>
         <p class="ss-region">${s.division ? escapeHtml(s.division) : 'Region ______________'}</p>
-        <p class="ss-title">Learner's Permanent Academic Record — Elementary</p>
+        <p class="ss-title">Learner's Permanent Academic Record for Elementary School (SF10-ES)</p>
       </div>
 
       <div class="ss-nameline">
@@ -4156,6 +4176,55 @@
         <span>Generated ${escapeHtml(new Date().toLocaleDateString())} by ${escapeHtml(currentActor())}</span>
       </div>
     `;
+  }
+
+  let shareDocType = 'sf9';
+  let shareLevel = 'VI';
+  const shareDocTypeSelect = document.getElementById('shareDocType');
+  const shareLevelSelect = document.getElementById('shareLevelSelect');
+  const shareLevelField = document.getElementById('shareLevelField');
+
+  // Picks the most recently-filled-in grade level for this student (the one
+  // with a school year on file), so the SF9 report card opens on sensible
+  // data instead of always defaulting to Grade VI.
+  function defaultLevelFor(s){
+    const pr = ensurePermanentRecord(s);
+    for(let i = GRADE_LEVELS.length - 1; i >= 0; i--){
+      const g = GRADE_LEVELS[i];
+      if(pr.meta[g] && pr.meta[g].schoolYear) return g;
+    }
+    return activeGradeTab || 'I';
+  }
+
+  const dynamicPageOrientation = document.getElementById('dynamicPageOrientation');
+  const shareModalBox = document.getElementById('shareModalBox');
+
+  function renderShareSheet(){
+    if(!shareStudent) return;
+    shareLevelField.style.display = shareDocType === 'sf9' ? '' : 'none';
+    shareSheet.innerHTML = shareDocType === 'sf9' ? buildSF9Sheet(shareStudent, shareLevel) : buildSF10Sheet(shareStudent);
+    // SF9 is landscape (this app's own layout choice, unlike the portrait
+    // DepEd form) — reflect that in the on-screen preview itself (a wider
+    // modal + a landscape-page aspect ratio on the sheet), not only in
+    // the print-time @page rule below, so what you see is what prints.
+    const isLandscape = shareDocType === 'sf9';
+    shareSheet.classList.toggle('ss-landscape', isLandscape);
+    shareModalBox.style.maxWidth = isLandscape ? '980px' : '640px';
+    dynamicPageOrientation.textContent = isLandscape
+      ? '@media print{ @page{ size:landscape; margin:0; } }'
+      : '@media print{ @page{ size:auto; margin:0; } }';
+  }
+
+  shareDocTypeSelect.addEventListener('change', () => { shareDocType = shareDocTypeSelect.value; renderShareSheet(); });
+  shareLevelSelect.addEventListener('change', () => { shareLevel = shareLevelSelect.value; renderShareSheet(); });
+
+  function openShareModal(s, docType){
+    shareStudent = s;
+    shareLevel = defaultLevelFor(s);
+    shareDocType = docType === 'sf10' ? 'sf10' : 'sf9';
+    shareDocTypeSelect.value = shareDocType;
+    shareLevelSelect.innerHTML = GRADE_LEVELS.map(g => `<option value="${g}"${g === shareLevel ? ' selected' : ''}>Grade ${g}</option>`).join('');
+    renderShareSheet();
     shareModalOverlay.classList.add('show');
   }
   function closeShareModal(){ shareModalOverlay.classList.remove('show'); }
@@ -4163,6 +4232,190 @@
   document.getElementById('shareModalClose').addEventListener('click', closeShareModal);
   document.getElementById('shareCloseBtn').addEventListener('click', closeShareModal);
   shareModalOverlay.addEventListener('click', e => { if(e.target === shareModalOverlay) closeShareModal(); });
+
+  // ---------- Birth certificate photos (front & back) — picture only, no fields ----------
+  const birthCertModalOverlay = document.getElementById('birthCertModalOverlay');
+  const bcFrontInput = document.getElementById('bcFrontInput');
+  const bcBackInput = document.getElementById('bcBackInput');
+  const bcFrontPreview = document.getElementById('bcFrontPreview');
+  const bcBackPreview = document.getElementById('bcBackPreview');
+  let bcStudent = null;
+
+  function setBcPreview(imgEl, dataUrl){
+    if(dataUrl) imgEl.src = dataUrl; else imgEl.removeAttribute('src');
+  }
+
+  function openBirthCertModal(s){
+    bcStudent = s;
+    setBcPreview(bcFrontPreview, s.birthCertFront || '');
+    setBcPreview(bcBackPreview, s.birthCertBack || '');
+    birthCertModalOverlay.classList.add('show');
+  }
+  function closeBirthCertModal(){ birthCertModalOverlay.classList.remove('show'); }
+
+  document.getElementById('birthCertModalClose').addEventListener('click', closeBirthCertModal);
+  document.getElementById('birthCertDoneBtn').addEventListener('click', closeBirthCertModal);
+  birthCertModalOverlay.addEventListener('click', e => { if(e.target === birthCertModalOverlay) closeBirthCertModal(); });
+
+  bcFrontInput.addEventListener('change', async () => {
+    const file = bcFrontInput.files[0];
+    if(!file || !bcStudent) return;
+    try{
+      bcStudent.birthCertFront = await resizeImageToDataURL(file, 1600, 'image/jpeg', 0.85);
+      setBcPreview(bcFrontPreview, bcStudent.birthCertFront);
+      saveData();
+    }catch(err){ showToast('Could not read that image — try a different file'); }
+    bcFrontInput.value = '';
+  });
+  bcBackInput.addEventListener('change', async () => {
+    const file = bcBackInput.files[0];
+    if(!file || !bcStudent) return;
+    try{
+      bcStudent.birthCertBack = await resizeImageToDataURL(file, 1600, 'image/jpeg', 0.85);
+      setBcPreview(bcBackPreview, bcStudent.birthCertBack);
+      saveData();
+    }catch(err){ showToast('Could not read that image — try a different file'); }
+    bcBackInput.value = '';
+  });
+  document.getElementById('bcFrontRemoveBtn').addEventListener('click', () => {
+    if(!bcStudent) return;
+    delete bcStudent.birthCertFront;
+    setBcPreview(bcFrontPreview, '');
+    saveData();
+  });
+  document.getElementById('bcBackRemoveBtn').addEventListener('click', () => {
+    if(!bcStudent) return;
+    delete bcStudent.birthCertBack;
+    setBcPreview(bcBackPreview, '');
+    saveData();
+  });
+
+  // Tap/click a birth-cert photo to view it full-size. Standalone/installed
+  // PWAs frequently suppress the browser's native pinch-to-zoom gesture, so
+  // this implements its own pinch (2-finger), mouse-wheel, double-tap, and
+  // drag-to-pan zoom on the lightbox image rather than relying on it.
+  const imageLightboxOverlay = document.getElementById('imageLightboxOverlay');
+  const imageLightboxImg = document.getElementById('imageLightboxImg');
+  const lightboxZoomInBtn = document.getElementById('lightboxZoomInBtn');
+  const lightboxZoomOutBtn = document.getElementById('lightboxZoomOutBtn');
+  const lightboxZoomResetBtn = document.getElementById('lightboxZoomResetBtn');
+  const lightboxOpenTabBtn = document.getElementById('lightboxOpenTabBtn');
+
+  let lbScale = 1, lbTranslateX = 0, lbTranslateY = 0;
+  let lbPanning = false, lbPanStartX = 0, lbPanStartY = 0, lbStartTranslateX = 0, lbStartTranslateY = 0;
+  let lbPinchStartDist = 0, lbPinchStartScale = 1;
+  const lbPointers = new Map();
+  const LB_MIN_SCALE = 1, LB_MAX_SCALE = 6;
+
+  function lbApplyTransform(){
+    imageLightboxImg.style.transform = `translate(${lbTranslateX}px, ${lbTranslateY}px) scale(${lbScale})`;
+    imageLightboxImg.classList.toggle('zoomed', lbScale > 1.01);
+  }
+  function lbSetScale(newScale, anchorX, anchorY){
+    newScale = Math.min(LB_MAX_SCALE, Math.max(LB_MIN_SCALE, newScale));
+    if(newScale === LB_MIN_SCALE){ lbScale = 1; lbTranslateX = 0; lbTranslateY = 0; lbApplyTransform(); return; }
+    // Keep the point under the cursor/pinch-midpoint stationary while scaling.
+    if(anchorX !== undefined){
+      const ratio = newScale / lbScale;
+      lbTranslateX = anchorX - ratio * (anchorX - lbTranslateX);
+      lbTranslateY = anchorY - ratio * (anchorY - lbTranslateY);
+    }
+    lbScale = newScale;
+    lbApplyTransform();
+  }
+  function lbReset(){ lbScale = 1; lbTranslateX = 0; lbTranslateY = 0; lbApplyTransform(); }
+
+  function openImageLightbox(src){
+    if(!src) return;
+    lbReset();
+    imageLightboxImg.src = src;
+    imageLightboxOverlay.classList.add('show');
+  }
+  function closeImageLightbox(){
+    imageLightboxOverlay.classList.remove('show');
+    imageLightboxImg.removeAttribute('src');
+    lbReset();
+  }
+  document.getElementById('imageLightboxClose').addEventListener('click', closeImageLightbox);
+  imageLightboxOverlay.addEventListener('click', e => { if(e.target === imageLightboxOverlay) closeImageLightbox(); });
+  bcFrontPreview.addEventListener('click', () => openImageLightbox(bcFrontPreview.getAttribute('src')));
+  bcBackPreview.addEventListener('click', () => openImageLightbox(bcBackPreview.getAttribute('src')));
+
+  // Pointer events cover touch (pinch/drag), mouse (drag), and pen in one
+  // API — tracked by pointerId so a 2-finger pinch and a 1-finger pan are
+  // told apart automatically.
+  // Pointer events cover mouse and pen drag-to-pan / pinch here; real touch
+  // pinch-zoom is left to the browser itself (see touch-action:pinch-zoom
+  // above) since that's the mechanism that actually re-enables zooming
+  // inside an installed/standalone PWA — a hand-rolled touch pinch would
+  // just fight the native one. Touch pointers are ignored below so the
+  // two never compete; wheel, double-click, and the +/− buttons still
+  // work for everyone regardless of pointer type.
+  imageLightboxImg.addEventListener('pointerdown', e => {
+    if(e.pointerType === 'touch') return;
+    imageLightboxImg.setPointerCapture(e.pointerId);
+    lbPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if(lbPointers.size === 1){
+      lbPanning = true;
+      lbPanStartX = e.clientX; lbPanStartY = e.clientY;
+      lbStartTranslateX = lbTranslateX; lbStartTranslateY = lbTranslateY;
+    } else if(lbPointers.size === 2){
+      lbPanning = false;
+      const pts = [...lbPointers.values()];
+      lbPinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
+      lbPinchStartScale = lbScale;
+    }
+  });
+  imageLightboxImg.addEventListener('pointermove', e => {
+    if(e.pointerType === 'touch') return;
+    if(!lbPointers.has(e.pointerId)) return;
+    lbPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if(lbPointers.size === 2){
+      const pts = [...lbPointers.values()];
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
+      const midX = (pts[0].x + pts[1].x) / 2, midY = (pts[0].y + pts[1].y) / 2;
+      lbSetScale(lbPinchStartScale * (dist / lbPinchStartDist), midX, midY);
+    } else if(lbPanning && lbScale > 1){
+      lbTranslateX = lbStartTranslateX + (e.clientX - lbPanStartX);
+      lbTranslateY = lbStartTranslateY + (e.clientY - lbPanStartY);
+      lbApplyTransform();
+    }
+  });
+  function lbEndPointer(e){
+    lbPointers.delete(e.pointerId);
+    if(lbPointers.size < 2) lbPinchStartDist = 0;
+    if(lbPointers.size === 0) lbPanning = false;
+  }
+  imageLightboxImg.addEventListener('pointerup', lbEndPointer);
+  imageLightboxImg.addEventListener('pointercancel', lbEndPointer);
+  imageLightboxImg.addEventListener('pointerleave', lbEndPointer);
+
+  imageLightboxImg.addEventListener('dblclick', e => {
+    const rect = imageLightboxImg.getBoundingClientRect();
+    if(lbScale > 1) lbReset();
+    else lbSetScale(2.5, e.clientX - rect.left, e.clientY - rect.top);
+  });
+  imageLightboxImg.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = imageLightboxImg.getBoundingClientRect();
+    lbSetScale(lbScale + (e.deltaY > 0 ? -0.25 : 0.25), e.clientX - rect.left, e.clientY - rect.top);
+  }, { passive: false });
+
+  lightboxZoomInBtn.addEventListener('click', () => lbSetScale(lbScale + 0.5));
+  lightboxZoomOutBtn.addEventListener('click', () => lbSetScale(lbScale - 0.5));
+  lightboxZoomResetBtn.addEventListener('click', lbReset);
+  // Fallback that always works regardless of any in-app zoom quirk: opens
+  // the photo in a brand-new browser tab (a plain document, outside the
+  // installed PWA's standalone display mode), where the OS/browser's own
+  // pinch-zoom is never suppressed.
+  lightboxOpenTabBtn.addEventListener('click', () => {
+    const src = imageLightboxImg.getAttribute('src');
+    if(!src) return;
+    const w = window.open('', '_blank');
+    if(!w){ showToast('Your browser blocked the new tab — allow pop-ups for this site to use this option'); return; }
+    w.document.write(`<!DOCTYPE html><html><head><title>Birth certificate photo</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;} img{max-width:100%;height:auto;}</style></head><body><img src="${src}" alt="Full-size photo"></body></html>`);
+    w.document.close();
+  });
 
   // Swap the browser tab title to a clean, student-specific name while
   // printing — this is what Chromium/Firefox use both as a fallback
@@ -4172,8 +4425,7 @@
   window.addEventListener('beforeprint', () => {
     if(shareModalOverlay.classList.contains('show') && shareStudent){
       savedDocTitle = document.title;
-      const label = shareDocType === 'sf9' ? 'SF9 Report Card' : 'SF10 Permanent Record';
-      document.title = `${label} - ${shareStudent.name} (${shareStudent.id})`;
+      document.title = `Permanent Record - ${shareStudent.name} (${shareStudent.id})`;
     }
   });
   window.addEventListener('afterprint', () => {
@@ -4181,23 +4433,22 @@
   });
 
   document.getElementById('sharePrintBtn').addEventListener('click', () => {
-    if(shareStudent) logActivity(`Shared student ${shareDocType === 'sf9' ? 'SF9' : 'SF10'} record (print/PDF)`, `${shareStudent.name} (${shareStudent.id})`);
+    if(shareStudent) logActivity('Shared student record (print/PDF)', `${shareStudent.name} (${shareStudent.id})`);
     window.print();
   });
   document.getElementById('shareEmailBtn').addEventListener('click', () => {
     if(!shareStudent) return;
     const s = shareStudent;
     const teacher = teacherById[s.teacherId];
-    const label = shareDocType === 'sf9' ? 'SF9 report card' : 'SF10 permanent record';
-    const subject = `${shareDocType === 'sf9' ? 'SF9' : 'SF10'} — ${s.name} (${s.id})`;
+    const subject = `Student record — ${s.name} (${s.id})`;
     const bodyLines = [
-      `${label} for ${s.name} (LRN ${s.id})`,
+      `Student record for ${s.name} (LRN ${s.id})`,
       `Section: ${s.section}   School year: ${s.year || '—'}`,
       `Adviser: ${teacher ? teacher.name : (s.teacherId || '—')}`,
       '',
       'A full formatted copy of this record can be saved as a PDF from the "Print / Save as PDF" button and attached to this email.'
     ];
-    logActivity(`Shared student ${shareDocType === 'sf9' ? 'SF9' : 'SF10'} record (email)`, `${s.name} (${s.id})`);
+    logActivity('Shared student record (email)', `${s.name} (${s.id})`);
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
   });
 
@@ -4249,37 +4500,13 @@
             </li>
           `).join('') || '<li>No prior section records on file.</li>'}
         </ul>
-
-        <p class="section-label">DepEd forms</p>
-        <div class="doc-picker-row">
-          <button type="button" class="btn-secondary" id="sf9FromProfileBtn">📄 SF9 — Report Card</button>
-          <button type="button" class="btn-secondary" id="sf10FromProfileBtn">📄 SF10 — Permanent Record</button>
-        </div>
-
-        <p class="section-label">Birth certificate (PSA copy)</p>
-        <div class="bc-grid">
-          <div class="bc-card">
-            <span class="bc-card-label">Front</span>
-            <div class="bc-preview" id="bcFrontPreview">${s.birthCertFront ? `<img src="${s.birthCertFront}" alt="Birth certificate — front">` : `<span class="bc-empty">No photo uploaded</span>`}</div>
-            <div class="bc-card-actions">
-              <label class="file-btn">📷 ${s.birthCertFront ? 'Replace' : 'Upload'}<input type="file" accept="image/*" id="bcFrontInput" style="display:none;"></label>
-              ${s.birthCertFront ? `<button type="button" class="file-btn bc-remove" id="bcFrontRemoveBtn">Remove</button>` : ''}
-            </div>
-          </div>
-          <div class="bc-card">
-            <span class="bc-card-label">Back</span>
-            <div class="bc-preview" id="bcBackPreview">${s.birthCertBack ? `<img src="${s.birthCertBack}" alt="Birth certificate — back">` : `<span class="bc-empty">No photo uploaded</span>`}</div>
-            <div class="bc-card-actions">
-              <label class="file-btn">📷 ${s.birthCertBack ? 'Replace' : 'Upload'}<input type="file" accept="image/*" id="bcBackInput" style="display:none;"></label>
-              ${s.birthCertBack ? `<button type="button" class="file-btn bc-remove" id="bcBackRemoveBtn">Remove</button>` : ''}
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-actions" style="justify-content:flex-start; margin-top:1.4rem;">
+        <div class="profile-actions">
           <button type="button" class="btn-secondary" id="editFromProfileBtn">Edit this student</button>
           <button type="button" class="btn-secondary" id="recordFromProfileBtn">🎓 Grades &amp; record</button>
-          <button type="button" class="btn-danger admin-only" id="deleteFromProfileBtn">Delete this student</button>
+          <button type="button" class="btn-secondary" id="sf9FromProfileBtn">📄 SF9 Report Card</button>
+          <button type="button" class="btn-secondary" id="sf10FromProfileBtn">📄 SF10 Permanent Record</button>
+          <button type="button" class="btn-secondary" id="birthCertFromProfileBtn">🪪 Birth certificate</button>
+          <button type="button" class="btn-danger" id="deleteFromProfileBtn">Delete this student</button>
         </div>
       </div>
     `;
@@ -4288,38 +4515,8 @@
     document.getElementById('recordFromProfileBtn').addEventListener('click', () => openRecordModal(s));
     document.getElementById('sf9FromProfileBtn').addEventListener('click', () => openShareModal(s, 'sf9'));
     document.getElementById('sf10FromProfileBtn').addEventListener('click', () => openShareModal(s, 'sf10'));
+    document.getElementById('birthCertFromProfileBtn').addEventListener('click', () => openBirthCertModal(s));
     document.getElementById('deleteFromProfileBtn').addEventListener('click', () => confirmDeleteStudents([s.id]));
-
-    // ---- Birth certificate front/back upload (images only) ----
-    async function handleBcUpload(file, field){
-      if(!file) return;
-      if(!file.type || !file.type.startsWith('image/')){
-        showToast('Only image files (JPG, PNG, etc.) are allowed for the birth certificate');
-        return;
-      }
-      try{
-        const dataUrl = await resizeImageToDataURL(file, 1400);
-        s[field] = dataUrl;
-        saveData();
-        logActivity(field === 'birthCertFront' ? 'Uploaded birth certificate (front)' : 'Uploaded birth certificate (back)', `${s.name} (${s.id})`);
-        renderProfile();
-        showToast('Birth certificate photo saved');
-      }catch(err){
-        showToast('Could not read that image');
-      }
-    }
-    const bcFrontInput = document.getElementById('bcFrontInput');
-    const bcBackInput = document.getElementById('bcBackInput');
-    if(bcFrontInput) bcFrontInput.addEventListener('change', e => handleBcUpload(e.target.files[0], 'birthCertFront'));
-    if(bcBackInput) bcBackInput.addEventListener('change', e => handleBcUpload(e.target.files[0], 'birthCertBack'));
-    const bcFrontRemoveBtn = document.getElementById('bcFrontRemoveBtn');
-    const bcBackRemoveBtn = document.getElementById('bcBackRemoveBtn');
-    if(bcFrontRemoveBtn) bcFrontRemoveBtn.addEventListener('click', () => {
-      delete s.birthCertFront; saveData(); logActivity('Removed birth certificate (front)', `${s.name} (${s.id})`); renderProfile();
-    });
-    if(bcBackRemoveBtn) bcBackRemoveBtn.addEventListener('click', () => {
-      delete s.birthCertBack; saveData(); logActivity('Removed birth certificate (back)', `${s.name} (${s.id})`); renderProfile();
-    });
   }
 
   function jumpToTeacher(teacherId){
@@ -4423,7 +4620,7 @@
               <div class="stamp">${escapeHtml(s.section)}</div>
               <button class="icon-del icon-share" data-share-student="${escapeHtml(s.id)}" aria-label="Share / print PDF" title="Share / print PDF">📄</button>
               <button class="icon-del icon-edit" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>
-              <button class="icon-del admin-only" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
+              <button class="icon-del" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
             </div>
           </div>
           <p class="id">${escapeHtml(s.id)}</p>
@@ -4490,7 +4687,7 @@
               <li>Once saved, they'll show up as an <b>adviser option</b> when you add students.</li>
               <li>Check the boxes on teacher cards to <b>select and delete several at once</b>.</li>
             </ol>
-            <button class="add-btn admin-only" id="onboardingAddTeacher">+ Add your first teacher</button>
+            <button class="add-btn" id="onboardingAddTeacher">+ Add your first teacher</button>
           </div>
         `;
         document.getElementById('onboardingAddTeacher').addEventListener('click', openTeacherModal);
@@ -4521,8 +4718,8 @@
             </label>
             <div class="card-head-right">
               <div class="stamp">${t.subjects.length} held</div>
-              <button class="icon-del icon-edit admin-only" data-edit-teacher="${escapeHtml(t.id)}" aria-label="Edit teacher" title="Edit teacher">✏️</button>
-              <button class="icon-del admin-only" data-delete-teacher="${escapeHtml(t.id)}" aria-label="Delete teacher" title="Delete teacher">🗑</button>
+              <button class="icon-del icon-edit" data-edit-teacher="${escapeHtml(t.id)}" aria-label="Edit teacher" title="Edit teacher">✏️</button>
+              <button class="icon-del" data-delete-teacher="${escapeHtml(t.id)}" aria-label="Delete teacher" title="Delete teacher">🗑</button>
             </div>
           </div>
           <p class="id">${escapeHtml(t.id)}</p>
@@ -4770,7 +4967,6 @@
       tabsEl.dataset.active = 'students';
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
       addBtn.textContent = '+ Add student';
-      addBtn.classList.remove('admin-only');
       query = id.toLowerCase();
       searchInput.value = id;
       clearBtn.classList.add('show');
@@ -4796,7 +4992,6 @@
     tabsEl.dataset.active = 'students';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
     addBtn.textContent = '+ Add student';
-      addBtn.classList.remove('admin-only');
     sectionFilter = ''; yearFilter = '';
     sectionSelect.value = ''; yearSelect.value = '';
     query = id.toLowerCase();
@@ -4904,7 +5099,6 @@
       tabsEl.dataset.active = 'teachers';
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'teachers'));
       addBtn.textContent = '+ Add teacher';
-      addBtn.classList.add('admin-only');
       render();
       showToast(`Saved changes to ${name}`);
       return;
@@ -4921,7 +5115,6 @@
     tabsEl.dataset.active = 'teachers';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'teachers'));
     addBtn.textContent = '+ Add teacher';
-      addBtn.classList.add('admin-only');
     sectionJumpWrap.style.display = 'none';
     yearJumpWrap.style.display = 'none';
     query = id.toLowerCase();
@@ -5297,7 +5490,6 @@
     tabsEl.dataset.active = 'students';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
     addBtn.textContent = '+ Add student';
-      addBtn.classList.remove('admin-only');
     view = 'list';
     render();
 
@@ -5448,6 +5640,114 @@
     };
     reader.onerror = () => showToast('Could not read that file');
     reader.readAsText(file);
+  });
+
+  // ---------- Demo data (for presentations / walkthroughs) ----------
+  // Real per-quarter figures for the Grade V sample learners are taken from
+  // a filled-in SF9 template, so a demo of the SF9/SF10 print views shows
+  // authentic-looking, internally-consistent numbers instead of placeholders.
+  function buildDemoDataset(){
+    const SY = '2025-2026';
+    const SCHOOL = 'Bagong Pag-asa Elementary School';
+    const DIVISION = 'Region IV-A (CALABARZON)';
+    const teachers = [
+      { id:'T-2026-01', name:'Andres Bonifacio', subjects:[{ subject:'Adviser', section:'V - Rizal' }], dateAdded: Date.now() },
+      { id:'T-2026-02', name:'Juana Dela Cruz', subjects:[{ subject:'Adviser', section:'III - Mabini' }], dateAdded: Date.now() }
+    ];
+
+    // level V quarterly figures: [esp, english, math, science, filipino, ap, epp, mapehMusic, mapehPE]
+    const g5Quarters = {
+      'Antonio Reyes':  { q1:[85,81,81,78,80,84,86,83,83], q2:[86,82,81,81,81,84,88,84,84], q3:[87,81,80,80,81,86,89,85,84], q4:[88,81,81,80,81,87,90,87,85] },
+      'Carlo Dela Cruz':{ q1:[82,80,83,79,79,80,84,83,86], q2:[84,82,82,82,80,82,85,84,85], q3:[85,81,80,80,81,83,87,84,85], q4:[86,81,86,85,81,85,88,85,86] },
+      'Miguel Santos':  { q1:[89,88,82,82,87,89,90,89,88], q2:[90,89,84,82,88,89,88,89,89], q3:[91,87,82,83,86,90,90,89,89], q4:[92,87,85,85,86,91,91,90,90] },
+      'Rafael Castillo':{ q1:[80,79,77,76,79,77,79,78,78], q2:[82,80,84,83,79,77,79,79,80], q3:[83,80,80,81,82,78,81,78,80], q4:[85,80,80,80,82,81,83,80,82] }
+    };
+    const upperKeys = ['esp','english','math','science','filipino','ap','epp','mapehMusic','mapehPE'];
+    function upperSubjects(quarters){
+      const subjects = {};
+      upperKeys.forEach((key, i) => {
+        subjects[key] = { q1:quarters.q1[i], q2:quarters.q2[i], q3:quarters.q3[i], q4:quarters.q4[i] };
+      });
+      return subjects;
+    }
+    function allAO(){
+      const ratings = {};
+      CORE_VALUE_ROWS.forEach(row => { ratings[row.key] = { q1:'AO', q2:'AO', q3:'AO', q4:'AO' }; });
+      return ratings;
+    }
+
+    const g5Students = [
+      { id:'136912345671', full:'Antonio Reyes', sex:'MALE', age:'10' },
+      { id:'136912345672', full:'Carlo Dela Cruz', sex:'MALE', age:'10' },
+      { id:'136912345673', full:'Miguel Santos', sex:'MALE', age:'10' },
+      { id:'136912345674', full:'Rafael Castillo', sex:'MALE', age:'10' }
+    ].map(d => {
+      const [firstName, ...rest] = d.full.split(' ');
+      const surname = rest.join(' ');
+      return {
+        id:d.id, name:d.full, firstName, surname, sex:d.sex,
+        section:'V - Rizal', year:SY, teacherId:'T-2026-01',
+        division:DIVISION, school:SCHOOL,
+        history:[{ year:SY, section:'V - Rizal' }],
+        dateAdded: Date.now(),
+        permanentRecord:{
+          meta:{ V:{ school:SCHOOL, schoolYear:SY, eligible:'Grade VI' } },
+          progress:{ V:{ subjects: upperSubjects(g5Quarters[d.full]) } },
+          coreValues:{ V:{ ratings: allAO() } },
+          attendance:{ V:{ schoolDays:'100', daysAbsent:'10', causeAbsent:'', timesTardy:'3', causeTardy:'', daysPresent:'90' } },
+          transfer:{ eligible:'', principal:'', date:'' }
+        }
+      };
+    });
+
+    // Lower-band (Grade III) sample — GMRC-era 5-subject set, synthetic but plausible.
+    const g3Base = { language:[86,87,88,89], reading:[84,85,86,87], math:[82,83,84,85], gmrc:[90,90,91,92], makabansa:[85,86,86,87] };
+    const g3Alt  = { language:[80,81,82,83], reading:[78,79,80,81], math:[79,80,81,82], gmrc:[88,88,89,89], makabansa:[81,82,82,83] };
+    function lowerSubjects(base){
+      const subjects = {};
+      Object.keys(base).forEach(key => {
+        subjects[key] = { q1:base[key][0], q2:base[key][1], q3:base[key][2], q4:base[key][3] };
+      });
+      return subjects;
+    }
+    const g3Students = [
+      { id:'136912345675', name:'Liza Fernandez', firstName:'Liza', surname:'Fernandez', sex:'FEMALE', subj:g3Base },
+      { id:'136912345676', name:'Mark Villanueva', firstName:'Mark', surname:'Villanueva', sex:'MALE', subj:g3Alt }
+    ].map(d => ({
+      id:d.id, name:d.name, firstName:d.firstName, surname:d.surname, sex:d.sex,
+      section:'III - Mabini', year:SY, teacherId:'T-2026-02',
+      division:DIVISION, school:SCHOOL,
+      history:[{ year:SY, section:'III - Mabini' }],
+      dateAdded: Date.now(),
+      permanentRecord:{
+        meta:{ III:{ school:SCHOOL, schoolYear:SY, eligible:'Grade IV' } },
+        progress:{ III:{ subjects: lowerSubjects(d.subj) } },
+        coreValues:{ III:{ ratings: allAO() } },
+        attendance:{ III:{ schoolDays:'100', daysAbsent:'6', causeAbsent:'', timesTardy:'1', causeTardy:'', daysPresent:'94' } },
+        transfer:{ eligible:'', principal:'', date:'' }
+      }
+    }));
+
+    // A Grade I learner with no adviser assigned yet, and no grades entered
+    // yet — shows what a freshly-added record looks like alongside the rest.
+    const g1Student = {
+      id:'136912345677', name:'Nica Santos', firstName:'Nica', surname:'Santos', sex:'FEMALE',
+      section:'I - Sampaguita', year:SY, teacherId:'',
+      division:DIVISION, school:SCHOOL,
+      history:[{ year:SY, section:'I - Sampaguita' }],
+      dateAdded: Date.now()
+    };
+
+    return { students:[...g5Students, ...g3Students, g1Student], teachers };
+  }
+
+  document.getElementById('loadDemoDataBtn').addEventListener('click', () => {
+    const result = mergeImportedBackup(buildDemoDataset());
+    exportModalOverlay.classList.remove('show');
+    view = 'list';
+    render();
+    const loaded = result.addedStudents > 0 || result.addedTeachers > 0;
+    showToast(loaded ? result.message.replace(/^Imported/, 'Loaded demo data:') : 'Demo data is already loaded');
   });
 
   // ---------- Google Drive sync ----------
