@@ -2,7 +2,7 @@
 // this string is what makes the browser see the service worker file as
 // "different" and install the update — without a change here, some browsers
 // may not even notice a new deploy happened.
-const CACHE_NAME = "roll-register-v2";
+const CACHE_NAME = "roll-register-v3";
 const ASSETS = [
   "./",
   "./index.html",
