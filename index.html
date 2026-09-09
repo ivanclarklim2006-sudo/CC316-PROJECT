@@ -514,6 +514,33 @@
   .role-step .field{ margin-bottom:0.5rem; }
   .role-step-actions{ display:flex; justify-content:space-between; gap:0.6rem; margin-top:0.8rem; }
   .role-error{ color:#c0392b; font-size:0.82rem; margin:0.2rem 0 0.4rem; }
+  .role-teacher-list{
+    max-height:180px;
+    overflow-y:auto;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    margin-bottom:0.6rem;
+    background:var(--surface);
+  }
+  .role-teacher-item{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    border-bottom:1px solid var(--line);
+    padding:0.55rem 0.7rem;
+    font-family:'Inter', sans-serif;
+    font-size:0.9rem;
+    color:var(--ink);
+    cursor:pointer;
+    transition:background-color 0.12s ease;
+  }
+  .role-teacher-item:last-child{ border-bottom:none; }
+  .role-teacher-item:hover{ background:var(--wash, #f4eedd); }
+  .role-teacher-item.selected{ background:var(--brass, #d8a84e); color:#fff; font-weight:600; }
+  .role-teacher-item .rt-id{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; opacity:0.7; margin-left:0.4rem; }
+  .role-teacher-empty{ padding:0.7rem; font-size:0.85rem; color:var(--ink-soft); text-align:center; }
   .signin-gate::before{
     content:'';
     position:absolute; inset:0;
@@ -2228,7 +2255,12 @@
     <div class="role-step" id="roleTeacherStep" style="display:none;">
       <p class="section-label">Which teacher is this?</p>
       <div class="field">
-        <select id="roleTeacherSelect"></select>
+        <input type="text" id="roleTeacherSearch" placeholder="Search your name…" autocomplete="off">
+      </div>
+      <div class="role-teacher-list" id="roleTeacherList"></div>
+      <div class="field" id="roleTeacherPasswordField" style="display:none;">
+        <label for="roleTeacherPassword">Password</label>
+        <input type="password" id="roleTeacherPassword" placeholder="Enter password" inputmode="numeric" autocomplete="off">
       </div>
       <p class="role-error" id="roleTeacherError" style="display:none;">Add a teacher first from an Admin session.</p>
       <div class="role-step-actions">
@@ -2547,6 +2579,10 @@
           <label for="teachName">Full name</label>
           <input type="text" id="teachName" placeholder="Ms. Dela Peña" required>
         </div>
+      </div>
+      <div class="field">
+        <label for="teachPassword">Password <span class="optional-tag">(optional — if set, this teacher must enter it to sign in)</span></label>
+        <input type="text" id="teachPassword" placeholder="e.g. 1234" autocomplete="off">
       </div>
       <label style="display:block; font-family:'IBM Plex Mono', monospace; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:0.4rem;">Subjects &amp; sections held</label>
       <div class="subject-rows" id="subjectRows"></div>
@@ -3296,7 +3332,8 @@
   //   history:[ {year:"2024-2025", section:"7-Rizal"} ], transferredFrom:"Optional Prior School" }
   const students = [];
 
-  // { id:"T-201", name:"Mr. Ramon Ibañez", subjects:[{subject:"Mathematics", section:"7-Rizal"}] }
+  // { id:"T-201", name:"Mr. Ramon Ibañez", password:"1234", subjects:[{subject:"Mathematics", section:"7-Rizal"}] }
+  // (password is optional — leave it out, or set it to "", for teachers who don't need one)
   const teachers = [];
 
   let teacherById = {};
@@ -5120,6 +5157,7 @@
       teacherSubmitBtn.textContent = 'Save changes';
       document.getElementById('teachId').value = existing.id;
       document.getElementById('teachName').value = existing.name;
+      document.getElementById('teachPassword').value = existing.password || '';
       if(existing.subjects && existing.subjects.length){
         existing.subjects.forEach(s => addSubjectRow(s.subject, s.section));
       } else {
@@ -5146,6 +5184,7 @@
     e.preventDefault();
     const id = document.getElementById('teachId').value.trim();
     const name = document.getElementById('teachName').value.trim();
+    const password = document.getElementById('teachPassword').value.trim();
 
     const dupe = teachers.some(t => t.id.toLowerCase() === id.toLowerCase() && t.id !== editingTeacherId);
     if(dupe){
@@ -5168,6 +5207,7 @@
       const t = teachers.find(tc => tc.id === oldId);
       t.id = id;
       t.name = name;
+      t.password = password;
       t.subjects = subjects;
 
       // If the teacher's ID changed, update any students that list them as adviser
@@ -5187,7 +5227,7 @@
       return;
     }
 
-    const newTeacher = { id, name, subjects, dateAdded: Date.now() };
+    const newTeacher = { id, name, password, subjects, dateAdded: Date.now() };
     teachers.push(newTeacher);
     rebuildTeacherById();
     logActivity('Added teacher', `${name} (${id})`);
@@ -5734,8 +5774,8 @@
     const SCHOOL = 'Bagong Pag-asa Elementary School';
     const DIVISION = 'Region IV-A (CALABARZON)';
     const teachers = [
-      { id:'T-2026-01', name:'Andres Bonifacio', subjects:[{ subject:'Adviser', section:'V - Rizal' }], dateAdded: Date.now() },
-      { id:'T-2026-02', name:'Juana Dela Cruz', subjects:[{ subject:'Adviser', section:'III - Mabini' }], dateAdded: Date.now() }
+      { id:'T-2026-01', name:'Andres Bonifacio', password:'1234', subjects:[{ subject:'Adviser', section:'V - Rizal' }], dateAdded: Date.now() },
+      { id:'T-2026-02', name:'Juana Dela Cruz', password:'4321', subjects:[{ subject:'Adviser', section:'III - Mabini' }], dateAdded: Date.now() }
     ];
 
     // level V quarterly figures: [esp, english, math, science, filipino, ap, epp, mapehMusic, mapehPE]
@@ -6223,11 +6263,15 @@
   const roleTeacherStep = document.getElementById('roleTeacherStep');
   const roleAdminPin = document.getElementById('roleAdminPin');
   const roleAdminError = document.getElementById('roleAdminError');
-  const roleTeacherSelect = document.getElementById('roleTeacherSelect');
+  const roleTeacherSearch = document.getElementById('roleTeacherSearch');
+  const roleTeacherList = document.getElementById('roleTeacherList');
+  const roleTeacherPasswordField = document.getElementById('roleTeacherPasswordField');
+  const roleTeacherPassword = document.getElementById('roleTeacherPassword');
   const roleTeacherError = document.getElementById('roleTeacherError');
   const roleChipBtn = document.getElementById('roleChipBtn');
   const roleChipDot = document.getElementById('roleChipDot');
   const roleChipLabel = document.getElementById('roleChipLabel');
+  let selectedRoleTeacherId = null;
 
   function showRoleStep(step){
     roleChoiceStep.style.display = step === 'choice' ? '' : 'none';
@@ -6235,16 +6279,74 @@
     roleTeacherStep.style.display = step === 'teacher' ? '' : 'none';
   }
 
+  // Renders the scrollable, tap-to-pick list of teachers in the login
+  // gate, filtered by whatever's typed in the search box — so a school
+  // with a long teacher roster doesn't force scrolling through a giant
+  // dropdown just to find your own name.
+  function renderRoleTeacherList(){
+    const q = roleTeacherSearch.value.trim().toLowerCase();
+    const matches = q
+      ? teachers.filter(t => t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q))
+      : teachers;
+
+    if(matches.length === 0){
+      roleTeacherList.innerHTML = '<p class="role-teacher-empty">No teacher matches that name.</p>';
+      return;
+    }
+
+    roleTeacherList.innerHTML = matches.map(t => `
+      <button type="button" class="role-teacher-item${t.id === selectedRoleTeacherId ? ' selected' : ''}" data-teacher-id="${escapeHtml(t.id)}">
+        ${escapeHtml(t.name)}<span class="rt-id">${escapeHtml(t.id)}</span>
+      </button>
+    `).join('');
+
+    roleTeacherList.querySelectorAll('.role-teacher-item').forEach(btn => {
+      btn.addEventListener('click', () => selectRoleTeacher(btn.dataset.teacherId));
+    });
+  }
+
+  function selectRoleTeacher(teacherId){
+    selectedRoleTeacherId = teacherId;
+    roleTeacherError.style.display = 'none';
+    roleTeacherList.querySelectorAll('.role-teacher-item').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.teacherId === teacherId);
+    });
+    const t = teacherById[teacherId];
+    if(t && t.password){
+      roleTeacherPasswordField.style.display = '';
+      roleTeacherPassword.value = '';
+      roleTeacherPassword.focus();
+    } else {
+      roleTeacherPasswordField.style.display = 'none';
+      roleTeacherPassword.value = '';
+    }
+  }
+
   function openRoleGate(){
     roleAdminPin.value = '';
     roleAdminError.style.display = 'none';
     roleTeacherError.style.display = 'none';
-    roleTeacherSelect.innerHTML = teachers.length
-      ? teachers.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.name)} (${escapeHtml(t.id)})</option>`).join('')
-      : '';
+    roleTeacherSearch.value = '';
+    selectedRoleTeacherId = null;
+    roleTeacherPasswordField.style.display = 'none';
+    roleTeacherPassword.value = '';
+    renderRoleTeacherList();
     showRoleStep('choice');
     roleGate.classList.add('show');
   }
+
+  roleTeacherSearch.addEventListener('input', renderRoleTeacherList);
+  roleTeacherSearch.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      if(selectedRoleTeacherId){
+        const t = teacherById[selectedRoleTeacherId];
+        if(t && t.password) roleTeacherPassword.focus();
+        else document.getElementById('roleTeacherSubmitBtn').click();
+      }
+    }
+  });
+  roleTeacherPassword.addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('roleTeacherSubmitBtn').click(); });
 
   // Applies the current role to the UI: hides admin-only controls for
   // teachers (add/delete, the Teachers tab, Customize, and the parts of
@@ -6313,8 +6415,20 @@
   });
   roleAdminPin.addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('roleAdminSubmitBtn').click(); });
   document.getElementById('roleTeacherSubmitBtn').addEventListener('click', () => {
-    if(!roleTeacherSelect.value) return;
-    chooseRole('teacher', roleTeacherSelect.value);
+    if(!selectedRoleTeacherId){
+      roleTeacherError.textContent = 'Pick your name from the list first.';
+      roleTeacherError.style.display = '';
+      return;
+    }
+    const t = teacherById[selectedRoleTeacherId];
+    if(t && t.password && roleTeacherPassword.value !== t.password){
+      roleTeacherError.textContent = 'Wrong password — try again.';
+      roleTeacherError.style.display = '';
+      roleTeacherPassword.value = '';
+      roleTeacherPassword.focus();
+      return;
+    }
+    chooseRole('teacher', selectedRoleTeacherId);
   });
   roleChipBtn.addEventListener('click', openRoleGate);
 
