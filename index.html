@@ -537,8 +537,8 @@
     transition:background-color 0.12s ease;
   }
   .role-teacher-item:last-child{ border-bottom:none; }
-  .role-teacher-item:hover{ background:var(--wash, #f4eedd); }
-  .role-teacher-item.selected{ background:var(--brass, #d8a84e); color:#fff; font-weight:600; }
+  .role-teacher-item:hover{ background:var(--paper-dark); }
+  .role-teacher-item.selected{ background:var(--green); color:var(--cream); font-weight:600; }
   .role-teacher-item .rt-id{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; opacity:0.7; margin-left:0.4rem; }
   .role-teacher-empty{ padding:0.7rem; font-size:0.85rem; color:var(--ink-soft); text-align:center; }
   .signin-gate::before{
@@ -5703,10 +5703,20 @@
       addedStudents++;
     });
 
-    let addedTeachers = 0, skippedTeachers = 0;
+    let addedTeachers = 0, skippedTeachers = 0, patchedTeachers = 0;
     importedTeachers.forEach(t => {
       if(!t || !t.id || !t.name) return;
-      if(teachers.some(existing => existing.id.toLowerCase() === String(t.id).toLowerCase())){ skippedTeachers++; return; }
+      const existing = teachers.find(tc => tc.id.toLowerCase() === String(t.id).toLowerCase());
+      if(existing){
+        // Already have this teacher — leave their record alone, except:
+        // backfill a password from the imported copy if this one doesn't
+        // have one yet, so re-running "Load demo data" after an update
+        // (like adding demo passwords) doesn't leave old-saved teachers
+        // stuck without one forever.
+        if(!existing.password && t.password){ existing.password = t.password; patchedTeachers++; }
+        skippedTeachers++;
+        return;
+      }
       teachers.push(t);
       addedTeachers++;
     });
@@ -5720,7 +5730,7 @@
 
     mergeActivityLog(data.activityLog);
 
-    if(addedStudents > 0 || addedTeachers > 0){
+    if(addedStudents > 0 || addedTeachers > 0 || patchedTeachers > 0){
       rebuildTeacherById();
       saveData();
       refreshDropdowns();
@@ -5733,9 +5743,10 @@
     let message = parts.length ? `Imported ${parts.join(' & ')}` : 'Nothing new to import';
     const skippedTotal = skippedStudents + skippedTeachers;
     if(skippedTotal > 0) message += ` — skipped ${skippedTotal} duplicate${skippedTotal === 1 ? '' : 's'}`;
+    if(patchedTeachers > 0) message += ` · added a password to ${patchedTeachers} existing teacher${patchedTeachers === 1 ? '' : 's'}`;
     if(brandingImported) message += ' · logo/title restored';
 
-    return { addedStudents, addedTeachers, skippedStudents, skippedTeachers, brandingImported, message };
+    return { addedStudents, addedTeachers, skippedStudents, skippedTeachers, patchedTeachers, brandingImported, message };
   }
 
   // ---------- Backup import (.json) ----------
@@ -5869,8 +5880,8 @@
     exportModalOverlay.classList.remove('show');
     view = 'list';
     render();
-    const loaded = result.addedStudents > 0 || result.addedTeachers > 0;
-    showToast(loaded ? result.message.replace(/^Imported/, 'Loaded demo data:') : 'Demo data is already loaded');
+    const loaded = result.addedStudents > 0 || result.addedTeachers > 0 || result.patchedTeachers > 0;
+    showToast(loaded ? result.message.replace(/^Imported/, 'Loaded demo data:').replace(/^Nothing new to import/, 'Demo data updated') : 'Demo data is already loaded');
   });
 
   // ---------- Google Drive sync ----------
