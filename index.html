@@ -507,6 +507,13 @@
     padding:1.5rem;
   }
   .signin-gate.show{ display:flex; }
+  .role-gate{ z-index:220; }
+  .role-choice{ display:flex; flex-direction:column; gap:0.7rem; margin-top:1rem; }
+  .role-choice-btn{ font-size:1rem; }
+  .role-step{ margin-top:1rem; text-align:left; }
+  .role-step .field{ margin-bottom:0.5rem; }
+  .role-step-actions{ display:flex; justify-content:space-between; gap:0.6rem; margin-top:0.8rem; }
+  .role-error{ color:#c0392b; font-size:0.82rem; margin:0.2rem 0 0.4rem; }
   .signin-gate::before{
     content:'';
     position:absolute; inset:0;
@@ -2185,6 +2192,53 @@
   </div>
 </div>
 
+<!-- ============================================================
+     ROLE GATE — shown on top of everything until someone picks
+     Admin or Teacher for this browser session. Reuses the sign-in
+     gate's card styling. Admin is protected by a simple shared
+     PIN (not real security — this is a static site with no server
+     to check a password against — just enough to keep casual
+     browsing by students off the admin controls). Teacher mode
+     just narrows the view to that teacher's own advisees; it
+     asks who you are rather than authenticating you.
+     ============================================================ -->
+<div class="signin-gate role-gate" id="roleGate">
+  <div class="signin-card">
+    <div class="signin-mark">R&amp;R</div>
+    <h2>Who's using this?</h2>
+    <p>Pick a role for this session. You can switch any time from the account menu.</p>
+
+    <div class="role-choice" id="roleChoiceStep">
+      <button type="button" class="signin-guest-btn role-choice-btn" id="roleChooseAdminBtn">🛡 Admin</button>
+      <button type="button" class="signin-guest-btn role-choice-btn" id="roleChooseTeacherBtn">🍎 Teacher</button>
+    </div>
+
+    <div class="role-step" id="roleAdminStep" style="display:none;">
+      <p class="section-label">Admin PIN</p>
+      <div class="field">
+        <input type="password" id="roleAdminPin" placeholder="Enter PIN" inputmode="numeric" autocomplete="off">
+      </div>
+      <p class="role-error" id="roleAdminError" style="display:none;">Wrong PIN — try again.</p>
+      <div class="role-step-actions">
+        <button type="button" class="btn-secondary" id="roleAdminBackBtn">← Back</button>
+        <button type="button" class="btn-primary" id="roleAdminSubmitBtn">Continue</button>
+      </div>
+    </div>
+
+    <div class="role-step" id="roleTeacherStep" style="display:none;">
+      <p class="section-label">Which teacher is this?</p>
+      <div class="field">
+        <select id="roleTeacherSelect"></select>
+      </div>
+      <p class="role-error" id="roleTeacherError" style="display:none;">Add a teacher first from an Admin session.</p>
+      <div class="role-step-actions">
+        <button type="button" class="btn-secondary" id="roleTeacherBackBtn">← Back</button>
+        <button type="button" class="btn-primary" id="roleTeacherSubmitBtn">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="header-inner">
     <div class="header-top" id="headerTop">
@@ -2222,6 +2276,17 @@
              per-browser (THEME_KEY in the script below).
              ============================================================ -->
         <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+
+        <!-- ============================================================
+             ROLE CHIP — shows the current role (Admin / Teacher name)
+             and lets you switch roles for this browser session.
+             ============================================================ -->
+        <div class="account-chip" id="roleChip">
+          <button type="button" class="account-chip-btn" id="roleChipBtn">
+            <span class="acc-dot" id="roleChipDot"></span>
+            <span class="acc-label" id="roleChipLabel">Admin</span>
+          </button>
+        </div>
 
         <!-- ============================================================
              ACCOUNT CHIP — top-corner Google account status/switcher.
@@ -3354,6 +3419,19 @@
   loadData();
   rebuildTeacherById();
 
+  // ---------- Roles (Admin / Teacher) ----------
+  // A soft, client-side-only gate — this is a static site with no server to
+  // check a password against, so the PIN just keeps casual browsers off the
+  // admin controls; it isn't real security. Chosen fresh each browser
+  // session (sessionStorage), with a chip in the header to switch anytime.
+  const ROLE_KEY = 'rollRegister_role';
+  const ROLE_TEACHER_KEY = 'rollRegister_roleTeacherId';
+  const ADMIN_PIN = '0000';
+  let currentRole = sessionStorage.getItem(ROLE_KEY) || null; // 'admin' | 'teacher' | null (gate still open)
+  let currentTeacherId = sessionStorage.getItem(ROLE_TEACHER_KEY) || null;
+  function isAdmin(){ return currentRole !== 'teacher'; }
+  function visibleStudents(){ return currentRole === 'teacher' ? students.filter(s => s.teacherId === currentTeacherId) : students; }
+
   const tabsEl = document.getElementById('tabs');
   const searchInput = document.getElementById('searchInput');
   const clearBtn = document.getElementById('clearBtn');
@@ -3373,8 +3451,9 @@
   function refreshDropdowns(){
     const currentSection = sectionSelect.value;
     const currentYear = yearSelect.value;
-    const allSections = [...new Set(students.map(s => s.section))].sort();
-    const allYears = [...new Set(students.map(s => s.year).filter(Boolean))].sort().reverse();
+    const scope = visibleStudents();
+    const allSections = [...new Set(scope.map(s => s.section))].sort();
+    const allYears = [...new Set(scope.map(s => s.year).filter(Boolean))].sort().reverse();
 
     sectionSelect.innerHTML = '<option value="">All</option>' +
       allSections.map(sec => `<option value="${escapeHtml(sec)}">${escapeHtml(sec)}</option>`).join('');
@@ -4455,7 +4534,7 @@
     document.querySelector('.search-wrap').style.display = 'none';
     hintText.style.display = 'none';
 
-    const s = students.find(st => st.id === profileStudentId);
+    const s = visibleStudents().find(st => st.id === profileStudentId);
     if(!s){
       resultsEl.innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="mark">—</span>Record not found.</div>`;
       return;
@@ -4500,22 +4579,22 @@
           `).join('') || '<li>No prior section records on file.</li>'}
         </ul>
         <div class="profile-actions">
-          <button type="button" class="btn-secondary" id="editFromProfileBtn">Edit this student</button>
+          ${isAdmin() ? '<button type="button" class="btn-secondary" id="editFromProfileBtn">Edit this student</button>' : ''}
           <button type="button" class="btn-secondary" id="recordFromProfileBtn">🎓 Grades &amp; record</button>
           <button type="button" class="btn-secondary" id="sf9FromProfileBtn">📄 SF9 Report Card</button>
           <button type="button" class="btn-secondary" id="sf10FromProfileBtn">📄 SF10 Permanent Record</button>
           <button type="button" class="btn-secondary" id="birthCertFromProfileBtn">🪪 Birth certificate</button>
-          <button type="button" class="btn-danger" id="deleteFromProfileBtn">Delete this student</button>
+          ${isAdmin() ? '<button type="button" class="btn-danger" id="deleteFromProfileBtn">Delete this student</button>' : ''}
         </div>
       </div>
     `;
     document.getElementById('backBtn').addEventListener('click', backToList);
-    document.getElementById('editFromProfileBtn').addEventListener('click', () => openStudentModal(s));
+    if(isAdmin()) document.getElementById('editFromProfileBtn').addEventListener('click', () => openStudentModal(s));
     document.getElementById('recordFromProfileBtn').addEventListener('click', () => openRecordModal(s));
     document.getElementById('sf9FromProfileBtn').addEventListener('click', () => openShareModal(s, 'sf9'));
     document.getElementById('sf10FromProfileBtn').addEventListener('click', () => openShareModal(s, 'sf10'));
     document.getElementById('birthCertFromProfileBtn').addEventListener('click', () => openBirthCertModal(s));
-    document.getElementById('deleteFromProfileBtn').addEventListener('click', () => confirmDeleteStudents([s.id]));
+    if(isAdmin()) document.getElementById('deleteFromProfileBtn').addEventListener('click', () => confirmDeleteStudents([s.id]));
   }
 
   function jumpToTeacher(teacherId){
@@ -4556,13 +4635,14 @@
 
     if(activeTab === 'students'){
       const hasFilter = query || sectionFilter || yearFilter;
+      const scope = visibleStudents();
 
-      if(students.length === 0 && !hasFilter){
+      if(scope.length === 0 && !hasFilter){
         selectionBar.classList.remove('show');
         document.querySelector('.search-wrap').style.display = 'none';
         hintText.style.display = 'none';
         hintText.textContent = '0 students on file';
-        resultsEl.innerHTML = `
+        resultsEl.innerHTML = isAdmin() ? `
           <div class="onboarding">
             <span class="stamp-icon">R&amp;R</span>
             <h2>No students yet</h2>
@@ -4576,12 +4656,12 @@
             </ol>
             <button class="add-btn" id="onboardingAddStudent">+ Add your first student</button>
           </div>
-        `;
-        document.getElementById('onboardingAddStudent').addEventListener('click', openStudentModal);
+        ` : `<div class="empty" style="grid-column:1/-1"><span class="mark">—</span>No advisees on file for you yet.</div>`;
+        if(isAdmin()) document.getElementById('onboardingAddStudent').addEventListener('click', openStudentModal);
         return;
       }
 
-      const list = sortList(hasFilter ? students.filter(matchStudent) : students);
+      const list = sortList(hasFilter ? scope.filter(matchStudent) : scope);
 
       if(sectionFilter || yearFilter){
         filterChip.classList.add('show');
@@ -4595,7 +4675,7 @@
 
       hintText.textContent = hasFilter
         ? `${list.length} match${list.length === 1 ? '' : 'es'}${query ? ` for "${searchInput.value.trim()}"` : ''}`
-        : `${students.length} students on file`;
+        : `${scope.length} students on file`;
 
       updateSelectionBar();
 
@@ -4611,22 +4691,22 @@
         card.style.animationDelay = (i * 0.03) + 's';
         card.innerHTML = `
           <div class="card-head">
-            <label class="chk">
+            <label class="chk" ${isAdmin() ? '' : 'style="display:none;"'}>
               <input type="checkbox" class="select-chk" data-select-student="${escapeHtml(s.id)}" ${selectedStudentIds.has(s.id) ? 'checked' : ''}>
               <span class="chk-box"></span>
             </label>
             <div class="card-head-right">
               <div class="stamp">${escapeHtml(s.section)}</div>
               <button class="icon-del icon-share" data-share-student="${escapeHtml(s.id)}" aria-label="Share / print PDF" title="Share / print PDF">📄</button>
-              <button class="icon-del icon-edit" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>
-              <button class="icon-del" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>
+              ${isAdmin() ? `<button class="icon-del icon-edit" data-edit-student="${escapeHtml(s.id)}" aria-label="Edit student" title="Edit student">✏️</button>` : ''}
+              ${isAdmin() ? `<button class="icon-del" data-delete-student="${escapeHtml(s.id)}" aria-label="Delete student" title="Delete student">🗑</button>` : ''}
             </div>
           </div>
           <p class="id">${escapeHtml(s.id)}</p>
           <button class="name-btn" data-profile="${escapeHtml(s.id)}">${escapeHtml(s.name)}</button>
           <div class="row"><span class="label">Section</span><span class="value">${escapeHtml(s.section)}</span></div>
           <div class="row"><span class="label">School Year</span><span class="value">${escapeHtml(s.year || '—')}</span></div>
-          <div class="row"><span class="label">Adviser</span><span class="value"><button class="link-btn" data-teacher="${escapeHtml(s.teacherId)}">${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || '—')}</button></span></div>
+          <div class="row"><span class="label">Adviser</span><span class="value">${isAdmin() ? `<button class="link-btn" data-teacher="${escapeHtml(s.teacherId)}">${teacher ? escapeHtml(teacher.name) : escapeHtml(s.teacherId || '—')}</button>` : escapeHtml(teacher ? teacher.name : (s.teacherId || '—'))}</span></div>
           <div class="row"><span class="label">Teacher ID</span><span class="value">${escapeHtml(s.teacherId || '—')}</span></div>
         `;
         resultsEl.appendChild(card);
@@ -4793,6 +4873,7 @@
   confirmModalOverlay.addEventListener('click', e => { if(e.target === confirmModalOverlay) closeConfirmModal(); });
 
   function confirmDeleteStudents(ids){
+    if(!isAdmin()) return;
     pendingDelete = { type: 'student', ids };
     const single = ids.length === 1 ? students.find(s => s.id === ids[0]) : null;
     openConfirmModal({
@@ -4805,6 +4886,7 @@
   }
 
   function confirmDeleteTeachers(ids){
+    if(!isAdmin()) return;
     pendingDelete = { type: 'teacher', ids };
     const single = ids.length === 1 ? teachers.find(t => t.id === ids[0]) : null;
     const affected = students.filter(s => ids.includes(s.teacherId)).length;
@@ -4863,6 +4945,7 @@
   let editingStudentId = null; // null = adding new; otherwise the original LRN being edited
 
   function openStudentModal(existing){
+    if(!isAdmin()) return;
     stuTeacherSelect.innerHTML = '<option value="">— none yet —</option>' +
       teachers.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.id)} — ${escapeHtml(t.name)}</option>`).join('');
     studentForm.reset();
@@ -5027,6 +5110,7 @@
   }
 
   function openTeacherModal(existing){
+    if(!isAdmin()) return;
     teacherForm.reset();
     subjectRows.innerHTML = '';
 
@@ -6131,6 +6215,114 @@
   }
 
   if(isGoogleConfigured) setGdriveUI('disconnected');
+
+  // ---------- Role gate wiring ----------
+  const roleGate = document.getElementById('roleGate');
+  const roleChoiceStep = document.getElementById('roleChoiceStep');
+  const roleAdminStep = document.getElementById('roleAdminStep');
+  const roleTeacherStep = document.getElementById('roleTeacherStep');
+  const roleAdminPin = document.getElementById('roleAdminPin');
+  const roleAdminError = document.getElementById('roleAdminError');
+  const roleTeacherSelect = document.getElementById('roleTeacherSelect');
+  const roleTeacherError = document.getElementById('roleTeacherError');
+  const roleChipBtn = document.getElementById('roleChipBtn');
+  const roleChipDot = document.getElementById('roleChipDot');
+  const roleChipLabel = document.getElementById('roleChipLabel');
+
+  function showRoleStep(step){
+    roleChoiceStep.style.display = step === 'choice' ? '' : 'none';
+    roleAdminStep.style.display = step === 'admin' ? '' : 'none';
+    roleTeacherStep.style.display = step === 'teacher' ? '' : 'none';
+  }
+
+  function openRoleGate(){
+    roleAdminPin.value = '';
+    roleAdminError.style.display = 'none';
+    roleTeacherError.style.display = 'none';
+    roleTeacherSelect.innerHTML = teachers.length
+      ? teachers.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.name)} (${escapeHtml(t.id)})</option>`).join('')
+      : '';
+    showRoleStep('choice');
+    roleGate.classList.add('show');
+  }
+
+  // Applies the current role to the UI: hides admin-only controls for
+  // teachers (add/delete, the Teachers tab, Customize, and the parts of
+  // Backup & Import that add or change data), and narrows the roster to
+  // that teacher's own advisees. Called whenever the role changes and
+  // whenever the main list re-renders, so it can't drift out of sync.
+  function applyRoleUI(){
+    const admin = isAdmin();
+    document.body.classList.toggle('role-teacher', !admin);
+
+    if(admin){
+      roleChipDot.style.background = '#8fae86';
+      roleChipLabel.textContent = 'Admin';
+    } else {
+      const t = teacherById[currentTeacherId];
+      roleChipDot.style.background = '#d8a84e';
+      roleChipLabel.textContent = t ? `Teacher: ${t.name}` : 'Teacher';
+    }
+
+    const teachersTabBtn = document.querySelector('.tab-btn[data-tab="teachers"]');
+    if(teachersTabBtn) teachersTabBtn.style.display = admin ? '' : 'none';
+    if(!admin && activeTab === 'teachers'){
+      activeTab = 'students';
+      tabsEl.dataset.active = 'students';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
+    }
+    addBtn.style.display = admin ? '' : 'none';
+    if(scanBtn) scanBtn.style.display = admin ? '' : 'none';
+    if(customizeBtn) customizeBtn.style.display = admin ? '' : 'none';
+
+    // Backup & Import: teachers can still download a backup of what they
+    // see, but importing/loading demo data can add or overwrite records,
+    // so those stay admin-only.
+    const importBtn = document.getElementById('importBackupBtn');
+    const demoBtn = document.getElementById('loadDemoDataBtn');
+    if(importBtn) importBtn.style.display = admin ? '' : 'none';
+    if(demoBtn) demoBtn.style.display = admin ? '' : 'none';
+
+    refreshDropdowns();
+  }
+
+  document.getElementById('roleChooseAdminBtn').addEventListener('click', () => { showRoleStep('admin'); roleAdminPin.focus(); });
+  document.getElementById('roleChooseTeacherBtn').addEventListener('click', () => {
+    if(teachers.length === 0){ roleTeacherError.style.display = ''; return; }
+    showRoleStep('teacher');
+  });
+  document.getElementById('roleAdminBackBtn').addEventListener('click', () => showRoleStep('choice'));
+  document.getElementById('roleTeacherBackBtn').addEventListener('click', () => showRoleStep('choice'));
+
+  function chooseRole(role, teacherId){
+    currentRole = role;
+    currentTeacherId = role === 'teacher' ? teacherId : null;
+    sessionStorage.setItem(ROLE_KEY, currentRole);
+    if(currentTeacherId) sessionStorage.setItem(ROLE_TEACHER_KEY, currentTeacherId);
+    else sessionStorage.removeItem(ROLE_TEACHER_KEY);
+    roleGate.classList.remove('show');
+    view = 'list';
+    profileStudentId = null;
+    applyRoleUI();
+    render();
+  }
+
+  document.getElementById('roleAdminSubmitBtn').addEventListener('click', () => {
+    if(roleAdminPin.value === ADMIN_PIN){ chooseRole('admin', null); }
+    else { roleAdminError.style.display = ''; roleAdminPin.value = ''; roleAdminPin.focus(); }
+  });
+  roleAdminPin.addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('roleAdminSubmitBtn').click(); });
+  document.getElementById('roleTeacherSubmitBtn').addEventListener('click', () => {
+    if(!roleTeacherSelect.value) return;
+    chooseRole('teacher', roleTeacherSelect.value);
+  });
+  roleChipBtn.addEventListener('click', openRoleGate);
+
+  if(currentRole){
+    applyRoleUI();
+  } else {
+    openRoleGate();
+  }
 
   render();
 
