@@ -1,8 +1,15 @@
-// Bump this on every deploy that changes index.html/manifest/icons. Changing
-// this string is what makes the browser see the service worker file as
-// "different" and install the update — without a change here, some browsers
-// may not even notice a new deploy happened.
-const CACHE_NAME = "roll-register-v8";
+// Auto-updating cache: CACHE_NAME is generated below from this file's own
+// install time, so a fresh cache bucket is created automatically every time
+// the browser installs a new version of this script — no manual version
+// string to remember to bump on deploy. (It only reinstalls when this
+// file's bytes actually change, which is normal: touching index.html alone
+// doesn't need a service-worker.js change at all, because of the
+// network-first fetch strategy below — that's what actually keeps content
+// fresh. This auto-versioned cache just makes sure precached assets like
+// icons/manifest never get stuck on someone's browser after an update to
+// this file specifically.)
+const CACHE_BASE = "roll-register";
+let CACHE_NAME = CACHE_BASE + "-v8"; // placeholder until install() sets the real, auto-generated name
 const ASSETS = [
   "./",
   "./index.html",
@@ -12,6 +19,7 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
+  CACHE_NAME = `${CACHE_BASE}-${Date.now()}`;
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
@@ -30,9 +38,10 @@ self.addEventListener("activate", (event) => {
 // Network-first, falling back to cache. This is the actual fix for "users
 // need to clear their history to see updates": as long as they're online,
 // they always get the live file from GitHub Pages, never a stale cached
-// copy — the cache only kicks in as an offline fallback. This matters more
-// than the CACHE_NAME bump above; that bump helps precache correctly on
-// install, but this strategy is what guarantees freshness on every load.
+// copy — the cache only kicks in as an offline fallback. Every successful
+// fetch also re-writes the cache entry for that file, so the offline
+// fallback keeps itself current too, on top of the auto-versioned cache
+// bucket created at install above.
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 

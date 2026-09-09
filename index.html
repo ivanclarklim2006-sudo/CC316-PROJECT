@@ -3334,7 +3334,14 @@
 
   // { id:"T-201", name:"Mr. Ramon Ibañez", password:"1234", subjects:[{subject:"Mathematics", section:"7-Rizal"}] }
   // (password is optional — leave it out, or set it to "", for teachers who don't need one)
-  const teachers = [];
+  // Two starter teachers ship by default (with placeholder passwords) so the
+  // Teacher sign-in screen always has someone to pick, even in a brand-new
+  // or incognito browser with no saved data yet. Edit, delete, or add to
+  // these like any other teacher from an Admin session.
+  const teachers = [
+    { id:'T-2026-01', name:'Andres Bonifacio', password:'1234', subjects:[{ subject:'Adviser', section:'V - Rizal' }], dateAdded: Date.now() },
+    { id:'T-2026-02', name:'Juana Dela Cruz', password:'4321', subjects:[{ subject:'Adviser', section:'III - Mabini' }], dateAdded: Date.now() }
+  ];
 
   let teacherById = {};
   function rebuildTeacherById(){
@@ -3453,7 +3460,18 @@
       storageAvailable = false; // silent — toast UI isn't wired up yet this early
     }
   }
+  // If this browser already has its own saved copy of a teacher (e.g. the
+  // two starter teachers, edited or previously loaded), that saved copy
+  // wins over the hardcoded default with the same ID — this just prevents
+  // the default seed and a saved record from both showing up as duplicates.
+  function dedupeTeachersById(){
+    const byId = new Map();
+    teachers.forEach(t => { if(t && t.id) byId.set(t.id, t); });
+    teachers.length = 0;
+    teachers.push(...byId.values());
+  }
   loadData();
+  dedupeTeachersById();
   rebuildTeacherById();
 
   // ---------- Roles (Admin / Teacher) ----------
@@ -6465,12 +6483,17 @@
           window.location.reload();
         });
 
-        // Ask the browser to check for a newer service-worker.js whenever
-        // this tab regains focus — covers the "left a tab open for days"
-        // case, since otherwise updates are only checked on navigation.
+        // Auto-updating check-in: ask the browser to look for a newer
+        // service-worker.js whenever this tab regains focus (covers the
+        // "left a tab open for days" case, since updates are otherwise only
+        // checked on navigation) AND on a recurring timer, so a tab that's
+        // simply left open and visible in the background — never
+        // backgrounded, never refocused — still picks up a new deploy on
+        // its own within the hour instead of waiting indefinitely.
         document.addEventListener('visibilitychange', () => {
           if(document.visibilityState === 'visible') reg.update().catch(() => {});
         });
+        setInterval(() => reg.update().catch(() => {}), 60 * 60 * 1000);
       }).catch(() => {});
     });
   }
