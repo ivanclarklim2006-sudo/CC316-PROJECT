@@ -2544,7 +2544,7 @@
           <input type="text" id="stuYear" placeholder="2024-2025" required>
         </div>
         <div class="field">
-          <label for="stuTeacher">Adviser (teacher ID)</label>
+          <label for="stuTeacher">Adviser (teacher ID) <span class="optional-tag" id="stuTeacherLockedHint" style="display:none;">— assigned to you automatically</span></label>
           <select id="stuTeacher"></select>
         </div>
       </div>
@@ -4693,8 +4693,15 @@
             </ol>
             <button class="add-btn" id="onboardingAddStudent">+ Add your first student</button>
           </div>
-        ` : `<div class="empty" style="grid-column:1/-1"><span class="mark">—</span>No advisees on file for you yet.</div>`;
-        if(isAdmin()) document.getElementById('onboardingAddStudent').addEventListener('click', openStudentModal);
+        ` : `
+          <div class="onboarding">
+            <span class="stamp-icon">R&amp;R</span>
+            <h2>No advisees yet</h2>
+            <p class="lead">Nothing's on file for you yet — tap below to add your first student. They'll be saved as your advisee automatically.</p>
+            <button class="add-btn" id="onboardingAddStudent">+ Add your first student</button>
+          </div>
+        `;
+        document.getElementById('onboardingAddStudent').addEventListener('click', () => openStudentModal());
         return;
       }
 
@@ -4982,7 +4989,11 @@
   let editingStudentId = null; // null = adding new; otherwise the original LRN being edited
 
   function openStudentModal(existing){
-    if(!isAdmin()) return;
+    // Editing an existing record stays admin-only (the ✏️/​profile edit
+    // buttons are already hidden for teachers), but adding a brand-new
+    // student is allowed for the Teacher role too — see the adviser-lock
+    // below, which pins the new student to the signed-in teacher.
+    if(existing && !isAdmin()) return;
     stuTeacherSelect.innerHTML = '<option value="">— none yet —</option>' +
       teachers.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.id)} — ${escapeHtml(t.name)}</option>`).join('');
     studentForm.reset();
@@ -5012,6 +5023,18 @@
       editingStudentId = null;
       studentModalTitle.textContent = 'Add student';
       studentSubmitBtn.textContent = 'Save student';
+    }
+
+    // Teacher role: a student they add is automatically their own advisee,
+    // and they can't reassign the adviser field to someone else.
+    const stuTeacherLockedHint = document.getElementById('stuTeacherLockedHint');
+    if(!isAdmin()){
+      stuTeacherSelect.value = currentTeacherId || '';
+      stuTeacherSelect.disabled = true;
+      if(stuTeacherLockedHint) stuTeacherLockedHint.style.display = '';
+    } else {
+      stuTeacherSelect.disabled = false;
+      if(stuTeacherLockedHint) stuTeacherLockedHint.style.display = 'none';
     }
 
     studentModalOverlay.classList.add('show');
@@ -6384,7 +6407,10 @@
       tabsEl.dataset.active = 'students';
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'students'));
     }
-    addBtn.style.display = admin ? '' : 'none';
+    // Teachers can add students (auto-assigned as their own advisee — see
+    // openStudentModal), so the button stays visible for both roles; since
+    // the Teachers tab is hidden for teachers, this always reads "+ Add student".
+    addBtn.style.display = '';
     if(scanBtn) scanBtn.style.display = admin ? '' : 'none';
     if(customizeBtn) customizeBtn.style.display = admin ? '' : 'none';
 
